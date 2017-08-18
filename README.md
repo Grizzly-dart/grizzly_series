@@ -6,11 +6,22 @@ Pandas-like Series and DataFrames for Dart
 
 A simple usage example:
 
-    import 'package:tandas/tandas.dart';
+```dart
+main() {
+  final ages =
+      new IntSeries<String>([20, 22, 35], indices: ['Jon', 'Dany', 'Tyrion']);
+  final house = new StringSeries<String>(['Stark', 'Targaryan', 'Lannister'],
+      indices: ['Jon', 'Dany', 'Tyrion']);
 
-    main() {
-      var awesome = new Awesome();
-    }
+  final df = new DataFrame<String, String>(
+      {'age': ages.data, 'house': house.data},
+      indices: ages.indices);
+
+  print(df['age']);
+  print(df.index['Jon']);
+  print(df.pos[2]);
+}
+```
 
 ## TODO
 

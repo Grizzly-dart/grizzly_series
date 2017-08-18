@@ -14,6 +14,6 @@ main() {
       indices: ages.indices);
 
   print(df['age']);
-  print(df.indexed('Jon'));
-  print(df.pos(2));
+  print(df.index['Jon']);
+  print(df.pos[2]);
 }
