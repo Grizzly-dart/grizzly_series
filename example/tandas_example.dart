@@ -1,13 +1,19 @@
 // Copyright (c) 2017, Teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:tandas/tandas.dart';
+import 'package:grizzly/grizzly.dart';
 
 main() {
-  {
-    final series1 =
-        new IntSeries<int>([1, 2, 3, 4, 5], indices: [1, 2, 3, 4, 4]);
-    final series2 = new IntSeries<int>([10, 20, 30], indices: [1, 2, 3]);
-    print(series1.add(series2, fillVal: 100));
-  }
+  final ages =
+      new IntSeries<String>([20, 22, 35], indices: ['Jon', 'Dany', 'Tyrion']);
+  final house = new StringSeries<String>(['Stark', 'Targaryan', 'Lannister'],
+      indices: ['Jon', 'Dany', 'Tyrion']);
+
+  final df = new DataFrame<String, String>(
+      {'age': ages.data, 'house': house.data},
+      indices: ages.indices);
+
+  print(df['age']);
+  print(df.indexed('Jon'));
+  print(df.pos(2));
 }

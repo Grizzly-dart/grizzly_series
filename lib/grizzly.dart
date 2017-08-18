@@ -6,6 +6,6 @@
 /// More dartdocs go here.
 library tandas;
 
-export 'src/tandas_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/data_frame/data_frame.dart';
+export 'src/series/series.dart';
+export 'src/loaders/loaders.dart';

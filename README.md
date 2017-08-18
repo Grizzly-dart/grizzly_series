@@ -1,4 +1,4 @@
-# tandas
+# Grizzly
 
 Pandas-like Series and DataFrames for Dart
 
@@ -12,8 +12,18 @@ A simple usage example:
       var awesome = new Awesome();
     }
 
-## Features and bugs
+## TODO
 
-Please file feature requests and bugs at the [issue tracker][tracker].
+[ ] Series
+[ ] DataFrame
+[ ] Plotting
+[ ] Loading data
+[ ] Numpy functionality
+[ ] Interactive web interface
+[ ] Statistical functions
 
-[tracker]: http://example.com/issues/replaceme
+### Advanced
+
+[ ] Linear regression
+[ ] Logistic regression
+[ ] Classification

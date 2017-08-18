@@ -1,11 +1,11 @@
 // Copyright (c) 2017, SERAGUD. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:tandas/tandas.dart';
+import 'package:grizzly/grizzly.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
+  group('Series', () {
     setUp(() {});
 
     test('Subscript operator', () {
@@ -42,17 +42,17 @@ void main() {
 
     test('Pos', () {
       final series = new IntSeries<int>([1, 2, 3, 4]);
-      expect(series.pos(0), 1);
-      expect(series.pos(1), 2);
-      expect(series.pos(2), 3);
-      expect(series.pos(3), 4);
+      expect(series.pos[0], 1);
+      expect(series.pos[1], 2);
+      expect(series.pos[2], 3);
+      expect(series.pos[3], 4);
     });
 
     test('Indexed', () {
       final series = new IntSeries<int>([1, 2, 3, 4], indices: [1, 2, 2, 3]);
-      expect(series.indexed(1), [1]);
-      expect(series.indexed(2), [2, 3]);
-      expect(series.indexed(3), [4]);
+      expect(series.getByIndexMulti(1), [1]);
+      expect(series.getByIndexMulti(2), [2, 3]);
+      expect(series.getByIndexMulti(3), [4]);
     });
 
     test('add', () {
