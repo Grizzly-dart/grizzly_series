@@ -98,7 +98,7 @@ class DataFrame<IT, CT> {
 
     final List d = _data[colPos].toList();
 
-    return new DynamicSeries<IT>(d, indices: _indices.toList());
+    return new DynamicSeries<IT>(d, indices: _indices.toList(), name: column);
   }
 
   operator []=(CT column, List value) {

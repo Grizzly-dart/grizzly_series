@@ -4,6 +4,7 @@
 import 'package:grizzly/grizzly.dart';
 
 main() {
+  /* TODO
   final ages =
       new IntSeries<String>([20, 22, 35], indices: ['Jon', 'Dany', 'Tyrion']);
   final house = new StringSeries<String>(['Stark', 'Targaryan', 'Lannister'],
@@ -16,4 +17,19 @@ main() {
   print(df['age']);
   print(df.index['Jon']);
   print(df.pos[2]);
+  */
+
+  /* TODO
+  final s1 = new IntSeries<String>([1, 2, 3, 4], indices: ['one', 'two', 'three', 'four']);
+  final s2 = new IntSeries<String>([1, 2, 3, 4], indices: ['one', 'three', 'four', 'two']);
+
+  final IntSeries<String> s3 = s1 + s2;
+
+  print(s3['one']);
+  print(s3['two']);
+  print(s3['three']);
+  print(s3['four']);
+
+  print(s3.indices);
+  */
 }
