@@ -32,4 +32,40 @@ main() {
 
   print(s3.indices);
   */
+
+  /* TODO
+  final s1 = new IntSeries<String>([1, 2, 1, 4], indices: ['A', 'B', 'C', 'D']);
+  final g1 = s1.groupByMapping({2: [0, 1], 1: [2, 3]});
+  print(g1.count(name: 'Count'));
+  print(g1.max(name: 'Maxed'));
+  print(g1.groups);
+  print(g1.indices);
+
+  final g2 = s1.groupByValue();
+
+  print(g2.count(name: 'Count'));
+  print(g2.max(name: 'Maxed'));
+  print(g2.groups);
+  print(g2.indices);
+
+  final s2 = new IntSeries<int>([2, 2, 1, 1], indices: [0, 1, 2, 3]);
+
+  final g3 = s1.groupBySeries(s2);
+
+  print(g3.count(name: 'Count'));
+  print(g3.max(name: 'Maxed'));
+  print(g3.groups);
+  print(g3.indices);
+  */
+
+  final s1 = new IntSeries<String>([2, 4, 2, 1, 4], indices: ['A', 'B', 'C', 'D', 'E']);
+  print(s1.valueCounts(sortByValue: true));
+  print(s1.valueCounts(sortByValue: true, ascending: true));
+  print(s1.valueCounts());
+  print(s1.valueCounts(ascending: true));
+
+  print(s1.mode());
+
+  final ret = new DataFrame<int, String>({'one': [1, 2, 1, 2], 'two': ['five', 'two', 'two', 'four']});
+  print(ret.mode());
 }

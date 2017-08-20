@@ -13,6 +13,52 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     }
   }
 
+  VT max({bool skipNan: true}) {
+    VT ret;
+    bool seenNan = false;
+
+    for(VT v in _data) {
+      if(v == null) continue;
+      if(v == double.NAN) {
+        if(skipNan) {
+          seenNan = true;
+          continue;
+        } else {
+          return double.NAN as VT;
+        }
+      }
+      if(ret == null) ret = v;
+      else if(ret < v) ret = v;
+    }
+
+    if(ret == null && seenNan) return double.NAN as VT;
+
+    return ret;
+  }
+
+  VT min({bool skipNan: true}) {
+    VT ret;
+    bool seenNan = false;
+
+    for(VT v in _data) {
+      if(v == null) continue;
+      if(v == double.NAN) {
+        if(skipNan) {
+          seenNan = true;
+          continue;
+        } else {
+          return double.NAN as VT;
+        }
+      }
+      if(ret == null) ret = v;
+      else if(ret > v) ret = v;
+    }
+
+    if(ret == null && seenNan) return double.NAN as VT;
+
+    return ret;
+  }
+
   VT sum({bool skipNull: true});
 
   BoolSeries<IT> _relOp(NumericSeries<IT, num> other, bool func(num a, num b),
@@ -143,4 +189,118 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   NumSeries<IT> floorDiv(NumericSeries<IT, VT> a, {VT fillVal, dynamic name}) =>
       _op(a, (VT opa, VT opb) => (opa / opb).floor(), fillVal: fillVal, name: name);
       */
+
+  NumericSeriesGroupBy<IT, VT> groupByValue({VT apply(VT value)}) {
+    final groups = new LinkedHashMap<VT, List<int>>();
+
+    for(int i = 0; i < length; i++) {
+      final VT v = _data[i];
+      if(!groups.containsKey(v)) groups[v] = <int>[];
+      groups[v].add(i);
+    }
+
+    return new NumericSeriesGroupBy<IT, VT>(this, groups);
+  }
+
+  NumericSeriesGroupBy<IT, VT> groupBySeries(NumericSeries<int, VT> series) {
+    final groups = new LinkedHashMap<VT, List<int>>();
+
+    for(int i = 0; i < series.length; i++) {
+      final VT v = series._data[i];
+      if(!groups.containsKey(v)) groups[v] = <int>[];
+      final int idx = series._indices[i];
+      groups[v].add(idx);
+    }
+
+    return new NumericSeriesGroupBy<IT, VT>(this, groups);
+  }
+
+  NumericSeriesGroupBy<IT, VT> groupByMapping(Map<VT, List<int>> indexMap) {
+    return new NumericSeriesGroupBy<IT, VT>(this, indexMap);
+  }
+}
+
+class NumericSeriesGroupBy<IT, VT extends num> {
+  final NumericSeries<IT, VT> series;
+
+  UnmodifiableMapView<VT, UnmodifiableListView<int>> _groups;
+
+  UnmodifiableMapView<VT, UnmodifiableListView<int>> get groups => _groups;
+
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> _indices;
+
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> get indices => _indices;
+
+  NumericSeriesGroupBy(this.series, Map<VT, List<int>> groupMapping) {
+    final temp = new LinkedHashMap<VT, UnmodifiableListView<int>>();
+    final tempIdx = new LinkedHashMap<VT, UnmodifiableListView<IT>>();
+
+    for (VT v in groupMapping.keys) {
+      temp[v] = new UnmodifiableListView<int>(groupMapping[v]);
+      tempIdx[v] = new UnmodifiableListView<IT>(groupMapping[v]
+          .map((int position) => series.indices[position])
+          .toList());
+    }
+
+    _groups = new UnmodifiableMapView<VT, UnmodifiableListView<int>>(temp);
+    _indices = new UnmodifiableMapView<VT, UnmodifiableListView<IT>>(tempIdx);
+  }
+
+  IntSeries<VT> count({dynamic name}) {
+    final List<VT> idx = [];
+    final List<int> data = [];
+
+    for (VT key in _groups.keys) {
+      idx.add(key);
+      data.add(_groups[key].length);
+    }
+
+    return new IntSeries<VT>(data, name: name, indices: idx);
+  }
+
+  NumSeries<VT> max({dynamic name}) {
+    final List<VT> idx = [];
+    final List<num> data = [];
+
+    for (VT key in _groups.keys) {
+      idx.add(key);
+      final List<VT> list = _groups[key]
+          .map((int position) => series.getByPos(position))
+          .toList();
+      num mx;
+      for (VT v in list) {
+        if (v == null) continue;
+        if (mx == null)
+          mx = v;
+        else if (mx < v) mx = v;
+      }
+
+      data.add(mx);
+    }
+
+    return new NumSeries<VT>(data, name: name, indices: idx);
+  }
+
+  NumSeries<VT> min({dynamic name}) {
+    final List<VT> idx = [];
+    final List<num> data = [];
+
+    for (VT key in _groups.keys) {
+      idx.add(key);
+      final List<VT> list = _groups[key]
+          .map((int position) => series.getByPos(position))
+          .toList();
+      num min;
+      for (VT v in list) {
+        if (v == null) continue;
+        if (min == null)
+          min = v;
+        else if (min > v) min = v;
+      }
+
+      data.add(min);
+    }
+
+    return new NumSeries<VT>(data, name: name, indices: idx);
+  }
 }

@@ -1,11 +1,11 @@
 part of grizzly.series;
 
-class StringSeries<IT> extends Object
-    with SeriesBase<IT, String>
-    implements Series<IT, String> {
+class DynamicSeries<IT> extends Object
+    with SeriesBase<IT, dynamic>
+    implements Series<IT, dynamic> {
   final List<IT> _indices;
 
-  final List<String> _data;
+  final List<dynamic> _data;
 
   final SplayTreeMap<IT, List<int>> _mapper;
 
@@ -13,33 +13,33 @@ class StringSeries<IT> extends Object
 
   final UnmodifiableListView<IT> indices;
 
-  final UnmodifiableListView<String> data;
+  final UnmodifiableListView<dynamic> data;
 
-  SeriesPositioned<IT, String> _pos;
+  SeriesPositioned<IT, dynamic> _pos;
 
-  SeriesPositioned<IT, String> get pos => _pos;
+  SeriesPositioned<IT, dynamic> get pos => _pos;
 
-  StringSeriesView<IT> _view;
+  DynamicSeriesView<IT> _view;
 
-  StringSeriesView<IT> toView() {
-    if (_view == null) _view = new StringSeriesView<IT>(this);
+  DynamicSeriesView<IT> toView() {
+    if (_view == null) _view = new DynamicSeriesView<IT>(this);
     return _view;
   }
 
-  StringSeries._(this._data, this._indices, this.name, this._mapper)
+  DynamicSeries._(this._data, this._indices, this.name, this._mapper)
       : indices = new UnmodifiableListView(_indices),
         data = new UnmodifiableListView(_data) {
-    _pos = new SeriesPositioned<IT, String>(this);
+    _pos = new SeriesPositioned<IT, dynamic>(this);
   }
 
-  factory StringSeries(Iterable<String> data,
+  factory DynamicSeries(Iterable<dynamic> data,
       {dynamic name, List<IT> indices}) {
     if (indices == null) {
       if (IT.runtimeType == int) {
         throw new Exception("Indices are required for non-int indexing!");
       }
       indices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
+      new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
     } else {
       if (indices.length != data.length) {
         throw new Exception("Indices and data must be same length!");
@@ -57,77 +57,79 @@ class StringSeries<IT> extends Object
       }
     }
 
-    return new StringSeries._(data.toList(), indices, name, mapper);
+    return new DynamicSeries._(data.toList(), indices, name, mapper);
   }
 
-  factory StringSeries.fromMap(Map<IT, List<String>> map, {dynamic name}) {
+  factory DynamicSeries.fromMap(Map<IT, List<dynamic>> map, {dynamic name}) {
     final List<IT> indices = [];
-    final List<String> data = [];
+    final List<dynamic> data = [];
     final mapper = new SplayTreeMap<IT, List<int>>();
 
     for (IT index in map.keys) {
       mapper[index] = <int>[];
-      for (String val in map[index]) {
+      for (dynamic val in map[index]) {
         indices.add(index);
         data.add(val);
         mapper[index].add(data.length - 1);
       }
     }
 
-    return new StringSeries._(data.toList(), indices, name, mapper);
+    return new DynamicSeries._(data.toList(), indices, name, mapper);
   }
 
-  StringSeries<IIT> makeNew<IIT>(Iterable<String> data,
+  DynamicSeries<IIT> makeNew<IIT>(Iterable<dynamic> data,
       {dynamic name, List<IIT> indices}) =>
-      new StringSeries<IIT>(data, name: name, indices: indices);
+      new DynamicSeries<IIT>(data, name: name, indices: indices);
 
-  String max() {
-    String ret;
+  dynamic max({bool skipNan: true}) {
+    dynamic ret;
+    bool seenNan = false;
 
-    for(String v in _data) {
+    for(dynamic v in _data) {
       if(v == null) continue;
+      if(v == double.NAN) {
+        if(skipNan) {
+          seenNan = true;
+          continue;
+        } else {
+          return double.NAN as dynamic;
+        }
+      }
       if(ret == null) ret = v;
-      else if(ret.compareTo(v) < 0) ret = v;
+      else if(ret < v) ret = v;
     }
+
+    if(ret == null && seenNan) return double.NAN as dynamic;
 
     return ret;
   }
 
-  String min() {
-    String ret;
+  dynamic min({bool skipNan: true}) {
+    dynamic ret;
+    bool seenNan = false;
 
-    for(String v in _data) {
+    for(dynamic v in _data) {
       if(v == null) continue;
+      if(v == double.NAN) {
+        if(skipNan) {
+          seenNan = true;
+          continue;
+        } else {
+          return double.NAN as dynamic;
+        }
+      }
       if(ret == null) ret = v;
-      else if(ret.compareTo(v) > 0) ret = v;
+      else if(ret > v) ret = v;
     }
 
+    if(ret == null && seenNan) return double.NAN as dynamic;
+
     return ret;
-  }
-
-  IntSeries<IT> toInt({int radix, int fillVal}) {
-    return new IntSeries<IT>(
-        _data
-            .map((String v) =>
-                int.parse(v, radix: radix, onError: (_) => fillVal))
-            .toList(),
-        name: name,
-        indices: _indices.toList());
-  }
-
-  DoubleSeries<IT> toDouble({double fillVal}) {
-    return new DoubleSeries<IT>(
-        _data
-            .map((String v) =>
-            double.parse(v, (_) => fillVal))
-            .toList(),
-        name: name,
-        indices: _indices.toList());
   }
 }
 
-class StringSeriesView<IT> extends StringSeries<IT> implements SeriesView<IT, String> {
-  StringSeriesView(StringSeries<IT> series)
+class DynamicSeriesView<IT> extends DynamicSeries<IT> implements SeriesView<IT, dynamic> {
+  DynamicSeriesView(DynamicSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
   }
@@ -141,7 +143,7 @@ class StringSeriesView<IT> extends StringSeries<IT> implements SeriesView<IT, St
   }
 
   @override
-  operator []=(IT index, String value) {
+  operator []=(IT index, dynamic value) {
     if (!_mapper.containsKey(index)) {
       throw new Exception('Cannot add new elements to SeriesView!');
     }
@@ -151,24 +153,24 @@ class StringSeriesView<IT> extends StringSeries<IT> implements SeriesView<IT, St
     });
   }
 
-  void append(IT index, String value) {
+  void append(IT index, dynamic value) {
     throw new Exception('Cannot add new elements to SeriesView!');
   }
 
-  StringSeries<IT> sortByValue(
+  DynamicSeries<IT> sortByValue(
       {bool ascending: true, bool inplace: false, name}) {
     if (inplace) throw new Exception('Cannot sort SeriesView!');
     return sortByValue(ascending: ascending, name: name);
   }
 
-  StringSeries<IT> sortByIndex(
+  DynamicSeries<IT> sortByIndex(
       {bool ascending: true, bool inplace: false, name}) {
     if (inplace) throw new Exception('Cannot sort SeriesView!');
     return sortByIndex(ascending: ascending, name: name);
   }
 
-  StringSeries<IT> toSeries() =>
-      new StringSeries(_data, name: name, indices: _indices);
+  DynamicSeries<IT> toSeries() =>
+      new DynamicSeries(_data, name: name, indices: _indices);
 
-  StringSeriesView<IT> toView() => this;
+  DynamicSeriesView<IT> toView() => this;
 }

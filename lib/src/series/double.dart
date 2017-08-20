@@ -19,6 +19,13 @@ class DoubleSeries<IT> extends Object
 
   SeriesPositioned<IT, double> get pos => _pos;
 
+  DoubleSeriesView<IT> _view;
+
+  DoubleSeriesView<IT> toView() {
+    if (_view == null) _view = new DoubleSeriesView<IT>(this);
+    return _view;
+  }
+
   DoubleSeries._(this._data, this._indices, this.name, this._mapper)
       : indices = new UnmodifiableListView(_indices),
         data = new UnmodifiableListView(_data) {
@@ -68,6 +75,10 @@ class DoubleSeries<IT> extends Object
 
     return new DoubleSeries._(data.toList(), indices, name, mapper);
   }
+
+  DoubleSeries<IIT> makeNew<IIT>(Iterable<double> data,
+      {dynamic name, List<IIT> indices}) =>
+      new DoubleSeries<IIT>(data, name: name, indices: indices);
 
   double sum({bool skipNull: true}) {
     double ret = 0.0;
@@ -183,4 +194,51 @@ class DoubleSeries<IT> extends Object
     return new IntSeries<IT>(_data.map((double v) => v.toInt()).toList(),
         name: name, indices: _indices.toList());
   }
+}
+
+class DoubleSeriesView<IT> extends DoubleSeries<IT> implements SeriesView<IT, double> {
+  DoubleSeriesView(DoubleSeries<IT> series)
+      : super._(series._data, series._indices, null, series._mapper) {
+    _nameGetter = () => series.name;
+  }
+
+  Function _nameGetter;
+
+  dynamic get name => _nameGetter();
+
+  set name(dynamic value) {
+    throw new Exception('Cannot change name of SeriesView!');
+  }
+
+  @override
+  operator []=(IT index, double value) {
+    if (!_mapper.containsKey(index)) {
+      throw new Exception('Cannot add new elements to SeriesView!');
+    }
+
+    _mapper[index].forEach((int position) {
+      _data[position] = value;
+    });
+  }
+
+  void append(IT index, double value) {
+    throw new Exception('Cannot add new elements to SeriesView!');
+  }
+
+  DoubleSeries<IT> sortByValue(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByValue(ascending: ascending, name: name);
+  }
+
+  DoubleSeries<IT> sortByIndex(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByIndex(ascending: ascending, name: name);
+  }
+
+  DoubleSeries<IT> toSeries() =>
+      new DoubleSeries(_data, name: name, indices: _indices);
+
+  DoubleSeriesView<IT> toView() => this;
 }

@@ -19,6 +19,13 @@ class IntSeries<IT> extends Object
 
   SeriesPositioned<IT, int> get pos => _pos;
 
+  IntSeriesView<IT> _view;
+
+  IntSeriesView<IT> toView() {
+    if (_view == null) _view = new IntSeriesView<IT>(this);
+    return _view;
+  }
+
   IntSeries._(this._data, this._indices, this.name, this._mapper)
       : indices = new UnmodifiableListView(_indices),
         data = new UnmodifiableListView(_data) {
@@ -26,22 +33,24 @@ class IntSeries<IT> extends Object
   }
 
   factory IntSeries(Iterable<int> data, {dynamic name, List<IT> indices}) {
-    if (indices == null) {
+    List<IT> madeIndices = indices;
+    if (madeIndices == null) {
       if (IT.runtimeType == int) {
         throw new Exception("Indices are required for non-int indexing!");
       }
-      indices =
-      new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
+      madeIndices =
+          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
     } else {
       if (indices.length != data.length) {
         throw new Exception("Indices and data must be same length!");
       }
+      madeIndices = indices.toList();
     }
 
     final mapper = new SplayTreeMap<IT, List<int>>();
 
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
+    for (int i = 0; i < madeIndices.length; i++) {
+      final IT index = madeIndices[i];
       if (mapper.containsKey(index)) {
         mapper[index].add(i);
       } else {
@@ -49,7 +58,7 @@ class IntSeries<IT> extends Object
       }
     }
 
-    return new IntSeries._(data.toList(), indices, name, mapper);
+    return new IntSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory IntSeries.fromMap(Map<IT, List<int>> map, {dynamic name}) {
@@ -68,6 +77,10 @@ class IntSeries<IT> extends Object
 
     return new IntSeries._(data.toList(), indices, name, mapper);
   }
+
+  IntSeries<IIT> makeNew<IIT>(Iterable<int> data,
+          {dynamic name, List<IIT> indices}) =>
+      new IntSeries<IIT>(data, name: name, indices: indices);
 
   int sum({bool skipNull: true}) {
     int ret = 0;
@@ -172,5 +185,55 @@ class IntSeries<IT> extends Object
         name: name, indices: _indices.toList());
   }
 
-  IntSeries<IT> operator+(IntSeries<IT> a) => add(a);
+  IntSeries<IT> operator +(IntSeries<IT> a) => add(a);
+}
+
+abstract class SeriesView<IT, VT> implements Series<IT, VT> {
+  Series<IT, VT> toSeries();
+}
+
+class IntSeriesView<IT> extends IntSeries<IT> implements SeriesView<IT, int> {
+  IntSeriesView(IntSeries<IT> series)
+      : super._(series._data, series._indices, null, series._mapper) {
+    _nameGetter = () => series.name;
+  }
+
+  Function _nameGetter;
+
+  dynamic get name => _nameGetter();
+
+  set name(dynamic value) {
+    throw new Exception('Cannot change name of SeriesView!');
+  }
+
+  @override
+  operator []=(IT index, int value) {
+    if (!_mapper.containsKey(index)) {
+      throw new Exception('Cannot add new elements to SeriesView!');
+    }
+
+    _mapper[index].forEach((int position) {
+      _data[position] = value;
+    });
+  }
+
+  void append(IT index, int value) {
+    throw new Exception('Cannot add new elements to SeriesView!');
+  }
+
+  IntSeries<IT> sortByValue({bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByValue(ascending: ascending, name: name);
+  }
+
+  IntSeries<IT> sortByIndex({bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByIndex(ascending: ascending, name: name);
+  }
+
+  IntSeries<IT> toSeries() =>
+      new IntSeries(_data, name: name, indices: _indices);
+
+  @override
+  IntSeriesView<IT> toView() => this;
 }

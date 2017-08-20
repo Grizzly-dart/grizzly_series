@@ -2,13 +2,65 @@ library grizzly.series;
 
 import 'dart:math' as math;
 import 'dart:collection';
+import '../data_frame/data_frame.dart';
 
 part 'bool.dart';
 part 'double.dart';
+part 'dynamic.dart';
 part 'int.dart';
 part 'num.dart';
 part 'numeric.dart';
 part 'string.dart';
+
+typedef SeriesMaker<IT, VT> = Series<IT, VT> Function(Iterable<VT> data,
+    {dynamic name, Iterable<IT> indices});
+
+void _sort(List list, bool ascending) {
+  dynamic firstVal = list.firstWhere((v) => v != null, orElse: () => null);
+  if (firstVal == null) return;
+
+  if (firstVal is Comparable) {
+    if (ascending) {
+      (list as List<Comparable>)
+          .sort((Comparable a, Comparable b) => a.compareTo(b));
+    } else {
+      (list as List<Comparable>)
+          .sort((Comparable a, Comparable b) => b.compareTo(a));
+    }
+  } else if (firstVal is bool) {
+    throw new Exception('Not implemented for bool yet!');
+  } else {
+    throw new Exception('Can only sort Comparable!');
+  }
+}
+
+class _SeriesValueSortItem<IT, VT>
+    implements Comparable<_SeriesValueSortItem<IT, VT>> {
+  final IT index;
+
+  final VT value;
+
+  _SeriesValueSortItem(this.index, this.value);
+
+  int compareTo(_SeriesValueSortItem<IT, VT> other) =>
+      _SeriesValueSortItem.compare<IT, VT>(this, other);
+
+  static int compare<IT, VT>(
+      _SeriesValueSortItem<IT, VT> first, _SeriesValueSortItem<IT, VT> second) {
+    if (first.value != null) {
+      if (first.value is! Comparable)
+        throw new Exception('Can only compare Comparable values!');
+    } else {
+      if (second.value != null) {
+        if (second.value is! Comparable)
+          throw new Exception('Can only compare Comparable values!');
+      } else {
+        return 0;
+      }
+    }
+    return (first.value as Comparable<VT>).compareTo(second.value);
+  }
+}
 
 abstract class Series<IT, VT> {
   dynamic name;
@@ -46,6 +98,35 @@ abstract class Series<IT, VT> {
   IT indexAt(int position);
 
   void append(IT index, VT value);
+
+  void apply(VT func(VT value));
+
+  void assign(Series<IT, VT> other);
+
+  VT max();
+
+  VT min();
+
+  Series<int, VT> mode();
+
+  IntSeries<VT> valueCounts(
+      {bool sortByValue: false, bool ascending: false, bool dropNull: false});
+
+  /* TODO IntSeries<VT> valueCountsNormalized(
+      {bool sortByValue: false, bool ascending: false, bool dropNull: false}); */
+
+  Series<IT, VT> sortByValue({bool ascending: true, bool inplace: false});
+
+  Series<IT, VT> sortByIndex({bool ascending: true, bool inplace: false});
+
+  Series<IIT, VT> makeNew<IIT>(Iterable<VT> data,
+      {dynamic name, List<IIT> indices});
+
+  SeriesView<IT, VT> toView();
+
+  DataFrame<IT, dynamic> toDataFrame<CT>({CT column});
+
+  StringSeries<IT> toStringSeries();
 
   SplayTreeMap<IT, List<int>> get _mapper;
 }
@@ -134,9 +215,200 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     }
   }
 
+  void assign(Series<IT, VT> other) {
+    // Check
+    for (IT key in _mapper.keys) {
+      if (!other.containsIndex(key)) continue;
+
+      final List<int> sourcePos = _mapper[key];
+      final List<int> destPos = other._mapper[key];
+
+      if (sourcePos.length != destPos.length) {
+        if (destPos.length != 1) {
+          throw new Exception('Mismatch of value lengths by index!');
+        }
+      }
+    }
+
+    // Assign
+    for (IT key in _mapper.keys) {
+      if (!other.containsIndex(key)) continue;
+
+      final List<int> sourcePos = _mapper[key];
+      final List<int> destPos = other._mapper[key];
+
+      if (sourcePos.length == destPos.length) {
+        for (int i = 0; i < sourcePos.length; i++) {
+          _data[sourcePos[i]] = other.data[destPos[i]];
+        }
+      } else {
+        final VT destData = other.data[destPos.first];
+        for (int pos in sourcePos) {
+          _data[pos] = destData;
+        }
+      }
+    }
+  }
+
+  void apply(VT func(VT value)) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = func(_data[i]);
+    }
+  }
+
+  Series<int, VT> mode() {
+    final LinkedHashMap<VT, int> map = new LinkedHashMap<VT, int>();
+    int max = 0;
+
+    for (VT v in _data) {
+      if (!map.containsKey(v)) map[v] = 0;
+      map[v]++;
+      if(map[v] > max) max = map[v];
+    }
+
+    if(max == 0) return makeNew<int>([], indices: []);
+
+    final ret = <VT>[];
+
+    for(VT k in map.keys) {
+      if(map[k] != max) continue;
+      ret.add(k);
+    }
+
+    return makeNew<int>(ret);
+  }
+
   StringSeries<IT> toStringSeries() {
     return new StringSeries<IT>(_data.map((v) => v.toString()).toList(),
         name: name, indices: _indices.toList());
+  }
+
+  @override
+  IntSeries<VT> valueCounts(
+      {bool sortByValue: false,
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name}) {
+    final groups = new Map<VT, List<int>>();
+
+    for (int i = 0; i < length; i++) {
+      final VT v = _data[i];
+      if (!groups.containsKey(v)) groups[v] = <int>[0];
+      groups[v][0]++;
+    }
+
+    // Drop null
+    if (dropNull) {
+      groups.remove(null);
+    }
+
+    final ret = new IntSeries<VT>.fromMap(groups, name: name ?? this.name);
+
+    // Sort
+    if (sortByValue) {
+      ret.sortByIndex(ascending: ascending, inplace: true);
+    } else {
+      ret.sortByValue(ascending: ascending, inplace: true);
+    }
+
+    return ret;
+  }
+
+  DataFrame<IT, dynamic> toDataFrame<CT>({CT column}) {
+    return new DataFrame<IT, CT>({column ?? name: data}, indices: indices);
+  }
+
+  Series<IT, VT> sortByValue(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (length == 0) {
+      if (inplace)
+        return this;
+      else
+        return makeNew([], indices: [], name: name ?? this.name);
+    }
+
+    final items = <_SeriesValueSortItem<IT, VT>>[];
+
+    for (int i = 0; i < length; i++) {
+      items.add(new _SeriesValueSortItem(_indices[i], _data[i]));
+    }
+
+    if (ascending) {
+      items.sort(_SeriesValueSortItem.compare);
+    } else {
+      items.sort((a, b) => _SeriesValueSortItem.compare(b, a));
+    }
+
+    if (inplace) {
+      final idx = <IT>[];
+      final List<VT> d = <VT>[];
+      final mapper = new SplayTreeMap<IT, List<int>>();
+
+      for (_SeriesValueSortItem i in items) {
+        idx.add(i.index);
+        d.add(i.value);
+        if (!mapper.containsKey(i.index)) mapper[i.index] = <int>[];
+        mapper[i.index].add(idx.length - 1);
+      }
+
+      _indices.replaceRange(0, _indices.length, idx);
+      _data.replaceRange(0, _data.length, d);
+      _mapper.clear();
+      _mapper.addAll(mapper);
+
+      return this;
+    } else {
+      final idx = <IT>[];
+      final List<VT> d = <VT>[];
+
+      for (_SeriesValueSortItem i in items) {
+        idx.add(i.index);
+        d.add(i.value);
+      }
+
+      return makeNew(d, name: name ?? this.name, indices: idx);
+    }
+  }
+
+  Series<IT, VT> sortByIndex(
+      {bool ascending: true, bool inplace: false, name}) {
+    List<IT> idxSorted = _mapper.keys.toList();
+
+    _sort(idxSorted, ascending);
+
+    if (inplace) {
+      final idx = <IT>[];
+      final List<VT> d = <VT>[];
+      final mapper = new SplayTreeMap<IT, List<int>>();
+
+      for (IT i in idxSorted) {
+        mapper[i] = <int>[];
+        for (int pos in _mapper[i]) {
+          idx.add(i);
+          d.add(_data[pos]);
+          mapper[i].add(idx.length - 1);
+        }
+      }
+
+      _indices.replaceRange(0, _indices.length, idx);
+      _data.replaceRange(0, _data.length, d);
+      _mapper.clear();
+      _mapper.addAll(mapper);
+
+      return this;
+    } else {
+      final idx = <IT>[];
+      final List<VT> d = <VT>[];
+
+      for (IT i in idxSorted) {
+        for (int pos in _mapper[i]) {
+          idx.add(i);
+          d.add(_data[pos]);
+        }
+      }
+
+      return makeNew(d, name: name ?? this.name, indices: idx);
+    }
   }
 
   String toString() {
@@ -148,76 +420,5 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     }
 
     return sb.toString();
-  }
-}
-
-class DynamicSeries<IT> extends Object
-    with SeriesBase<IT, dynamic>
-    implements Series<IT, dynamic> {
-  final List<IT> _indices;
-
-  final List<dynamic> _data;
-
-  final SplayTreeMap<IT, List<int>> _mapper;
-
-  dynamic name;
-
-  final UnmodifiableListView<IT> indices;
-
-  final UnmodifiableListView<dynamic> data;
-
-  SeriesPositioned<IT, dynamic> _pos;
-
-  SeriesPositioned<IT, dynamic> get pos => _pos;
-
-  DynamicSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
-        data = new UnmodifiableListView(_data) {
-    _pos = new SeriesPositioned<IT, dynamic>(this);
-  }
-
-  factory DynamicSeries(Iterable<dynamic> data,
-      {dynamic name, List<IT> indices}) {
-    if (indices == null) {
-      if (IT.runtimeType == int) {
-        throw new Exception("Indices are required for non-int indexing!");
-      }
-      indices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
-    } else {
-      if (indices.length != data.length) {
-        throw new Exception("Indices and data must be same length!");
-      }
-    }
-
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
-      if (mapper.containsKey(index)) {
-        mapper[index].add(i);
-      } else {
-        mapper[index] = new List<int>()..add(i);
-      }
-    }
-
-    return new DynamicSeries._(data.toList(), indices, name, mapper);
-  }
-
-  factory DynamicSeries.fromMap(Map<IT, List<dynamic>> map, {dynamic name}) {
-    final List<IT> indices = [];
-    final List<dynamic> data = [];
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (IT index in map.keys) {
-      mapper[index] = <int>[];
-      for (dynamic val in map[index]) {
-        indices.add(index);
-        data.add(val);
-        mapper[index].add(data.length - 1);
-      }
-    }
-
-    return new DynamicSeries._(data.toList(), indices, name, mapper);
   }
 }

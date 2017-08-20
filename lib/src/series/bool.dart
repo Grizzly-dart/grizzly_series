@@ -19,6 +19,13 @@ class BoolSeries<IT> extends Object
 
   SeriesPositioned<IT, bool> get pos => _pos;
 
+  BoolSeriesView<IT> _view;
+
+  BoolSeriesView<IT> toView() {
+    if (_view == null) _view = new BoolSeriesView<IT>(this);
+    return _view;
+  }
+
   BoolSeries._(this._data, this._indices, this.name, this._mapper)
       : indices = new UnmodifiableListView(_indices),
         data = new UnmodifiableListView(_data) {
@@ -69,6 +76,28 @@ class BoolSeries<IT> extends Object
     return new BoolSeries._(data.toList(), indices, name, mapper);
   }
 
+  BoolSeries<IIT> makeNew<IIT>(Iterable<bool> data,
+      {dynamic name, List<IIT> indices}) =>
+      new BoolSeries<IIT>(data, name: name, indices: indices);
+
+  bool max() {
+    for(bool v in _data) {
+      if(v == null) continue;
+      if(v) return true;
+    }
+
+    return false;
+  }
+
+  bool min() {
+    for(bool v in _data) {
+      if(v == null) continue;
+      if(!v) return false;
+    }
+
+    return true;
+  }
+
   IntSeries<IT> toInt({int radix, int fillVal}) {
     return new IntSeries<IT>(_data.map((bool v) => v ? 1 : 0).toList(),
         name: name, indices: _indices.toList());
@@ -78,4 +107,52 @@ class BoolSeries<IT> extends Object
     return new DoubleSeries<IT>(_data.map((bool v) => v ? 1.0 : 0.0).toList(),
         name: name, indices: _indices.toList());
   }
+}
+
+class BoolSeriesView<IT> extends BoolSeries<IT> implements SeriesView<IT, bool> {
+  BoolSeriesView(BoolSeries<IT> series)
+      : super._(series._data, series._indices, null, series._mapper) {
+    _nameGetter = () => series.name;
+  }
+
+  Function _nameGetter;
+
+  dynamic get name => _nameGetter();
+
+  set name(dynamic value) {
+    throw new Exception('Cannot change name of SeriesView!');
+  }
+
+  @override
+  operator []=(IT index, bool value) {
+    if (!_mapper.containsKey(index)) {
+      throw new Exception('Cannot add new elements to SeriesView!');
+    }
+
+    _mapper[index].forEach((int position) {
+      _data[position] = value;
+    });
+  }
+
+  void append(IT index, bool value) {
+    throw new Exception('Cannot add new elements to SeriesView!');
+  }
+
+  BoolSeries<IT> sortByValue(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByValue(ascending: ascending, name: name);
+  }
+
+  BoolSeries<IT> sortByIndex(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByIndex(ascending: ascending, name: name);
+  }
+
+  BoolSeries<IT> toSeries() =>
+      new BoolSeries(_data, name: name, indices: _indices);
+
+  @override
+  BoolSeriesView<IT> toView() => this;
 }
