@@ -48,7 +48,7 @@ class DataFrame<IT, CT> {
         throw new Exception("Indices are required for non-int indexing!");
       }
       if (len == null) {
-        if(data.length != 0) {
+        if (data.length != 0) {
           throw new Exception('Cannot figure out length!');
         } else {
           len = 0;
@@ -256,13 +256,13 @@ class DataFrame<IT, CT> {
     final sb = new StringBuffer();
 
     //TODO format table
-    for(CT col in _columns) sb.write('$col\t');
+    for (CT col in _columns) sb.write('$col\t');
     sb.writeln();
 
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       sb.write(_indices[i]);
       sb.write('\t');
-      for(Series s in _data) {
+      for (Series s in _data) {
         sb.write(s.pos[i]);
         sb.write('\t');
       }

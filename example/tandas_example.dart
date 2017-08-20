@@ -58,7 +58,8 @@ main() {
   print(g3.indices);
   */
 
-  final s1 = new IntSeries<String>([2, 4, 2, 1, 4], indices: ['A', 'B', 'C', 'D', 'E']);
+  final s1 = new IntSeries<String>([2, 4, 2, 1, 4],
+      indices: ['A', 'B', 'C', 'D', 'E']);
   print(s1.valueCounts(sortByValue: true));
   print(s1.valueCounts(sortByValue: true, ascending: true));
   print(s1.valueCounts());
@@ -66,6 +67,9 @@ main() {
 
   print(s1.mode());
 
-  final ret = new DataFrame<int, String>({'one': [1, 2, 1, 2], 'two': ['five', 'two', 'two', 'four']});
+  final ret = new DataFrame<int, String>({
+    'one': [1, 2, 1, 2],
+    'two': ['five', 'two', 'two', 'four']
+  });
   print(ret.mode());
 }

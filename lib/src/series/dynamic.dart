@@ -39,7 +39,7 @@ class DynamicSeries<IT> extends Object
         throw new Exception("Indices are required for non-int indexing!");
       }
       indices =
-      new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
+          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
     } else {
       if (indices.length != data.length) {
         throw new Exception("Indices and data must be same length!");
@@ -78,28 +78,29 @@ class DynamicSeries<IT> extends Object
   }
 
   DynamicSeries<IIT> makeNew<IIT>(Iterable<dynamic> data,
-      {dynamic name, List<IIT> indices}) =>
+          {dynamic name, List<IIT> indices}) =>
       new DynamicSeries<IIT>(data, name: name, indices: indices);
 
   dynamic max({bool skipNan: true}) {
     dynamic ret;
     bool seenNan = false;
 
-    for(dynamic v in _data) {
-      if(v == null) continue;
-      if(v == double.NAN) {
-        if(skipNan) {
+    for (dynamic v in _data) {
+      if (v == null) continue;
+      if (v == double.NAN) {
+        if (skipNan) {
           seenNan = true;
           continue;
         } else {
           return double.NAN as dynamic;
         }
       }
-      if(ret == null) ret = v;
-      else if(ret < v) ret = v;
+      if (ret == null)
+        ret = v;
+      else if (ret < v) ret = v;
     }
 
-    if(ret == null && seenNan) return double.NAN as dynamic;
+    if (ret == null && seenNan) return double.NAN as dynamic;
 
     return ret;
   }
@@ -108,27 +109,29 @@ class DynamicSeries<IT> extends Object
     dynamic ret;
     bool seenNan = false;
 
-    for(dynamic v in _data) {
-      if(v == null) continue;
-      if(v == double.NAN) {
-        if(skipNan) {
+    for (dynamic v in _data) {
+      if (v == null) continue;
+      if (v == double.NAN) {
+        if (skipNan) {
           seenNan = true;
           continue;
         } else {
           return double.NAN as dynamic;
         }
       }
-      if(ret == null) ret = v;
-      else if(ret > v) ret = v;
+      if (ret == null)
+        ret = v;
+      else if (ret > v) ret = v;
     }
 
-    if(ret == null && seenNan) return double.NAN as dynamic;
+    if (ret == null && seenNan) return double.NAN as dynamic;
 
     return ret;
   }
 }
 
-class DynamicSeriesView<IT> extends DynamicSeries<IT> implements SeriesView<IT, dynamic> {
+class DynamicSeriesView<IT> extends DynamicSeries<IT>
+    implements SeriesView<IT, dynamic> {
   DynamicSeriesView(DynamicSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
@@ -151,22 +154,6 @@ class DynamicSeriesView<IT> extends DynamicSeries<IT> implements SeriesView<IT, 
     _mapper[index].forEach((int position) {
       _data[position] = value;
     });
-  }
-
-  void append(IT index, dynamic value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  DynamicSeries<IT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  DynamicSeries<IT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
   }
 
   DynamicSeries<IT> toSeries() =>

@@ -99,6 +99,21 @@ abstract class Series<IT, VT> {
 
   void append(IT index, VT value);
 
+  /// Remove element at position [pos]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> remove(int pos, {bool inplace: false});
+
+  /// Remove multiple element at positions [positions]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> removeMany(List<int> positions, {bool inplace: false});
+
+  /// Drop elements by label [label]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> drop(IT label, {bool inplace: false});
+
   void apply(VT func(VT value));
 
   void assign(Series<IT, VT> other);
@@ -215,6 +230,143 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     }
   }
 
+  void _updatePosOnRemove(int posLimit) {
+    _mapper.forEach((_, List<int> list) {
+      for (int i = 0; i < list.length; i++) {
+        if (list[i] > posLimit) list[i]--;
+      }
+    });
+  }
+
+  /// Remove element at position [pos]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> remove(int pos, {bool inplace: false}) {
+    if (pos >= length) throw new RangeError.range(pos, 0, length);
+    if (inplace) {
+      final IT label = _indices[pos];
+      _mapper[label].remove(pos);
+      if (_mapper[label].length == 0) _mapper.remove(label);
+      _indices.removeAt(pos);
+      _data.removeAt(pos);
+      _updatePosOnRemove(pos);
+      return this;
+    } else {
+      final List<IT> idx = _indices.toList();
+      final List<VT> d = _data.toList();
+
+      idx.removeAt(pos);
+      d.removeAt(pos);
+
+      return makeNew(d, name: name, indices: idx);
+    }
+  }
+
+  /// Remove multiple element at positions [positions]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> removeMany(List<int> positions, {bool inplace: false}) {
+    if (positions.length == 0) {
+      //TODO we should accept this
+      throw new Exception('positions cannot be empty List!');
+    }
+
+    final positionSet = new Set<int>.from(positions).toList();
+    positionSet.sort((int a, int b) => b.compareTo(a));
+    if (positionSet.first >= length)
+      throw new RangeError.range(positionSet.first, 0, length);
+
+    if (inplace) {
+      for (int pos in positionSet) {
+        final IT label = _indices[pos];
+        _mapper[label].remove(pos);
+        if (_mapper[label].length == 0) _mapper.remove(label);
+        _indices.removeAt(pos);
+        _data.removeAt(pos);
+        _updatePosOnRemove(pos);
+      }
+      return this;
+    } else {
+      final List<IT> idx = _indices.toList();
+      final List<VT> d = _data.toList();
+
+      for (int pos in positionSet) {
+        idx.removeAt(pos);
+        d.removeAt(pos);
+      }
+
+      return makeNew(d, name: name, indices: idx);
+    }
+  }
+
+  /// Drop elements by label [label]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> drop(IT label, {bool inplace: false}) {
+    if (!_mapper.containsKey(label)) {
+      //TODO should we ignore this?
+      throw new Exception('Label not found!');
+    }
+
+    if (inplace) {
+      final List<int> poses = _mapper[label].toList();
+      poses.sort((int a, int b) => b.compareTo(a));
+      for (int pos in poses) {
+        _indices.removeAt(pos);
+        _data.removeAt(pos);
+        _updatePosOnRemove(pos);
+      }
+      _mapper.remove(label);
+      return this;
+    } else {
+      final List<IT> idx = _indices.toList();
+      final List<VT> d = _data.toList();
+
+      final List<int> poses = _mapper[label].toList();
+      poses.sort((int a, int b) => b.compareTo(a));
+      for (int pos in poses) {
+        idx.removeAt(pos);
+        d.removeAt(pos);
+      }
+
+      return makeNew(d, name: name, indices: idx);
+    }
+  }
+
+  /// Drop elements by label [label]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> dropMany(List<IT> label, {bool inplace: false}) {
+    final List<IT> labelSet =
+        label.where((IT lab) => _mapper.containsKey(lab)).toList();
+    final positionSet = labelSet.fold(new Set<int>(), (Set<int> set, IT lab) {
+      List<int> pos = _mapper[lab];
+      set.addAll(pos);
+      return set;
+    }).toList()
+      ..sort((int a, int b) => b.compareTo(a));
+
+    if (inplace) {
+      labelSet.forEach((IT idx) => _mapper.remove(idx));
+      for (int pos in positionSet) {
+        _indices.removeAt(pos);
+        _data.removeAt(pos);
+        _updatePosOnRemove(pos);
+      }
+      return this;
+    } else {
+      final List<IT> idx = _indices.toList();
+      final List<VT> d = _data.toList();
+
+      for (int pos in positionSet) {
+        idx.removeAt(pos);
+        d.removeAt(pos);
+      }
+
+      return makeNew(d, name: name, indices: idx);
+    }
+  }
+
   void assign(Series<IT, VT> other) {
     // Check
     for (IT key in _mapper.keys) {
@@ -263,15 +415,15 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     for (VT v in _data) {
       if (!map.containsKey(v)) map[v] = 0;
       map[v]++;
-      if(map[v] > max) max = map[v];
+      if (map[v] > max) max = map[v];
     }
 
-    if(max == 0) return makeNew<int>([], indices: []);
+    if (max == 0) return makeNew<int>([], indices: []);
 
     final ret = <VT>[];
 
-    for(VT k in map.keys) {
-      if(map[k] != max) continue;
+    for (VT k in map.keys) {
+      if (map[k] != max) continue;
       ret.add(k);
     }
 

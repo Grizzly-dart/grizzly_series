@@ -192,7 +192,9 @@ abstract class SeriesView<IT, VT> implements Series<IT, VT> {
   Series<IT, VT> toSeries();
 }
 
-class IntSeriesView<IT> extends IntSeries<IT> implements SeriesView<IT, int> {
+class IntSeriesView<IT> extends IntSeries<IT>
+    with SeriesViewBase<IT, int>
+    implements SeriesView<IT, int> {
   IntSeriesView(IntSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
@@ -217,23 +219,45 @@ class IntSeriesView<IT> extends IntSeries<IT> implements SeriesView<IT, int> {
     });
   }
 
-  void append(IT index, int value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  IntSeries<IT> sortByValue({bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  IntSeries<IT> sortByIndex({bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
-  }
-
   IntSeries<IT> toSeries() =>
       new IntSeries(_data, name: name, indices: _indices);
 
   @override
   IntSeriesView<IT> toView() => this;
+}
+
+abstract class SeriesViewBase<IT, VT> implements SeriesView<IT, VT> {
+  /// Appends a value [value] with index [index] into the series
+  ///
+  /// append is not supported on [SeriesView]. Throws an exception if the
+  /// operation is attempted on a [SeriesView].
+  void append(IT index, VT value) {
+    throw new Exception('Cannot add new elements to SeriesView!');
+  }
+
+  /// Remove element at position [pos]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> remove(int pos, {bool inplace: false}) {
+    throw new Exception('Cannot remove elements from SeriesView!');
+  }
+
+  /// Drop elements by label [label]
+  ///
+  /// If [inplace] is true, the modifications are done inplace.
+  Series<IT, VT> drop(IT label, {bool inplace: false}) {
+    throw new Exception('Cannot remove elements from SeriesView!');
+  }
+
+  Series<IT, VT> sortByValue(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByValue(ascending: ascending, name: name);
+  }
+
+  SeriesView<IT, VT> sortByIndex(
+      {bool ascending: true, bool inplace: false, name}) {
+    if (inplace) throw new Exception('Cannot sort SeriesView!');
+    return sortByIndex(ascending: ascending, name: name);
+  }
 }

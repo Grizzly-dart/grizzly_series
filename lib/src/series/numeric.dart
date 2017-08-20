@@ -17,21 +17,22 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     VT ret;
     bool seenNan = false;
 
-    for(VT v in _data) {
-      if(v == null) continue;
-      if(v == double.NAN) {
-        if(skipNan) {
+    for (VT v in _data) {
+      if (v == null) continue;
+      if (v == double.NAN) {
+        if (skipNan) {
           seenNan = true;
           continue;
         } else {
           return double.NAN as VT;
         }
       }
-      if(ret == null) ret = v;
-      else if(ret < v) ret = v;
+      if (ret == null)
+        ret = v;
+      else if (ret < v) ret = v;
     }
 
-    if(ret == null && seenNan) return double.NAN as VT;
+    if (ret == null && seenNan) return double.NAN as VT;
 
     return ret;
   }
@@ -40,21 +41,22 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     VT ret;
     bool seenNan = false;
 
-    for(VT v in _data) {
-      if(v == null) continue;
-      if(v == double.NAN) {
-        if(skipNan) {
+    for (VT v in _data) {
+      if (v == null) continue;
+      if (v == double.NAN) {
+        if (skipNan) {
           seenNan = true;
           continue;
         } else {
           return double.NAN as VT;
         }
       }
-      if(ret == null) ret = v;
-      else if(ret > v) ret = v;
+      if (ret == null)
+        ret = v;
+      else if (ret > v) ret = v;
     }
 
-    if(ret == null && seenNan) return double.NAN as VT;
+    if (ret == null && seenNan) return double.NAN as VT;
 
     return ret;
   }
@@ -193,9 +195,9 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   NumericSeriesGroupBy<IT, VT> groupByValue({VT apply(VT value)}) {
     final groups = new LinkedHashMap<VT, List<int>>();
 
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final VT v = _data[i];
-      if(!groups.containsKey(v)) groups[v] = <int>[];
+      if (!groups.containsKey(v)) groups[v] = <int>[];
       groups[v].add(i);
     }
 
@@ -205,9 +207,9 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   NumericSeriesGroupBy<IT, VT> groupBySeries(NumericSeries<int, VT> series) {
     final groups = new LinkedHashMap<VT, List<int>>();
 
-    for(int i = 0; i < series.length; i++) {
+    for (int i = 0; i < series.length; i++) {
       final VT v = series._data[i];
-      if(!groups.containsKey(v)) groups[v] = <int>[];
+      if (!groups.containsKey(v)) groups[v] = <int>[];
       final int idx = series._indices[i];
       groups[v].add(idx);
     }

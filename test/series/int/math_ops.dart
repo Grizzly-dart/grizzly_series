@@ -19,8 +19,10 @@ void main() {
     });
 
     test('add.StrIndex', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4], indices: ['one', 'two', 'three', 'four']);
-      final s2 = new IntSeries<String>([1, 2, 3, 4], indices: ['one', 'three', 'four', 'two']);
+      final s1 = new IntSeries<String>([1, 2, 3, 4],
+          indices: ['one', 'two', 'three', 'four']);
+      final s2 = new IntSeries<String>([1, 2, 3, 4],
+          indices: ['one', 'three', 'four', 'two']);
 
       final IntSeries<String> s3 = s1 + s2;
 

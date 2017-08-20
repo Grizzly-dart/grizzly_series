@@ -38,7 +38,7 @@ class NumSeries<IT> extends Object
         throw new Exception("Indices are required for non-int indexing!");
       }
       indices =
-      new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
+          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
     } else {
       if (indices.length != data.length) {
         throw new Exception("Indices and data must be same length!");
@@ -77,7 +77,7 @@ class NumSeries<IT> extends Object
   }
 
   NumSeries<IIT> makeNew<IIT>(Iterable<num> data,
-      {dynamic name, List<IIT> indices}) =>
+          {dynamic name, List<IIT> indices}) =>
       new NumSeries<IIT>(data, name: name, indices: indices);
 
   num sum({bool skipNull: true}) {
@@ -156,37 +156,37 @@ class NumSeries<IT> extends Object
   }
 
   NumSeries<IT> add<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa + opb, fillVal: fillVal, name: name);
 
   NumSeries<IT> sub<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa - opb, fillVal: fillVal, name: name);
 
   NumSeries<IT> mul<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa * opb, fillVal: fillVal, name: name);
 
   NumSeries<IT> div<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa / opb, fillVal: fillVal, name: name);
 
   NumSeries<IT> floorDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => (opa / opb).floor(),
           fillVal: fillVal, name: name);
 
   NumSeries<IT> ceilDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => (opa / opb).ceil(),
           fillVal: fillVal, name: name);
 
   NumSeries<IT> mod<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa % opb, fillVal: fillVal, name: name);
 
   NumSeries<IT> pow<VVT extends num>(NumericSeries<IT, VVT> a,
-      {num fillVal, dynamic name}) =>
+          {num fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => math.pow(opa, opb),
           fillVal: fillVal, name: name);
 
@@ -224,22 +224,6 @@ class NumSeriesView<IT> extends NumSeries<IT> implements SeriesView<IT, num> {
     _mapper[index].forEach((int position) {
       _data[position] = value;
     });
-  }
-
-  void append(IT index, num value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  NumSeries<IT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  NumSeries<IT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
   }
 
   NumSeries<IT> toSeries() =>

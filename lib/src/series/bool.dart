@@ -77,22 +77,22 @@ class BoolSeries<IT> extends Object
   }
 
   BoolSeries<IIT> makeNew<IIT>(Iterable<bool> data,
-      {dynamic name, List<IIT> indices}) =>
+          {dynamic name, List<IIT> indices}) =>
       new BoolSeries<IIT>(data, name: name, indices: indices);
 
   bool max() {
-    for(bool v in _data) {
-      if(v == null) continue;
-      if(v) return true;
+    for (bool v in _data) {
+      if (v == null) continue;
+      if (v) return true;
     }
 
     return false;
   }
 
   bool min() {
-    for(bool v in _data) {
-      if(v == null) continue;
-      if(!v) return false;
+    for (bool v in _data) {
+      if (v == null) continue;
+      if (!v) return false;
     }
 
     return true;
@@ -109,7 +109,8 @@ class BoolSeries<IT> extends Object
   }
 }
 
-class BoolSeriesView<IT> extends BoolSeries<IT> implements SeriesView<IT, bool> {
+class BoolSeriesView<IT> extends BoolSeries<IT>
+    implements SeriesView<IT, bool> {
   BoolSeriesView(BoolSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
@@ -132,22 +133,6 @@ class BoolSeriesView<IT> extends BoolSeries<IT> implements SeriesView<IT, bool> 
     _mapper[index].forEach((int position) {
       _data[position] = value;
     });
-  }
-
-  void append(IT index, bool value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  BoolSeries<IT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  BoolSeries<IT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
   }
 
   BoolSeries<IT> toSeries() =>

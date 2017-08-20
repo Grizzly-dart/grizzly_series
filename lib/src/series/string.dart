@@ -78,16 +78,17 @@ class StringSeries<IT> extends Object
   }
 
   StringSeries<IIT> makeNew<IIT>(Iterable<String> data,
-      {dynamic name, List<IIT> indices}) =>
+          {dynamic name, List<IIT> indices}) =>
       new StringSeries<IIT>(data, name: name, indices: indices);
 
   String max() {
     String ret;
 
-    for(String v in _data) {
-      if(v == null) continue;
-      if(ret == null) ret = v;
-      else if(ret.compareTo(v) < 0) ret = v;
+    for (String v in _data) {
+      if (v == null) continue;
+      if (ret == null)
+        ret = v;
+      else if (ret.compareTo(v) < 0) ret = v;
     }
 
     return ret;
@@ -96,10 +97,11 @@ class StringSeries<IT> extends Object
   String min() {
     String ret;
 
-    for(String v in _data) {
-      if(v == null) continue;
-      if(ret == null) ret = v;
-      else if(ret.compareTo(v) > 0) ret = v;
+    for (String v in _data) {
+      if (v == null) continue;
+      if (ret == null)
+        ret = v;
+      else if (ret.compareTo(v) > 0) ret = v;
     }
 
     return ret;
@@ -117,16 +119,14 @@ class StringSeries<IT> extends Object
 
   DoubleSeries<IT> toDouble({double fillVal}) {
     return new DoubleSeries<IT>(
-        _data
-            .map((String v) =>
-            double.parse(v, (_) => fillVal))
-            .toList(),
+        _data.map((String v) => double.parse(v, (_) => fillVal)).toList(),
         name: name,
         indices: _indices.toList());
   }
 }
 
-class StringSeriesView<IT> extends StringSeries<IT> implements SeriesView<IT, String> {
+class StringSeriesView<IT> extends StringSeries<IT>
+    implements SeriesView<IT, String> {
   StringSeriesView(StringSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
@@ -149,22 +149,6 @@ class StringSeriesView<IT> extends StringSeries<IT> implements SeriesView<IT, St
     _mapper[index].forEach((int position) {
       _data[position] = value;
     });
-  }
-
-  void append(IT index, String value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  StringSeries<IT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  StringSeries<IT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
   }
 
   StringSeries<IT> toSeries() =>

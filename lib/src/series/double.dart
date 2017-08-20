@@ -32,13 +32,14 @@ class DoubleSeries<IT> extends Object
     _pos = new SeriesPositioned<IT, double>(this);
   }
 
-  factory DoubleSeries(Iterable<double> data, {dynamic name, List<IT> indices}) {
+  factory DoubleSeries(Iterable<double> data,
+      {dynamic name, List<IT> indices}) {
     if (indices == null) {
       if (IT.runtimeType == int) {
         throw new Exception("Indices are required for non-int indexing!");
       }
       indices =
-      new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
+          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
     } else {
       if (indices.length != data.length) {
         throw new Exception("Indices and data must be same length!");
@@ -77,7 +78,7 @@ class DoubleSeries<IT> extends Object
   }
 
   DoubleSeries<IIT> makeNew<IIT>(Iterable<double> data,
-      {dynamic name, List<IIT> indices}) =>
+          {dynamic name, List<IIT> indices}) =>
       new DoubleSeries<IIT>(data, name: name, indices: indices);
 
   double sum({bool skipNull: true}) {
@@ -156,37 +157,37 @@ class DoubleSeries<IT> extends Object
   }
 
   DoubleSeries<IT> add<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa + opb, fillVal: fillVal, name: name);
 
   DoubleSeries<IT> sub<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa - opb, fillVal: fillVal, name: name);
 
   DoubleSeries<IT> mul<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa * opb, fillVal: fillVal, name: name);
 
   DoubleSeries<IT> div<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa / opb, fillVal: fillVal, name: name);
 
   DoubleSeries<IT> floorDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => (opa / opb).floor(),
           fillVal: fillVal, name: name);
 
   DoubleSeries<IT> ceilDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => (opa / opb).ceil(),
           fillVal: fillVal, name: name);
 
   DoubleSeries<IT> mod<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => opa % opb, fillVal: fillVal, name: name);
 
   DoubleSeries<IT> pow<VVT extends num>(NumericSeries<IT, VVT> a,
-      {int fillVal, dynamic name}) =>
+          {int fillVal, dynamic name}) =>
       _op(a, (num opa, num opb) => math.pow(opa, opb),
           fillVal: fillVal, name: name);
 
@@ -196,7 +197,8 @@ class DoubleSeries<IT> extends Object
   }
 }
 
-class DoubleSeriesView<IT> extends DoubleSeries<IT> implements SeriesView<IT, double> {
+class DoubleSeriesView<IT> extends DoubleSeries<IT>
+    implements SeriesView<IT, double> {
   DoubleSeriesView(DoubleSeries<IT> series)
       : super._(series._data, series._indices, null, series._mapper) {
     _nameGetter = () => series.name;
@@ -219,22 +221,6 @@ class DoubleSeriesView<IT> extends DoubleSeries<IT> implements SeriesView<IT, do
     _mapper[index].forEach((int position) {
       _data[position] = value;
     });
-  }
-
-  void append(IT index, double value) {
-    throw new Exception('Cannot add new elements to SeriesView!');
-  }
-
-  DoubleSeries<IT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByValue(ascending: ascending, name: name);
-  }
-
-  DoubleSeries<IT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (inplace) throw new Exception('Cannot sort SeriesView!');
-    return sortByIndex(ascending: ascending, name: name);
   }
 
   DoubleSeries<IT> toSeries() =>
