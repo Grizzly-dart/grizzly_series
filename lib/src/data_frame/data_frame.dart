@@ -2,7 +2,8 @@ library grizzly.data_frame;
 
 import 'dart:collection';
 
-import '../series/series.dart';
+import 'package:grizzly_series/src/series/series.dart';
+import 'package:grizzly_series/src/utils/utils.dart';
 
 class DataFrame<IT, CT> {
   final List<CT> _columns;
@@ -21,7 +22,13 @@ class DataFrame<IT, CT> {
 
   DataFrameIndexed get index => _index;
 
-  DataFrame._(this._columns, this._indices, this._data, this._mapper) {
+  final UnmodifiableListView<CT> columns;
+
+  final UnmodifiableListView<IT> indices;
+
+  DataFrame._(this._columns, this._indices, this._data, this._mapper)
+      : indices = new UnmodifiableListView(_indices),
+        columns = new UnmodifiableListView(_columns) {
     _pos = new DataFramePositioned<IT, CT>(this);
     _index = new DataFrameIndexed<IT, CT>(this);
   }
@@ -44,7 +51,7 @@ class DataFrame<IT, CT> {
     }
 
     if (indices == null) {
-      if (IT.runtimeType == int) {
+      if (IT == int) {
         throw new Exception("Indices are required for non-int indexing!");
       }
       if (len == null) {
@@ -100,12 +107,73 @@ class DataFrame<IT, CT> {
     return new DataFrame._(c, indices, d, mapper);
   }
 
-  /* TODO
-  factory DataFrame.series(Map<CT, Series<IT, dynamic>> series,
-      {Map<CT, List> data}) {
-    //TODO
+  factory DataFrame.series(Map<CT, Series<IT, dynamic>> seriesMap,
+      {Map<CT, List> lists: const {},
+      List<Series<IT, dynamic>> series: const []}) {
+    final List<Series<IT, dynamic>> seriesAll = seriesMap.values.toList()
+      ..addAll(series);
+
+    {
+      final int len = seriesAll.first.length;
+
+      bool sameIdx = seriesAll.every((Series s) => s.length == len);
+
+      if (sameIdx) {
+        for (int i = 0; i < seriesAll.first.length; i++) {
+          final IT idx = seriesAll.first.indices[i];
+          sameIdx =
+              sameIdx && seriesAll.every((Series s) => s.indices[i] == idx);
+          if (!sameIdx) break;
+        }
+
+        if (sameIdx) {
+          final bool listMatchLen =
+              lists.values.every((List l) => l.length == len);
+
+          if (!listMatchLen)
+            throw new Exception('Some of the lists dont match indices length!');
+
+          final List<IT> indices = seriesAll.first.indices.toList();
+
+          seriesAll.addAll(lists.keys.map((CT key) =>
+              new DynamicSeries<IT>(lists[key], name: key, indices: indices)));
+
+          final List<CT> columns = seriesMap.keys.toList()
+            ..addAll(series.map((Series s) => s.name).toList() as List<CT>)
+            ..addAll(lists.keys.toList());
+          final SplayTreeMap<IT, List<int>> mapper =
+              indicesToPosMapper(indices);
+          return new DataFrame._(columns, indices, seriesAll, mapper);
+        }
+      }
+    }
+
+    if (lists.length != 0)
+      throw new Exception(
+          'lists can be specified only when all series have identical indices!');
+
+    final indicesSet = new SplayTreeSet<IT>();
+    seriesAll.forEach((Series<IT, dynamic> s) => indicesSet.addAll(s.indices));
+    final List<IT> indicesSorted = indicesSet.toList()..sort();
+
+    final List<Series<IT, dynamic>> d =
+        seriesAll.map((Series<IT, dynamic> s) => s.makeNew([])).toList();
+
+    final indices = <IT>[];
+
+    for (IT idx in indicesSorted) {
+      for (int i = 0; i < seriesAll.length; i++) {
+        //TODO
+      }
+    }
+
+    final List<CT> columns = seriesMap.keys.toList()
+      ..addAll(series.map((Series s) => s.name) as Iterable<CT>);
+
+    final SplayTreeMap<IT, List<int>> mapper = indicesToPosMapper<IT>(indices);
+
+    return new DataFrame._(columns, indices, d, mapper);
   }
-  */
 
   SeriesView<IT, dynamic> operator [](CT column) {
     final int colPos = _columns.indexOf(column);
@@ -138,7 +206,7 @@ class DataFrame<IT, CT> {
     Series<IT, VVT> series;
 
     if (maker == null) {
-      if (VVT.runtimeType != dynamic)
+      if (VVT != dynamic)
         throw new Exception('Need a maker for non-dynamic element type!');
       series =
           new DynamicSeries<IT>(value, name: column, indices: _indices.toList())

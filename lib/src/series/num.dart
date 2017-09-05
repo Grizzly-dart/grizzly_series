@@ -33,30 +33,10 @@ class NumSeries<IT> extends Object
   }
 
   factory NumSeries(Iterable<num> data, {dynamic name, List<IT> indices}) {
-    if (indices == null) {
-      if (IT.runtimeType == int) {
-        throw new Exception("Indices are required for non-int indexing!");
-      }
-      indices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
-    } else {
-      if (indices.length != data.length) {
-        throw new Exception("Indices and data must be same length!");
-      }
-    }
+    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
+    final SplayTreeMap<IT, List<int>> mapper = indicesToPosMapper(madeIndices);
 
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
-      if (mapper.containsKey(index)) {
-        mapper[index].add(i);
-      } else {
-        mapper[index] = new List<int>()..add(i);
-      }
-    }
-
-    return new NumSeries._(data.toList(), indices, name, mapper);
+    return new NumSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory NumSeries.fromMap(Map<IT, List<num>> map, {dynamic name}) {

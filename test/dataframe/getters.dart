@@ -1,4 +1,4 @@
-import 'package:grizzly/grizzly.dart';
+import 'package:grizzly_series/grizzly_series.dart';
 import 'package:test/test.dart';
 
 void main() {

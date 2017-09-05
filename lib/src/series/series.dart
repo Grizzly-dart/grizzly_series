@@ -3,6 +3,7 @@ library grizzly.series;
 import 'dart:math' as math;
 import 'dart:collection';
 import '../data_frame/data_frame.dart';
+import 'package:grizzly_series/src/utils/utils.dart';
 
 part 'bool.dart';
 part 'double.dart';
@@ -14,53 +15,6 @@ part 'string.dart';
 
 typedef SeriesMaker<IT, VT> = Series<IT, VT> Function(Iterable<VT> data,
     {dynamic name, Iterable<IT> indices});
-
-void _sort(List list, bool ascending) {
-  dynamic firstVal = list.firstWhere((v) => v != null, orElse: () => null);
-  if (firstVal == null) return;
-
-  if (firstVal is Comparable) {
-    if (ascending) {
-      (list as List<Comparable>)
-          .sort((Comparable a, Comparable b) => a.compareTo(b));
-    } else {
-      (list as List<Comparable>)
-          .sort((Comparable a, Comparable b) => b.compareTo(a));
-    }
-  } else if (firstVal is bool) {
-    throw new Exception('Not implemented for bool yet!');
-  } else {
-    throw new Exception('Can only sort Comparable!');
-  }
-}
-
-class _SeriesValueSortItem<IT, VT>
-    implements Comparable<_SeriesValueSortItem<IT, VT>> {
-  final IT index;
-
-  final VT value;
-
-  _SeriesValueSortItem(this.index, this.value);
-
-  int compareTo(_SeriesValueSortItem<IT, VT> other) =>
-      _SeriesValueSortItem.compare<IT, VT>(this, other);
-
-  static int compare<IT, VT>(
-      _SeriesValueSortItem<IT, VT> first, _SeriesValueSortItem<IT, VT> second) {
-    if (first.value != null) {
-      if (first.value is! Comparable)
-        throw new Exception('Can only compare Comparable values!');
-    } else {
-      if (second.value != null) {
-        if (second.value is! Comparable)
-          throw new Exception('Can only compare Comparable values!');
-      } else {
-        return 0;
-      }
-    }
-    return (first.value as Comparable<VT>).compareTo(second.value);
-  }
-}
 
 abstract class Series<IT, VT> {
   dynamic name;
@@ -427,7 +381,8 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       ret.add(k);
     }
 
-    return makeNew<int>(ret);
+    return makeNew<int>(ret,
+        indices: new List<int>.generate(ret.length, (int i) => i));
   }
 
   StringSeries<IT> toStringSeries() {
@@ -479,16 +434,16 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         return makeNew([], indices: [], name: name ?? this.name);
     }
 
-    final items = <_SeriesValueSortItem<IT, VT>>[];
+    final items = <SeriesValueSortItem<IT, VT>>[];
 
     for (int i = 0; i < length; i++) {
-      items.add(new _SeriesValueSortItem(_indices[i], _data[i]));
+      items.add(new SeriesValueSortItem(_indices[i], _data[i]));
     }
 
     if (ascending) {
-      items.sort(_SeriesValueSortItem.compare);
+      items.sort(SeriesValueSortItem.compare);
     } else {
-      items.sort((a, b) => _SeriesValueSortItem.compare(b, a));
+      items.sort((a, b) => SeriesValueSortItem.compare(b, a));
     }
 
     if (inplace) {
@@ -496,7 +451,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       final List<VT> d = <VT>[];
       final mapper = new SplayTreeMap<IT, List<int>>();
 
-      for (_SeriesValueSortItem i in items) {
+      for (SeriesValueSortItem i in items) {
         idx.add(i.index);
         d.add(i.value);
         if (!mapper.containsKey(i.index)) mapper[i.index] = <int>[];
@@ -513,7 +468,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       final idx = <IT>[];
       final List<VT> d = <VT>[];
 
-      for (_SeriesValueSortItem i in items) {
+      for (SeriesValueSortItem i in items) {
         idx.add(i.index);
         d.add(i.value);
       }
@@ -526,7 +481,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       {bool ascending: true, bool inplace: false, name}) {
     List<IT> idxSorted = _mapper.keys.toList();
 
-    _sort(idxSorted, ascending);
+    sortList(idxSorted, ascending);
 
     if (inplace) {
       final idx = <IT>[];

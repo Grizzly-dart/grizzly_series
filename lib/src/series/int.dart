@@ -33,30 +33,8 @@ class IntSeries<IT> extends Object
   }
 
   factory IntSeries(Iterable<int> data, {dynamic name, List<IT> indices}) {
-    List<IT> madeIndices = indices;
-    if (madeIndices == null) {
-      if (IT.runtimeType == int) {
-        throw new Exception("Indices are required for non-int indexing!");
-      }
-      madeIndices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
-    } else {
-      if (indices.length != data.length) {
-        throw new Exception("Indices and data must be same length!");
-      }
-      madeIndices = indices.toList();
-    }
-
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < madeIndices.length; i++) {
-      final IT index = madeIndices[i];
-      if (mapper.containsKey(index)) {
-        mapper[index].add(i);
-      } else {
-        mapper[index] = new List<int>()..add(i);
-      }
-    }
+    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
+    final mapper = indicesToPosMapper(madeIndices);
 
     return new IntSeries._(data.toList(), madeIndices, name, mapper);
   }
@@ -79,8 +57,9 @@ class IntSeries<IT> extends Object
   }
 
   IntSeries<IIT> makeNew<IIT>(Iterable<int> data,
-          {dynamic name, List<IIT> indices}) =>
-      new IntSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> indices}) {
+    return new IntSeries<IIT>(data, name: name, indices: indices);
+  }
 
   int sum({bool skipNull: true}) {
     int ret = 0;

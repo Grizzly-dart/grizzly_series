@@ -1,4 +1,4 @@
-# Grizzly
+# Grizzly Series
 
 Pandas-like Series and DataFrames for Dart
 
