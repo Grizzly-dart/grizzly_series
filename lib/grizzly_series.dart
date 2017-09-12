@@ -6,6 +6,7 @@
 /// More dartdocs go here.
 library grizzly_series;
 
+export 'src/primitives/primitives.dart';
 export 'src/array/array.dart';
 export 'src/ndarray/ndarray.dart';
 export 'src/data_frame/data_frame.dart';

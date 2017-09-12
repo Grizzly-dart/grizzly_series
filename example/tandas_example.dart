@@ -59,7 +59,7 @@ main() {
   */
 
   final s1 = new IntSeries<String>([2, 4, 2, 1, 4],
-      indices: ['A', 'B', 'C', 'D', 'E']);
+      labels: ['A', 'B', 'C', 'D', 'E']);
   print(s1.valueCounts(sortByValue: true));
   print(s1.valueCounts(sortByValue: true, ascending: true));
   print(s1.valueCounts());

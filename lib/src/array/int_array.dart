@@ -1,20 +1,24 @@
 part of grizzly.series.array;
 
-class NumArray extends Object
-    with IterableMixin<num>
-    implements NumericArray<num> {
-  final Float64List _data;
+class IntArray extends Object
+    with IterableMixin<int>
+    implements NumericArray<int> {
+  final Int64List _data;
 
-  NumArray(this._data);
+  IntArray(this._data);
+
+  IntArray.from(Iterable<int> data) : _data = new Int64List.fromList(data);
+
+  IntArray makeFrom(Iterable<int> newData) => new IntArray(newData);
 
   @override
-  Iterator<double> get iterator => _data.iterator;
+  Iterator<int> get iterator => _data.iterator;
 
   @override
-  num min() {
-    num ret;
+  int min() {
+    int ret;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
@@ -24,10 +28,10 @@ class NumArray extends Object
   }
 
   @override
-  num max() {
-    num ret;
+  int max() {
+    int ret;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
@@ -37,26 +41,26 @@ class NumArray extends Object
   }
 
   @override
-  Extent<num> extent() {
-    num min;
-    num max;
+  Extent<int> extent() {
+    int min;
+    int max;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
       if (max == null || d > max) max = d;
       if (min == null || d < min) min = d;
     }
-    return new Extent(min, max);
+    return new Extent<int>(min, max);
   }
 
   @override
   int argMin() {
     int ret;
-    num min;
+    int min;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
@@ -71,9 +75,9 @@ class NumArray extends Object
   @override
   int argMax() {
     int ret;
-    num max;
+    int max;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
@@ -86,10 +90,10 @@ class NumArray extends Object
   }
 
   @override
-  void clip({num min, num max}) {
+  void clip({int min, int max}) {
     if (min != null && max != null) {
       for (int i = 0; i < _data.length; i++) {
-        final num d = _data[i];
+        final int d = _data[i];
 
         if (d < min) _data[i] = min;
         if (d > max) _data[i] = max;
@@ -98,7 +102,7 @@ class NumArray extends Object
     }
     if (min != null) {
       for (int i = 0; i < _data.length; i++) {
-        final num d = _data[i];
+        final int d = _data[i];
 
         if (d < min) _data[i] = min;
       }
@@ -106,7 +110,7 @@ class NumArray extends Object
     }
     if (max != null) {
       for (int i = 0; i < _data.length; i++) {
-        final num d = _data[i];
+        final int d = _data[i];
 
         if (d > max) _data[i] = max;
       }
@@ -114,12 +118,17 @@ class NumArray extends Object
     }
   }
 
+  IntPair<int> pairAt(int index) => new IntPair<int>(index, _data[index]);
+
+  Iterable<IntPair<int>> enumerate() =>
+      Ranger.indices(_data.length).map((i) => intPair<int>(i, _data[i]));
+
   @override
-  num ptp() {
-    num min;
-    num max;
+  int ptp() {
+    int min;
+    int max;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
 
       if (d == null) continue;
 
@@ -135,9 +144,9 @@ class NumArray extends Object
   double mean() {
     if (_data.length == 0) return 0.0;
 
-    num sum = 0;
+    int sum = 0;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
       if (d == null) continue;
       sum += d;
     }
@@ -145,10 +154,10 @@ class NumArray extends Object
   }
 
   @override
-  num sum() {
-    num sum = 0;
+  int sum() {
+    int sum = 0;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
       if (d == null) continue;
       sum += d;
     }
@@ -156,10 +165,10 @@ class NumArray extends Object
   }
 
   @override
-  num prod() {
+  int prod() {
     int prod = 1;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
       if (d == null) continue;
       prod *= d;
     }
@@ -167,13 +176,13 @@ class NumArray extends Object
   }
 
   @override
-  NumArray cumsum() {
-    final NumArray ret = new NumArray(new Float64List(_data.length));
-    num sum = 0;
+  IntArray cumsum() {
+    final ret = new IntArray(new Int64List(_data.length));
+    int sum = 0;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
       if (d == null) {
-      	_data[i] = sum;
+        _data[i] = sum;
         continue;
       }
       sum += d;
@@ -183,14 +192,14 @@ class NumArray extends Object
   }
 
   @override
-  NumArray cumprod() {
-	  final NumArray ret = new NumArray(new Float64List(_data.length));
-    num prod = 1;
+  IntArray cumprod() {
+    final ret = new IntArray(new Int64List(_data.length));
+    int prod = 1;
     for (int i = 0; i < _data.length; i++) {
-      final num d = _data[i];
+      final int d = _data[i];
       if (d == null) {
-	      _data[i] = prod;
-	      continue;
+        _data[i] = prod;
+        continue;
       }
       prod *= d;
       _data[i] = prod;
@@ -200,11 +209,37 @@ class NumArray extends Object
 
   @override
   double variance() {
-  	throw new Exception('Unimplemented!');
+    //TODO
+    throw new UnimplementedError();
   }
 
   @override
   double std() {
-	  throw new Exception('Unimplemented!');
+    //TODO
+    throw new UnimplementedError();
   }
+
+  /// Returns a new  [IntArray] containing first [count] elements of this array
+  ///
+  /// If the length of the array is shorter than [count], all elements are
+  /// returned
+  IntArray head([int count = 10]) {
+    if (length <= count) return makeFrom(_data);
+    return makeFrom(_data.sublist(0, count));
+  }
+
+  /// Returns a new  [IntArray] containing last [count] elements of this array
+  ///
+  /// If the length of the array is shorter than [count], all elements are
+  /// returned
+  IntArray tail([int count = 10]) {
+    if (length <= count) return makeFrom(_data);
+    return makeFrom(_data.sublist(length - count));
+  }
+
+  /// Returns a new  [Array] containing random [count] elements of this array
+  ///
+  /// If the length of the array is shorter than [count], all elements are
+  /// returned
+  IntArray sample([int count = 10]) => makeFrom(_sample<int>(_data, count));
 }

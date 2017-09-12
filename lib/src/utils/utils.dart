@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-List<IT> makeIndices<IT>(int dataLength, List<IT> indices, Type itType) {
+List<IT> makeLabels<IT>(int dataLength, List<IT> indices, Type itType) {
   if(dataLength == 0) return <IT>[];
 
   List<IT> madeIndices;
@@ -20,7 +20,7 @@ List<IT> makeIndices<IT>(int dataLength, List<IT> indices, Type itType) {
   return madeIndices;
 }
 
-SplayTreeMap<IT, List<int>> indicesToPosMapper<IT>(List<IT> indices) {
+SplayTreeMap<IT, List<int>> labelsToPosMapper<IT>(List<IT> indices) {
   final mapper = new SplayTreeMap<IT, List<int>>();
 
   for (int i = 0; i < indices.length; i++) {
@@ -62,11 +62,11 @@ void sortList(List list, bool ascending) {
 
 class SeriesValueSortItem<IT, VT>
     implements Comparable<SeriesValueSortItem<IT, VT>> {
-  final IT index;
+  final IT label;
 
   final VT value;
 
-  SeriesValueSortItem(this.index, this.value);
+  SeriesValueSortItem(this.label, this.value);
 
   int compareTo(SeriesValueSortItem<IT, VT> other) =>
       SeriesValueSortItem.compare<IT, VT>(this, other);

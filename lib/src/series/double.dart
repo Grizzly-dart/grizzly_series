@@ -3,7 +3,7 @@ part of grizzly.series;
 class DoubleSeries<IT> extends Object
     with SeriesBase<IT, double>, NumericSeries<IT, double>
     implements Series<IT, double> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<double> _data;
 
@@ -11,7 +11,7 @@ class DoubleSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<double> data;
 
@@ -26,16 +26,16 @@ class DoubleSeries<IT> extends Object
     return _view;
   }
 
-  DoubleSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  DoubleSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, double>(this);
   }
 
   factory DoubleSeries(Iterable<double> data,
-      {dynamic name, List<IT> indices}) {
-    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
-    final mapper = indicesToPosMapper(madeIndices);
+      {dynamic name, List<IT> labels}) {
+    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
+    final mapper = labelsToPosMapper(madeIndices);
 
     return new DoubleSeries._(data.toList(), madeIndices, name, mapper);
   }
@@ -58,8 +58,8 @@ class DoubleSeries<IT> extends Object
   }
 
   DoubleSeries<IIT> makeNew<IIT>(Iterable<double> data,
-          {dynamic name, List<IIT> indices}) =>
-      new DoubleSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) =>
+      new DoubleSeries<IIT>(data, name: name, labels: labels);
 
   double sum({bool skipNull: true}) {
     double ret = 0.0;
@@ -173,14 +173,14 @@ class DoubleSeries<IT> extends Object
 
   IntSeries<IT> toInt() {
     return new IntSeries<IT>(_data.map((double v) => v.toInt()).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 }
 
 class DoubleSeriesView<IT> extends DoubleSeries<IT>
     implements SeriesView<IT, double> {
   DoubleSeriesView(DoubleSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -204,7 +204,7 @@ class DoubleSeriesView<IT> extends DoubleSeries<IT>
   }
 
   DoubleSeries<IT> toSeries() =>
-      new DoubleSeries(_data, name: name, indices: _indices);
+      new DoubleSeries(_data, name: name, labels: _labels);
 
   DoubleSeriesView<IT> toView() => this;
 }

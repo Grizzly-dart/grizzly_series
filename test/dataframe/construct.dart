@@ -11,7 +11,7 @@ void main() {
         'two': new IntSeries<int>([10, 20, 30, 40])
       });
 
-      expect(df.indices, [0, 1, 2, 3]);
+      expect(df.labels, [0, 1, 2, 3]);
 
       expect(df.pos[0].data, [1, 10]);
       expect(df.pos[1].data, [2, 20]);
@@ -27,7 +27,7 @@ void main() {
         new StringSeries<int>(['A', 'B', 'C', 'D'], name: 'alphabets')
       ]);
 
-      expect(df.indices, [0, 1, 2, 3]);
+      expect(df.labels, [0, 1, 2, 3]);
       expect(df.columns, ['one', 'two', 'alphabets']);
 
       expect(df.pos[0].data, [1, 10, 'A']);
@@ -47,7 +47,7 @@ void main() {
           'four': ['AA', 'BB', 'CC', 'DD']
       });
 
-      expect(df.indices, [0, 1, 2, 3]);
+      expect(df.labels, [0, 1, 2, 3]);
       expect(df.columns, ['one', 'two', 'alphabets', 'three', 'four']);
 
       expect(df.pos[0].data, [1, 10, 'A', 1000, 'AA']);

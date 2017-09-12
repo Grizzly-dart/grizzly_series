@@ -8,7 +8,7 @@ import 'package:grizzly_series/src/utils/utils.dart';
 class DataFrame<IT, CT> {
   final List<CT> _columns;
 
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<Series> _data;
 
@@ -24,16 +24,16 @@ class DataFrame<IT, CT> {
 
   final UnmodifiableListView<CT> columns;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
-  DataFrame._(this._columns, this._indices, this._data, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  DataFrame._(this._columns, this._labels, this._data, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         columns = new UnmodifiableListView(_columns) {
     _pos = new DataFramePositioned<IT, CT>(this);
     _index = new DataFrameIndexed<IT, CT>(this);
   }
 
-  factory DataFrame(Map<CT, List> data, {List<IT> indices}) {
+  factory DataFrame(Map<CT, List> data, {List<IT> labels}) {
     int len;
 
     if (data.length > 0) {
@@ -50,7 +50,7 @@ class DataFrame<IT, CT> {
       }
     }
 
-    if (indices == null) {
+    if (labels == null) {
       if (IT == int) {
         throw new Exception("Indices are required for non-int indexing!");
       }
@@ -59,18 +59,18 @@ class DataFrame<IT, CT> {
           throw new Exception('Cannot figure out length!');
         } else {
           len = 0;
-          indices = <IT>[];
+          labels = <IT>[];
         }
       } else {
-        indices = new List<int>.generate(len, (int idx) => idx) as List<IT>;
+        labels = new List<int>.generate(len, (int idx) => idx) as List<IT>;
       }
     } else {
       if (len != null) {
-        if (indices.length != len) {
+        if (labels.length != len) {
           throw new Exception("Indices and data must be same length!");
         }
       } else {
-        len = indices.length;
+        len = labels.length;
       }
     }
 
@@ -86,17 +86,17 @@ class DataFrame<IT, CT> {
         final List v = data[k];
         if (v == null) {
           d.add(new DynamicSeries(new List.filled(len, null),
-              name: k, indices: indices));
+              name: k, labels: labels));
         } else {
-          d.add(new DynamicSeries(v, name: k, indices: indices));
+          d.add(new DynamicSeries(v, name: k, labels: labels));
         }
       }
     }
 
     final mapper = new SplayTreeMap<IT, List<int>>();
 
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
+    for (int i = 0; i < labels.length; i++) {
+      final IT index = labels[i];
       if (mapper.containsKey(index)) {
         mapper[index].add(i);
       } else {
@@ -104,7 +104,7 @@ class DataFrame<IT, CT> {
       }
     }
 
-    return new DataFrame._(c, indices, d, mapper);
+    return new DataFrame._(c, labels, d, mapper);
   }
 
   factory DataFrame.series(Map<CT, Series<IT, dynamic>> seriesMap,
@@ -120,9 +120,9 @@ class DataFrame<IT, CT> {
 
       if (sameIdx) {
         for (int i = 0; i < seriesAll.first.length; i++) {
-          final IT idx = seriesAll.first.indices[i];
+          final IT idx = seriesAll.first.labels[i];
           sameIdx =
-              sameIdx && seriesAll.every((Series s) => s.indices[i] == idx);
+              sameIdx && seriesAll.every((Series s) => s.labels[i] == idx);
           if (!sameIdx) break;
         }
 
@@ -131,37 +131,37 @@ class DataFrame<IT, CT> {
               lists.values.every((List l) => l.length == len);
 
           if (!listMatchLen)
-            throw new Exception('Some of the lists dont match indices length!');
+            throw new Exception('Some of the lists dont match labels length!');
 
-          final List<IT> indices = seriesAll.first.indices.toList();
+          final List<IT> labels = seriesAll.first.labels.toList();
 
           seriesAll.addAll(lists.keys.map((CT key) =>
-              new DynamicSeries<IT>(lists[key], name: key, indices: indices)));
+              new DynamicSeries<IT>(lists[key], name: key, labels: labels)));
 
           final List<CT> columns = seriesMap.keys.toList()
             ..addAll(series.map((Series s) => s.name).toList() as List<CT>)
             ..addAll(lists.keys.toList());
           final SplayTreeMap<IT, List<int>> mapper =
-              indicesToPosMapper(indices);
-          return new DataFrame._(columns, indices, seriesAll, mapper);
+              labelsToPosMapper(labels);
+          return new DataFrame._(columns, labels, seriesAll, mapper);
         }
       }
     }
 
     if (lists.length != 0)
       throw new Exception(
-          'lists can be specified only when all series have identical indices!');
+          'lists can be specified only when all series have identical labels!');
 
-    final indicesSet = new SplayTreeSet<IT>();
-    seriesAll.forEach((Series<IT, dynamic> s) => indicesSet.addAll(s.indices));
-    final List<IT> indicesSorted = indicesSet.toList()..sort();
+    final labelsSet = new SplayTreeSet<IT>();
+    seriesAll.forEach((Series<IT, dynamic> s) => labelsSet.addAll(s.labels));
+    final List<IT> labelsSorted = labelsSet.toList()..sort();
 
     final List<Series<IT, dynamic>> d =
         seriesAll.map((Series<IT, dynamic> s) => s.makeNew([])).toList();
 
-    final indices = <IT>[];
+    final labels = <IT>[];
 
-    for (IT idx in indicesSorted) {
+    for (IT idx in labelsSorted) {
       for (int i = 0; i < seriesAll.length; i++) {
         //TODO
       }
@@ -170,9 +170,9 @@ class DataFrame<IT, CT> {
     final List<CT> columns = seriesMap.keys.toList()
       ..addAll(series.map((Series s) => s.name) as Iterable<CT>);
 
-    final SplayTreeMap<IT, List<int>> mapper = indicesToPosMapper<IT>(indices);
+    final SplayTreeMap<IT, List<int>> mapper = labelsToPosMapper<IT>(labels);
 
-    return new DataFrame._(columns, indices, d, mapper);
+    return new DataFrame._(columns, labels, d, mapper);
   }
 
   SeriesView<IT, dynamic> operator [](CT column) {
@@ -188,7 +188,7 @@ class DataFrame<IT, CT> {
     final int colPos = _columns.indexOf(column);
     if (colPos == -1) {
       final temp = value.makeNew(new List.filled(length, null),
-          name: column, indices: _indices.toList());
+          name: column, labels: _labels.toList());
       temp.assign(value);
       _columns.add(column);
       _data.add(temp);
@@ -200,7 +200,7 @@ class DataFrame<IT, CT> {
 
   void addColumnFromList<VVT>(CT column, List<VVT> value,
       {SeriesMaker<IT, VVT> maker}) {
-    if (value.length != _indices.length)
+    if (value.length != _labels.length)
       throw new Exception('Value does not match length!');
 
     Series<IT, VVT> series;
@@ -209,10 +209,10 @@ class DataFrame<IT, CT> {
       if (VVT != dynamic)
         throw new Exception('Need a maker for non-dynamic element type!');
       series =
-          new DynamicSeries<IT>(value, name: column, indices: _indices.toList())
+          new DynamicSeries<IT>(value, name: column, labels: _labels.toList())
               as Series<IT, VVT>;
     } else {
-      series = maker(value, name: column, indices: _indices.toList());
+      series = maker(value, name: column, labels: _labels.toList());
     }
 
     final int colPos = _columns.indexOf(column);
@@ -234,7 +234,7 @@ class DataFrame<IT, CT> {
 
     final List d = _data.map((Series l) => l.pos[pos]).toList();
 
-    return new DynamicSeries<CT>(d, indices: _columns.toList(), name: index);
+    return new DynamicSeries<CT>(d, labels: _columns.toList(), name: index);
   }
 
   List<DynamicSeries<CT>> getByIndexMulti(IT index) {
@@ -244,7 +244,7 @@ class DataFrame<IT, CT> {
 
     return _mapper[index].map((int pos) {
       final List d = _data.map((Series l) => l.pos[pos]).toList();
-      return new DynamicSeries<CT>(d, indices: _columns.toList(), name: index);
+      return new DynamicSeries<CT>(d, labels: _columns.toList(), name: index);
     }).toList();
   }
 
@@ -264,18 +264,18 @@ class DataFrame<IT, CT> {
   }
 
   DynamicSeries<CT> getByPos(int position) {
-    if (position >= _indices.length)
-      throw new RangeError.range(position, 0, _indices.length);
+    if (position >= _labels.length)
+      throw new RangeError.range(position, 0, _labels.length);
 
     final List d = _data.map((Series l) => l.pos[position]).toList();
 
     return new DynamicSeries<CT>(d,
-        indices: _columns.toList(), name: _indices[position]);
+        labels: _columns.toList(), name: _labels[position]);
   }
 
   void setByPos(int position, List value) {
-    if (position >= _indices.length)
-      throw new RangeError.range(position, 0, _indices.length);
+    if (position >= _labels.length)
+      throw new RangeError.range(position, 0, _labels.length);
     if (value.length != _columns.length)
       throw new Exception('Value does not match number of columns!');
 
@@ -285,7 +285,7 @@ class DataFrame<IT, CT> {
   }
 
   NumSeries<CT> max({dynamic name, bool numericOnly: false}) {
-    final ret = new NumSeries<CT>([], name: name, indices: []);
+    final ret = new NumSeries<CT>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
       if (numericOnly && _data[i] is! NumericSeries) continue;
@@ -296,7 +296,7 @@ class DataFrame<IT, CT> {
   }
 
   NumSeries<CT> min({dynamic name, bool numericOnly: false}) {
-    final ret = new NumSeries<CT>([], name: name, indices: []);
+    final ret = new NumSeries<CT>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
       if (numericOnly && _data[i] is! NumericSeries) continue;
@@ -316,9 +316,9 @@ class DataFrame<IT, CT> {
     return ret;
   }
 
-  List<int> get shape => [_indices.length, _columns.length];
+  List<int> get shape => [_labels.length, _columns.length];
 
-  int get length => _indices.length;
+  int get length => _labels.length;
 
   String toString() {
     final sb = new StringBuffer();
@@ -328,7 +328,7 @@ class DataFrame<IT, CT> {
     sb.writeln();
 
     for (int i = 0; i < length; i++) {
-      sb.write(_indices[i]);
+      sb.write(_labels[i]);
       sb.write('\t');
       for (Series s in _data) {
         sb.write(s.pos[i]);

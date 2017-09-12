@@ -3,7 +3,7 @@ part of grizzly.series;
 class NumSeries<IT> extends Object
     with SeriesBase<IT, num>, NumericSeries<IT, num>
     implements Series<IT, num> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<num> _data;
 
@@ -11,7 +11,7 @@ class NumSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<num> data;
 
@@ -26,39 +26,39 @@ class NumSeries<IT> extends Object
     return _view;
   }
 
-  NumSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  NumSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, num>(this);
   }
 
-  factory NumSeries(Iterable<num> data, {dynamic name, List<IT> indices}) {
-    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
-    final SplayTreeMap<IT, List<int>> mapper = indicesToPosMapper(madeIndices);
+  factory NumSeries(Iterable<num> data, {dynamic name, List<IT> labels}) {
+    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
+    final SplayTreeMap<IT, List<int>> mapper = labelsToPosMapper(madeIndices);
 
     return new NumSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory NumSeries.fromMap(Map<IT, List<num>> map, {dynamic name}) {
-    final List<IT> indices = [];
+    final List<IT> labels = [];
     final List<num> data = [];
     final mapper = new SplayTreeMap<IT, List<int>>();
 
     for (IT index in map.keys) {
       mapper[index] = <int>[];
       for (num val in map[index]) {
-        indices.add(index);
+        labels.add(index);
         data.add(val);
         mapper[index].add(data.length - 1);
       }
     }
 
-    return new NumSeries._(data.toList(), indices, name, mapper);
+    return new NumSeries._(data.toList(), labels, name, mapper);
   }
 
   NumSeries<IIT> makeNew<IIT>(Iterable<num> data,
-          {dynamic name, List<IIT> indices}) =>
-      new NumSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) =>
+      new NumSeries<IIT>(data, name: name, labels: labels);
 
   num sum({bool skipNull: true}) {
     num ret = 0;
@@ -172,18 +172,18 @@ class NumSeries<IT> extends Object
 
   IntSeries<IT> toInt() {
     return new IntSeries<IT>(_data.map((num v) => v.toInt()).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 
   DoubleSeries<IT> toDouble() {
     return new DoubleSeries<IT>(_data.map((num v) => v.toDouble()).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 }
 
 class NumSeriesView<IT> extends NumSeries<IT> implements SeriesView<IT, num> {
   NumSeriesView(NumSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -207,7 +207,7 @@ class NumSeriesView<IT> extends NumSeries<IT> implements SeriesView<IT, num> {
   }
 
   NumSeries<IT> toSeries() =>
-      new NumSeries(_data, name: name, indices: _indices);
+      new NumSeries(_data, name: name, labels: _labels);
 
   NumSeriesView<IT> toView() => this;
 }

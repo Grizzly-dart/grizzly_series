@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'dart:collection';
 import '../data_frame/data_frame.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
+import 'package:grizzly_series/grizzly_series.dart';
+import 'package:grizzly_viz_scales/grizzly_viz_scales.dart';
 
 part 'bool.dart';
 part 'double.dart';
@@ -14,12 +16,12 @@ part 'numeric.dart';
 part 'string.dart';
 
 typedef SeriesMaker<IT, VT> = Series<IT, VT> Function(Iterable<VT> data,
-    {dynamic name, Iterable<IT> indices});
+    {dynamic name, Iterable<IT> labels});
 
 abstract class Series<IT, VT> {
   dynamic name;
 
-  UnmodifiableListView<IT> get indices;
+  UnmodifiableListView<IT> get labels;
 
   UnmodifiableListView<VT> get data;
 
@@ -27,31 +29,39 @@ abstract class Series<IT, VT> {
 
   SeriesPositioned<IT, VT> get pos;
 
-  /// Checks if Series contains the index
-  bool containsIndex(IT index);
+  /// Checks if Series contains the label
+  bool containsIndex(IT label);
 
-  /// Lookup by index
-  VT operator [](IT index);
+  /// Lookup by label
+  VT operator [](IT label);
 
-  operator []=(IT index, VT val);
+  operator []=(IT label, VT val);
 
   /// Lookup by position
   VT getByPos(int position);
 
   void setByPos(int position, VT value);
 
-  /// Returns multiple values by index
-  VT getByIndex(IT index);
+  /// Returns multiple values by label
+  VT getByLabel(IT label);
 
-  void setByIndex(IT index, VT value);
+  void setByLabel(IT label, VT value);
 
-  /// Returns multiple values by index
-  List<VT> getByIndexMulti(IT index);
+  /// Returns multiple values by label
+  List<VT> getByLabelMulti(IT label);
 
-  /// Returns index at position
-  IT indexAt(int position);
+  /// Returns label at position
+  IT labelAt(int position);
 
-  void append(IT index, VT value);
+  Pair<IT, VT> pairByLabel(IT label);
+
+  Pair<IT, VT> pairByPos(int pos);
+
+  Iterable<Pair<IT, VT>> enumerate();
+
+  Iterable<Pair<IT, VT>> enumerateSliced(int start, [int end]);
+
+  void append(IT label, VT value);
 
   /// Remove element at position [pos]
   ///
@@ -89,7 +99,7 @@ abstract class Series<IT, VT> {
   Series<IT, VT> sortByIndex({bool ascending: true, bool inplace: false});
 
   Series<IIT, VT> makeNew<IIT>(Iterable<VT> data,
-      {dynamic name, List<IIT> indices});
+      {dynamic name, List<IIT> labels});
 
   SeriesView<IT, VT> toView();
 
@@ -115,7 +125,7 @@ class SeriesPositioned<IT, VT> {
 }
 
 abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
-  List<IT> get _indices;
+  List<IT> get _labels;
 
   List<VT> get _data;
 
@@ -123,25 +133,25 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
 
   int get length => _data.length;
 
-  bool containsIndex(IT index) => _mapper.containsKey(index);
+  bool containsIndex(IT label) => _mapper.containsKey(label);
 
-  VT operator [](IT index) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception("Index named $index not found!");
+  VT operator [](IT label) {
+    if (!_mapper.containsKey(label)) {
+      throw new Exception("Index named $label not found!");
     }
 
-    return _data[_mapper[index].first];
+    return _data[_mapper[label].first];
   }
 
-  operator []=(IT index, VT value) {
-    if (!_mapper.containsKey(index)) {
-      _indices.add(index);
+  operator []=(IT label, VT value) {
+    if (!_mapper.containsKey(label)) {
+      _labels.add(label);
       _data.add(value);
-      _mapper[index].add(_data.length - 1);
+      _mapper[label].add(_data.length - 1);
       return;
     }
 
-    _mapper[index].forEach((int position) {
+    _mapper[label].forEach((int position) {
       _data[position] = value;
     });
   }
@@ -156,31 +166,56 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     _data[position] = value;
   }
 
-  VT getByIndex(IT index) => this[index];
+  VT getByLabel(IT label) => this[label];
 
-  void setByIndex(IT index, VT value) => this[index] = value;
+  void setByLabel(IT label, VT value) => this[label] = value;
 
-  List<VT> getByIndexMulti(IT index) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception("Index named $index not found!");
+  List<VT> getByLabelMulti(IT label) {
+    if (!_mapper.containsKey(label)) {
+      throw new Exception("Index named $label not found!");
     }
 
-    return _mapper[index].map((int pos) => _data[pos]).toList();
+    return _mapper[label].map((int pos) => _data[pos]).toList();
   }
 
-  IT indexAt(int position) {
+  IT labelAt(int position) {
     if (position >= length) throw new RangeError.range(position, 0, length);
-    return _indices[position];
+    return _labels[position];
   }
 
-  void append(IT index, VT value) {
-    _indices.add(index);
+  Pair<IT, VT> pairByLabel(IT label) => pair<IT, VT>(label, this[label]);
+
+  Pair<IT, VT> pairByPos(int position) {
+    if (position >= length) throw new RangeError.range(position, 0, length);
+    return pair<IT, VT>(_labels[position], _data[position]);
+  }
+
+  Iterable<Pair<IT, VT>> enumerate() => Ranger.indices(length).map(pairByPos);
+
+  Iterable<Pair<IT, VT>> enumerateSliced(int start, [int end]) {
+    if (end == null)
+      end = length - 1;
+    else {
+      if (end > length - 1) {
+        throw new ArgumentError.value(end, 'end', 'Out of range');
+      }
+    }
+
+    if(start > length - 1) {
+      throw new ArgumentError.value(start, 'start', 'Out of range');
+    }
+
+    return Ranger.range(start, end).map(pairByPos);
+  }
+
+  void append(IT label, VT value) {
+    _labels.add(label);
     _data.add(value);
 
-    if (!_mapper.containsKey(index)) {
-      _mapper[index] = new List<int>()..add(_data.length - 1);
+    if (!_mapper.containsKey(label)) {
+      _mapper[label] = new List<int>()..add(_data.length - 1);
     } else {
-      _mapper[index].add(_data.length - 1);
+      _mapper[label].add(_data.length - 1);
     }
   }
 
@@ -198,21 +233,21 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
   Series<IT, VT> remove(int pos, {bool inplace: false}) {
     if (pos >= length) throw new RangeError.range(pos, 0, length);
     if (inplace) {
-      final IT label = _indices[pos];
+      final IT label = _labels[pos];
       _mapper[label].remove(pos);
       if (_mapper[label].length == 0) _mapper.remove(label);
-      _indices.removeAt(pos);
+      _labels.removeAt(pos);
       _data.removeAt(pos);
       _updatePosOnRemove(pos);
       return this;
     } else {
-      final List<IT> idx = _indices.toList();
+      final List<IT> idx = _labels.toList();
       final List<VT> d = _data.toList();
 
       idx.removeAt(pos);
       d.removeAt(pos);
 
-      return makeNew(d, name: name, indices: idx);
+      return makeNew(d, name: name, labels: idx);
     }
   }
 
@@ -232,16 +267,16 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
 
     if (inplace) {
       for (int pos in positionSet) {
-        final IT label = _indices[pos];
+        final IT label = _labels[pos];
         _mapper[label].remove(pos);
         if (_mapper[label].length == 0) _mapper.remove(label);
-        _indices.removeAt(pos);
+        _labels.removeAt(pos);
         _data.removeAt(pos);
         _updatePosOnRemove(pos);
       }
       return this;
     } else {
-      final List<IT> idx = _indices.toList();
+      final List<IT> idx = _labels.toList();
       final List<VT> d = _data.toList();
 
       for (int pos in positionSet) {
@@ -249,7 +284,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         d.removeAt(pos);
       }
 
-      return makeNew(d, name: name, indices: idx);
+      return makeNew(d, name: name, labels: idx);
     }
   }
 
@@ -266,14 +301,14 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       final List<int> poses = _mapper[label].toList();
       poses.sort((int a, int b) => b.compareTo(a));
       for (int pos in poses) {
-        _indices.removeAt(pos);
+        _labels.removeAt(pos);
         _data.removeAt(pos);
         _updatePosOnRemove(pos);
       }
       _mapper.remove(label);
       return this;
     } else {
-      final List<IT> idx = _indices.toList();
+      final List<IT> idx = _labels.toList();
       final List<VT> d = _data.toList();
 
       final List<int> poses = _mapper[label].toList();
@@ -283,7 +318,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         d.removeAt(pos);
       }
 
-      return makeNew(d, name: name, indices: idx);
+      return makeNew(d, name: name, labels: idx);
     }
   }
 
@@ -303,13 +338,13 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     if (inplace) {
       labelSet.forEach((IT idx) => _mapper.remove(idx));
       for (int pos in positionSet) {
-        _indices.removeAt(pos);
+        _labels.removeAt(pos);
         _data.removeAt(pos);
         _updatePosOnRemove(pos);
       }
       return this;
     } else {
-      final List<IT> idx = _indices.toList();
+      final List<IT> idx = _labels.toList();
       final List<VT> d = _data.toList();
 
       for (int pos in positionSet) {
@@ -317,7 +352,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         d.removeAt(pos);
       }
 
-      return makeNew(d, name: name, indices: idx);
+      return makeNew(d, name: name, labels: idx);
     }
   }
 
@@ -331,7 +366,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
 
       if (sourcePos.length != destPos.length) {
         if (destPos.length != 1) {
-          throw new Exception('Mismatch of value lengths by index!');
+          throw new Exception('Mismatch of value lengths by label!');
         }
       }
     }
@@ -372,7 +407,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       if (map[v] > max) max = map[v];
     }
 
-    if (max == 0) return makeNew<int>([], indices: []);
+    if (max == 0) return makeNew<int>([], labels: []);
 
     final ret = <VT>[];
 
@@ -382,12 +417,12 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     }
 
     return makeNew<int>(ret,
-        indices: new List<int>.generate(ret.length, (int i) => i));
+        labels: new List<int>.generate(ret.length, (int i) => i));
   }
 
   StringSeries<IT> toStringSeries() {
     return new StringSeries<IT>(_data.map((v) => v.toString()).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 
   @override
@@ -422,7 +457,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
   }
 
   DataFrame<IT, dynamic> toDataFrame<CT>({CT column}) {
-    return new DataFrame<IT, CT>({column ?? name: data}, indices: indices);
+    return new DataFrame<IT, CT>({column ?? name: data}, labels: labels);
   }
 
   Series<IT, VT> sortByValue(
@@ -431,13 +466,13 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       if (inplace)
         return this;
       else
-        return makeNew([], indices: [], name: name ?? this.name);
+        return makeNew([], labels: [], name: name ?? this.name);
     }
 
     final items = <SeriesValueSortItem<IT, VT>>[];
 
     for (int i = 0; i < length; i++) {
-      items.add(new SeriesValueSortItem(_indices[i], _data[i]));
+      items.add(new SeriesValueSortItem(_labels[i], _data[i]));
     }
 
     if (ascending) {
@@ -452,13 +487,14 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       final mapper = new SplayTreeMap<IT, List<int>>();
 
       for (SeriesValueSortItem i in items) {
-        idx.add(i.index);
+        idx.add(i.label);
         d.add(i.value);
-        if (!mapper.containsKey(i.index)) mapper[i.index] = <int>[];
-        mapper[i.index].add(idx.length - 1);
+        if (!mapper.containsKey(i.label)) mapper[i.label] = <int>[];
+        mapper[i.label].add(idx.length - 1);
       }
 
-      _indices.replaceRange(0, _indices.length, idx);
+      _labels.replaceRange(0, _labels.length, idx);
+      _labels.replaceRange(0, _labels.length, idx);
       _data.replaceRange(0, _data.length, d);
       _mapper.clear();
       _mapper.addAll(mapper);
@@ -469,11 +505,11 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       final List<VT> d = <VT>[];
 
       for (SeriesValueSortItem i in items) {
-        idx.add(i.index);
+        idx.add(i.label);
         d.add(i.value);
       }
 
-      return makeNew(d, name: name ?? this.name, indices: idx);
+      return makeNew(d, name: name ?? this.name, labels: idx);
     }
   }
 
@@ -497,7 +533,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         }
       }
 
-      _indices.replaceRange(0, _indices.length, idx);
+      _labels.replaceRange(0, _labels.length, idx);
       _data.replaceRange(0, _data.length, d);
       _mapper.clear();
       _mapper.addAll(mapper);
@@ -514,7 +550,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
         }
       }
 
-      return makeNew(d, name: name ?? this.name, indices: idx);
+      return makeNew(d, name: name ?? this.name, labels: idx);
     }
   }
 
@@ -522,8 +558,8 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     final sb = new StringBuffer();
 
     //TODO print as table
-    for (int i = 0; i < indices.length; i++) {
-      sb.writeln('${_indices[i]} ${_data[i]}');
+    for (int i = 0; i < labels.length; i++) {
+      sb.writeln('${_labels[i]} ${_data[i]}');
     }
 
     return sb.toString();

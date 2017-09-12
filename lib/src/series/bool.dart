@@ -3,7 +3,7 @@ part of grizzly.series;
 class BoolSeries<IT> extends Object
     with SeriesBase<IT, bool>
     implements Series<IT, bool> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<bool> _data;
 
@@ -11,7 +11,7 @@ class BoolSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<bool> data;
 
@@ -26,15 +26,15 @@ class BoolSeries<IT> extends Object
     return _view;
   }
 
-  BoolSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  BoolSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, bool>(this);
   }
 
   factory BoolSeries(Iterable<bool> data, {dynamic name, List<IT> indices}) {
-    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
-    final mapper = indicesToPosMapper(madeIndices);
+    final List<IT> madeIndices = makeLabels<IT>(data.length, indices, IT);
+    final mapper = labelsToPosMapper(madeIndices);
 
     return new BoolSeries._(data.toList(), madeIndices, name, mapper);
   }
@@ -57,8 +57,8 @@ class BoolSeries<IT> extends Object
   }
 
   BoolSeries<IIT> makeNew<IIT>(Iterable<bool> data,
-          {dynamic name, List<IIT> indices}) =>
-      new BoolSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) =>
+      new BoolSeries<IIT>(data, name: name, indices: labels);
 
   bool max() {
     for (bool v in _data) {
@@ -80,19 +80,19 @@ class BoolSeries<IT> extends Object
 
   IntSeries<IT> toInt({int radix, int fillVal}) {
     return new IntSeries<IT>(_data.map((bool v) => v ? 1 : 0).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 
   DoubleSeries<IT> toDouble({double fillVal}) {
     return new DoubleSeries<IT>(_data.map((bool v) => v ? 1.0 : 0.0).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 }
 
 class BoolSeriesView<IT> extends BoolSeries<IT>
     implements SeriesView<IT, bool> {
   BoolSeriesView(BoolSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -116,7 +116,7 @@ class BoolSeriesView<IT> extends BoolSeries<IT>
   }
 
   BoolSeries<IT> toSeries() =>
-      new BoolSeries(_data, name: name, indices: _indices);
+      new BoolSeries(_data, name: name, indices: _labels);
 
   @override
   BoolSeriesView<IT> toView() => this;

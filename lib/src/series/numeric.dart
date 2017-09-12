@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
-  List<IT> get _indices;
+  List<IT> get _labels;
 
   List<VT> get _data;
 
@@ -210,7 +210,7 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     for (int i = 0; i < series.length; i++) {
       final VT v = series._data[i];
       if (!groups.containsKey(v)) groups[v] = <int>[];
-      final int idx = series._indices[i];
+      final int idx = series._labels[i];
       groups[v].add(idx);
     }
 
@@ -229,9 +229,9 @@ class NumericSeriesGroupBy<IT, VT extends num> {
 
   UnmodifiableMapView<VT, UnmodifiableListView<int>> get groups => _groups;
 
-  UnmodifiableMapView<VT, UnmodifiableListView<IT>> _indices;
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> _labels;
 
-  UnmodifiableMapView<VT, UnmodifiableListView<IT>> get indices => _indices;
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> get labels => _labels;
 
   NumericSeriesGroupBy(this.series, Map<VT, List<int>> groupMapping) {
     final temp = new LinkedHashMap<VT, UnmodifiableListView<int>>();
@@ -240,12 +240,12 @@ class NumericSeriesGroupBy<IT, VT extends num> {
     for (VT v in groupMapping.keys) {
       temp[v] = new UnmodifiableListView<int>(groupMapping[v]);
       tempIdx[v] = new UnmodifiableListView<IT>(groupMapping[v]
-          .map((int position) => series.indices[position])
+          .map((int position) => series.labels[position])
           .toList());
     }
 
     _groups = new UnmodifiableMapView<VT, UnmodifiableListView<int>>(temp);
-    _indices = new UnmodifiableMapView<VT, UnmodifiableListView<IT>>(tempIdx);
+    _labels = new UnmodifiableMapView<VT, UnmodifiableListView<IT>>(tempIdx);
   }
 
   IntSeries<VT> count({dynamic name}) {
@@ -257,7 +257,7 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(_groups[key].length);
     }
 
-    return new IntSeries<VT>(data, name: name, indices: idx);
+    return new IntSeries<VT>(data, name: name, labels: idx);
   }
 
   NumSeries<VT> max({dynamic name}) {
@@ -280,7 +280,7 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(mx);
     }
 
-    return new NumSeries<VT>(data, name: name, indices: idx);
+    return new NumSeries<VT>(data, name: name, labels: idx);
   }
 
   NumSeries<VT> min({dynamic name}) {
@@ -303,6 +303,6 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(min);
     }
 
-    return new NumSeries<VT>(data, name: name, indices: idx);
+    return new NumSeries<VT>(data, name: name, labels: idx);
   }
 }

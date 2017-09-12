@@ -3,7 +3,7 @@ part of grizzly.series;
 class IntSeries<IT> extends Object
     with SeriesBase<IT, int>, NumericSeries<IT, int>
     implements Series<IT, int> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<int> _data;
 
@@ -11,7 +11,7 @@ class IntSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<int> data;
 
@@ -26,15 +26,15 @@ class IntSeries<IT> extends Object
     return _view;
   }
 
-  IntSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  IntSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, int>(this);
   }
 
-  factory IntSeries(Iterable<int> data, {dynamic name, List<IT> indices}) {
-    final List<IT> madeIndices = makeIndices<IT>(data.length, indices, IT);
-    final mapper = indicesToPosMapper(madeIndices);
+  factory IntSeries(Iterable<int> data, {dynamic name, List<IT> labels}) {
+    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
+    final mapper = labelsToPosMapper(madeIndices);
 
     return new IntSeries._(data.toList(), madeIndices, name, mapper);
   }
@@ -57,8 +57,8 @@ class IntSeries<IT> extends Object
   }
 
   IntSeries<IIT> makeNew<IIT>(Iterable<int> data,
-          {dynamic name, List<IIT> indices}) {
-    return new IntSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) {
+    return new IntSeries<IIT>(data, name: name, labels: labels);
   }
 
   int sum({bool skipNull: true}) {
@@ -161,7 +161,7 @@ class IntSeries<IT> extends Object
 
   DoubleSeries<IT> toDouble() {
     return new DoubleSeries<IT>(_data.map((int v) => v.toDouble()).toList(),
-        name: name, indices: _indices.toList());
+        name: name, labels: _labels.toList());
   }
 
   IntSeries<IT> operator +(IntSeries<IT> a) => add(a);
@@ -175,7 +175,7 @@ class IntSeriesView<IT> extends IntSeries<IT>
     with SeriesViewBase<IT, int>
     implements SeriesView<IT, int> {
   IntSeriesView(IntSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -199,7 +199,7 @@ class IntSeriesView<IT> extends IntSeries<IT>
   }
 
   IntSeries<IT> toSeries() =>
-      new IntSeries(_data, name: name, indices: _indices);
+      new IntSeries(_data, name: name, labels: _labels);
 
   @override
   IntSeriesView<IT> toView() => this;
