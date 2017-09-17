@@ -5,7 +5,7 @@ import 'dart:collection';
 import '../data_frame/data_frame.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
-import 'package:grizzly_viz_scales/grizzly_viz_scales.dart';
+import 'package:grizzly_scales/grizzly_scales.dart';
 
 part 'bool.dart';
 part 'double.dart';
@@ -190,7 +190,8 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
     return pair<IT, VT>(_labels[position], _data[position]);
   }
 
-  Iterable<Pair<IT, VT>> enumerate() => Ranger.indices(length).map(pairByPos);
+  Iterable<Pair<IT, VT>> enumerate() =>
+      Ranger.indices(length - 1).map(pairByPos);
 
   Iterable<Pair<IT, VT>> enumerateSliced(int start, [int end]) {
     if (end == null)
@@ -201,7 +202,7 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
       }
     }
 
-    if(start > length - 1) {
+    if (start > length - 1) {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
