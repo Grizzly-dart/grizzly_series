@@ -8,22 +8,68 @@ import 'package:grizzly_series/grizzly_series.dart';
 
 part 'int_array.dart';
 part 'double_array.dart';
+
 //TODO DateTime
 //TODO String
 //TODO bool
 
+abstract class Index {
+  /// Number of dimensions
+  int get dim;
+
+  /// Get index at dimension [d]
+  int operator[](int d);
+
+  List<int> toList();
+}
+
+class Index1D {
+  final int x;
+
+  const Index1D(this.x);
+
+  int get dim => 1;
+
+  int operator[](int d) {
+    if(d >= dim) throw new RangeError.range(d, 0, 0, 'd', 'Out of range!');
+    return x;
+  }
+
+  List<int> toList() => <int>[x];
+
+  bool operator==(other) {
+    if(other is! Index1D) return false;
+
+    if(other is Index1D) {
+      return other.x == this.x;
+    }
+
+    return false;
+  }
+}
+
+Index1D idx1D(int x) => new Index1D(x);
+
 abstract class Array<E> implements Iterable<E> {
   Array<E> makeFrom(Iterable<E> newData);
 
-  E min();
+  Index1D get shape;
 
-  E max();
+  E operator[](int i);
 
-  Extent<E> extent();
+  operator[]=(int i, E val);
 
-  int argMin();
+  // TODO [Index] based indexing
 
-  int argMax();
+  E get min;
+
+  E get max;
+
+  Extent<E> get extent;
+
+  int get argMin;
+
+  int get argMax;
 
   void clip({E min, E max});
 
@@ -51,21 +97,21 @@ abstract class Array<E> implements Iterable<E> {
 }
 
 abstract class NumericArray<E extends num> implements Array<E> {
-  E ptp();
+  E get ptp;
 
-  double mean();
+  double get mean;
 
-  E sum();
+  E get sum;
 
-  E prod();
+  E get prod;
 
-  NumericArray<E> cumsum();
+  NumericArray<E> get cumsum;
 
-  NumericArray<E> cumprod();
+  NumericArray<E> get cumprod;
 
-  double variance();
+  double get variance;
 
-  double std();
+  double get std;
 }
 
 final math.Random _rand = new math.Random();

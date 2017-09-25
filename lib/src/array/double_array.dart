@@ -15,8 +15,25 @@ class DoubleArray extends Object
   @override
   Iterator<double> get iterator => _data.iterator;
 
+  Index1D get shape => new Index1D(_data.length);
+
+  double operator [](int i) => _data[i];
+
+  operator []=(int i, double val) {
+    if (i > _data.length) {
+      throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');
+    }
+
+    if (i == _data.length) {
+      _data.add(val);
+      return;
+    }
+
+    _data[i] = val;
+  }
+
   @override
-  double min() {
+  double get min {
     double ret;
     for (int i = 0; i < _data.length; i++) {
       final double d = _data[i];
@@ -29,7 +46,7 @@ class DoubleArray extends Object
   }
 
   @override
-  double max() {
+  double get max {
     double ret;
     for (int i = 0; i < _data.length; i++) {
       final double d = _data[i];
@@ -42,7 +59,7 @@ class DoubleArray extends Object
   }
 
   @override
-  Extent<double> extent() {
+  Extent<double> get extent {
     double min;
     double max;
     for (int i = 0; i < _data.length; i++) {
@@ -57,7 +74,7 @@ class DoubleArray extends Object
   }
 
   @override
-  int argMin() {
+  int get argMin {
     int ret;
     double min;
     for (int i = 0; i < _data.length; i++) {
@@ -74,7 +91,7 @@ class DoubleArray extends Object
   }
 
   @override
-  int argMax() {
+  int get argMax {
     int ret;
     double max;
     for (int i = 0; i < _data.length; i++) {
@@ -125,7 +142,7 @@ class DoubleArray extends Object
       Ranger.indices(_data.length).map((i) => intPair<double>(i, _data[i]));
 
   @override
-  double ptp() {
+  double get ptp {
     double min;
     double max;
     for (int i = 0; i < _data.length; i++) {
@@ -142,7 +159,7 @@ class DoubleArray extends Object
   }
 
   @override
-  double mean() {
+  double get mean {
     if (_data.length == 0) return 0.0;
 
     double sum = 0.0;
@@ -155,7 +172,7 @@ class DoubleArray extends Object
   }
 
   @override
-  double sum() {
+  double get sum {
     double sum = 0.0;
     for (int i = 0; i < _data.length; i++) {
       final double d = _data[i];
@@ -166,7 +183,7 @@ class DoubleArray extends Object
   }
 
   @override
-  double prod() {
+  double get prod {
     double prod = 1.0;
     for (int i = 0; i < _data.length; i++) {
       final double d = _data[i];
@@ -177,7 +194,7 @@ class DoubleArray extends Object
   }
 
   @override
-  DoubleArray cumsum() {
+  DoubleArray get cumsum {
     final DoubleArray ret = new DoubleArray(new Float64List(_data.length));
     double sum = 0.0;
     for (int i = 0; i < _data.length; i++) {
@@ -193,7 +210,7 @@ class DoubleArray extends Object
   }
 
   @override
-  DoubleArray cumprod() {
+  DoubleArray get cumprod {
     final DoubleArray ret = new DoubleArray(new Float64List(_data.length));
     double prod = 1.0;
     for (int i = 0; i < _data.length; i++) {
@@ -209,13 +226,13 @@ class DoubleArray extends Object
   }
 
   @override
-  double variance() {
+  double get variance {
     //TODO
     throw new UnimplementedError();
   }
 
   @override
-  double std() {
+  double get std {
     //TODO
     throw new UnimplementedError();
   }

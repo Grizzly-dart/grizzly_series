@@ -2,7 +2,7 @@ import 'package:grizzly_series/grizzly_series.dart';
 import 'package:test/test.dart';
 
 void main() {
-	group('Series.remove', () {
+	group('IntArray.remove', () {
 		setUp(() {});
 
 		test('drop.inplace', () {

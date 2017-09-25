@@ -2,10 +2,12 @@ part of grizzly.series.array;
 
 class IntArray extends Object
     with IterableMixin<int>
-    implements NumericArray<int> {
+    implements NumericArray<int>, Array<int> {
   final Int64List _data;
 
   IntArray(this._data);
+
+  IntArray.sized(int length) : _data = new Int64List(length);
 
   IntArray.from(Iterable<int> data) : _data = new Int64List.fromList(data);
 
@@ -14,8 +16,41 @@ class IntArray extends Object
   @override
   Iterator<int> get iterator => _data.iterator;
 
+  Index1D get shape => new Index1D(_data.length);
+
+  int operator [](int i) => _data[i];
+
+  operator []=(int i, int val) {
+    if (i > _data.length) {
+      throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');
+    }
+
+    if (i == _data.length) {
+      _data.add(val);
+      return;
+    }
+
+    _data[i] = val;
+  }
+
+  bool operator==(other) {
+    if(other is! Array<int>) return false;
+
+    if(other is Array<int>) {
+      if(length != other.length) return false;
+
+      for(int i = 0; i < length; i++) {
+        if(_data[i] != other[i]) return false;
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
   @override
-  int min() {
+  int get min {
     int ret;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -28,7 +63,7 @@ class IntArray extends Object
   }
 
   @override
-  int max() {
+  int get max {
     int ret;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -41,7 +76,7 @@ class IntArray extends Object
   }
 
   @override
-  Extent<int> extent() {
+  Extent<int> get extent {
     int min;
     int max;
     for (int i = 0; i < _data.length; i++) {
@@ -56,7 +91,7 @@ class IntArray extends Object
   }
 
   @override
-  int argMin() {
+  int get argMin {
     int ret;
     int min;
     for (int i = 0; i < _data.length; i++) {
@@ -73,7 +108,7 @@ class IntArray extends Object
   }
 
   @override
-  int argMax() {
+  int get argMax {
     int ret;
     int max;
     for (int i = 0; i < _data.length; i++) {
@@ -118,13 +153,13 @@ class IntArray extends Object
     }
   }
 
-  IntPair<int> pairAt(int index) => new IntPair<int>(index, _data[index]);
+  IntPair<int> pairAt(int index) => intPair<int>(index, _data[index]);
 
   Iterable<IntPair<int>> enumerate() =>
       Ranger.indices(_data.length).map((i) => intPair<int>(i, _data[i]));
 
   @override
-  int ptp() {
+  int get ptp {
     int min;
     int max;
     for (int i = 0; i < _data.length; i++) {
@@ -141,7 +176,7 @@ class IntArray extends Object
   }
 
   @override
-  double mean() {
+  double get mean {
     if (_data.length == 0) return 0.0;
 
     int sum = 0;
@@ -154,7 +189,7 @@ class IntArray extends Object
   }
 
   @override
-  int sum() {
+  int get sum {
     int sum = 0;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -165,7 +200,7 @@ class IntArray extends Object
   }
 
   @override
-  int prod() {
+  int get prod {
     int prod = 1;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -176,7 +211,7 @@ class IntArray extends Object
   }
 
   @override
-  IntArray cumsum() {
+  IntArray get cumsum {
     final ret = new IntArray(new Int64List(_data.length));
     int sum = 0;
     for (int i = 0; i < _data.length; i++) {
@@ -192,7 +227,7 @@ class IntArray extends Object
   }
 
   @override
-  IntArray cumprod() {
+  IntArray get cumprod {
     final ret = new IntArray(new Int64List(_data.length));
     int prod = 1;
     for (int i = 0; i < _data.length; i++) {
@@ -208,13 +243,13 @@ class IntArray extends Object
   }
 
   @override
-  double variance() {
+  double get variance {
     //TODO
     throw new UnimplementedError();
   }
 
   @override
-  double std() {
+  double get std {
     //TODO
     throw new UnimplementedError();
   }
