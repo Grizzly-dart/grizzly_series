@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 List<IT> makeLabels<IT>(int dataLength, List<IT> indices, Type itType) {
-  if(dataLength == 0) return <IT>[];
+  if (dataLength == 0) return <IT>[];
 
   List<IT> madeIndices;
   if (indices == null) {

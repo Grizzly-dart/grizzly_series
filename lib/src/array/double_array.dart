@@ -7,6 +7,17 @@ class DoubleArray extends Object
 
   DoubleArray(this._data);
 
+  DoubleArray.sized(int length, {double data: 0.0})
+      : _data = new Float64List(length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = data;
+    }
+  }
+
+  DoubleArray.single(double data) : _data = new Float64List(1) {
+    _data[0] = data;
+  }
+
   DoubleArray.from(Iterable<double> iterable)
       : _data = new Float64List.fromList(iterable);
 
@@ -30,6 +41,10 @@ class DoubleArray extends Object
     }
 
     _data[i] = val;
+  }
+
+  void add(double a) {
+    _data.add(a);
   }
 
   @override
@@ -193,6 +208,25 @@ class DoubleArray extends Object
     return prod;
   }
 
+  double average(Iterable<num> weights) {
+    if (weights.length != length) {
+      throw new Exception('Weights have mismatching length!');
+    }
+    if (_data.length == 0) return 0.0;
+
+    double sum = 0.0;
+    num denom = 0.0;
+    for (int i = 0; i < _data.length; i++) {
+      final double d = _data[i];
+      final int w = weights.elementAt(i);
+      if (d == null) continue;
+      if (w == null) continue;
+      sum += d * w;
+      denom += w;
+    }
+    return sum / denom;
+  }
+
   @override
   DoubleArray get cumsum {
     final DoubleArray ret = new DoubleArray(new Float64List(_data.length));
@@ -237,6 +271,373 @@ class DoubleArray extends Object
     throw new UnimplementedError();
   }
 
+  DoubleArray operator +(/* num | Iterable<num> */ other) {
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      final ret = new DoubleArray.sized(length);
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other.elementAt(i);
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    final ret = new DoubleArray.sized(length);
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other;
+      }
+    } else if (other is DoubleArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other[i];
+      }
+    }
+    return ret;
+  }
+
+  DoubleArray addition(/* num | Iterable<num> */ other, {bool copy: false}) {
+    if (copy) return this + other;
+
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        _data[i] += other.elementAt(i);
+      }
+      return this;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        _data[i] += other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        _data[i] += other[i];
+      }
+    }
+    return this;
+  }
+
+  DoubleArray operator -(/* num | Iterable<num> */ other) {
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      final ret = new DoubleArray.sized(length);
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other.elementAt(i);
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    final ret = new DoubleArray.sized(length);
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other[i];
+      }
+    }
+    return ret;
+  }
+
+  DoubleArray subtract(/* num | Iterable<num> */ other, {bool copy: false}) {
+    if (copy) return this - other;
+
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        _data[i] -= other.elementAt(i);
+      }
+      return this;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        _data[i] -= other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        _data[i] -= other[i];
+      }
+    }
+    return this;
+  }
+
+  DoubleArray operator *(/* num | Iterable<num> */ other) {
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      final ret = new DoubleArray.sized(length);
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other.elementAt(i);
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    final ret = new DoubleArray.sized(length);
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other[i];
+      }
+    }
+    return ret;
+  }
+
+  DoubleArray multiple(/* num | Iterable<num> */ other, {bool copy: false}) {
+    if (copy) return this * other;
+
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        _data[i] *= other.elementAt(i);
+      }
+      return this;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        _data[i] *= other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        _data[i] *= other[i];
+      }
+    }
+    return this;
+  }
+
+  DoubleArray operator /(/* num | Iterable<num> */ other) {
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      final ret = new DoubleArray.sized(length);
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] / other.elementAt(i);
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    final ret = new DoubleArray.sized(length);
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] / other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] / other[i];
+      }
+    }
+    return ret;
+  }
+
+  DoubleArray divide(/* E | Iterable<E> */ other, {bool copy: false}) {
+    if (copy) return this / other;
+
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        _data[i] /= other.elementAt(i);
+      }
+      return this;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        _data[i] /= other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        _data[i] /= other[i];
+      }
+    }
+    return this;
+  }
+
+  IntArray operator ~/(/* num | Iterable<num> */ other) {
+    if (other is NumericArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is num) {
+      // Nothing here
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      final ret = new IntArray.sized(length);
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other.elementAt(i).toInt();
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    final ret = new IntArray.sized(length);
+    if (other is num) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other;
+      }
+    } else if (other is NumericArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other[i];
+      }
+    }
+    return ret;
+  }
+
+  IntArray truncDiv(/* num | Iterable<num> */ other, {bool copy: false}) {
+    if (copy) return this ~/ other;
+
+    throw new Exception('Operation not supported!');
+  }
+
+  IntArray toInt() {
+    final ret = new IntArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].toInt();
+    }
+
+    return ret;
+  }
+
+  IntArray floor() {
+    final ret = new IntArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].floor();
+    }
+
+    return ret;
+  }
+
+  IntArray ceil() {
+    final ret = new IntArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].ceil();
+    }
+
+    return ret;
+  }
+
+  DoubleArray floorToDouble({bool copy: false}) {
+    if (!copy) {
+      for (int i = 0; i < length; i++) {
+        _data[i] = _data[i].floorToDouble();
+      }
+      return this;
+    }
+
+    final ret = new DoubleArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].floorToDouble();
+    }
+
+    return ret;
+  }
+
+  DoubleArray ceilToDouble({bool copy: false}) {
+    if (!copy) {
+      for (int i = 0; i < length; i++) {
+        _data[i] = _data[i].ceilToDouble();
+      }
+      return this;
+    }
+
+    final ret = new DoubleArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].ceilToDouble();
+    }
+
+    return ret;
+  }
+
   /// Returns a new  [DoubleArray] containing first [count] elements of this array
   ///
   /// If the length of the array is shorter than [count], all elements are
@@ -261,4 +662,24 @@ class DoubleArray extends Object
   /// returned
   DoubleArray sample([int count = 10]) =>
       makeFrom(_sample<double>(_data, count));
+
+  Double2DArray to2D() => new Double2DArray.from([_data]);
+
+  Double2DArray repeat({int repeat: 1, bool transpose: false}) {
+    if (!transpose) {
+      return new Double2DArray.columns(_data, repeat + 1);
+    } else {
+      return new Double2DArray.rows(_data, repeat + 1);
+    }
+  }
+
+  Double2DArray transpose() {
+    final ret = new Double2DArray.sized(length, 1);
+
+    for (int i = 0; i < length; i++) {
+      ret[i][0] = _data[i];
+    }
+
+    return ret;
+  }
 }

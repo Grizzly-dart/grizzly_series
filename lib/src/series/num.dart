@@ -206,8 +206,7 @@ class NumSeriesView<IT> extends NumSeries<IT> implements SeriesView<IT, num> {
     });
   }
 
-  NumSeries<IT> toSeries() =>
-      new NumSeries(_data, name: name, labels: _labels);
+  NumSeries<IT> toSeries() => new NumSeries(_data, name: name, labels: _labels);
 
   NumSeriesView<IT> toView() => this;
 }

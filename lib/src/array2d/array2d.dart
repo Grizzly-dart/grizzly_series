@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
+part 'double_array2d.dart';
 part 'int_array2d.dart';
 
 class Index2D implements Index {
@@ -16,18 +17,19 @@ class Index2D implements Index {
 
   int get dim => 2;
 
-  int operator[](int d) {
-    if(d >= dim) throw new RangeError.range(d, 0, dim - 1, 'd', 'Out of range!');
-    if(d == 0) return x;
+  int operator [](int d) {
+    if (d >= dim)
+      throw new RangeError.range(d, 0, dim - 1, 'd', 'Out of range!');
+    if (d == 0) return x;
     return y;
   }
 
   List<int> toList() => <int>[x, y];
 
-  bool operator==(other) {
-    if(other is! Index2D) return false;
+  bool operator ==(other) {
+    if (other is! Index2D) return false;
 
-    if(other is Index2D) {
+    if (other is Index2D) {
       return other.x == this.x && other.y == this.y;
     }
 
@@ -46,9 +48,17 @@ abstract class Array2D<E> implements Iterable<Array<E>> {
 
   Index2D get shape;
 
-  Array<E> operator[](int i);
+  Array<E> operator [](int i);
 
-  operator[]=(int i, Array<E> val);
+  operator []=(int i, Array<E> val);
+
+  void addRow(Iterable<E> row);
+
+  void addRowScalar(E v);
+
+  void assign(int index, Iterable<E> v, {bool column: false});
+
+  void assignScalar(int index, E v, {bool column: false});
 
   E get min;
 
@@ -91,4 +101,34 @@ abstract class Array2D<E> implements Iterable<Array<E>> {
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Array2D<E> sample([int count = 10]);
+
+  Array2D<E> transpose();
+}
+
+abstract class Numeric2DArray<E extends num> implements Array2D<E> {
+  // TODO E get ptp;
+
+  double get mean;
+
+  DoubleArray get meanX;
+
+  DoubleArray get meanY;
+
+  // TODO E get sum;
+
+  // TODO E get prod;
+
+  double average(Iterable<Iterable<num>> weights);
+
+  DoubleArray averageX(Iterable<num> weights);
+
+  DoubleArray averageY(Iterable<num> weights);
+
+  // TODO NumericArray<E> get cumsum;
+
+  // TODO NumericArray<E> get cumprod;
+
+  // TODO double get variance;
+
+  // TODO double get std;
 }

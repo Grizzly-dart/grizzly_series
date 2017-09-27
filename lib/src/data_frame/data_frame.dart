@@ -141,8 +141,7 @@ class DataFrame<IT, CT> {
           final List<CT> columns = seriesMap.keys.toList()
             ..addAll(series.map((Series s) => s.name).toList() as List<CT>)
             ..addAll(lists.keys.toList());
-          final SplayTreeMap<IT, List<int>> mapper =
-              labelsToPosMapper(labels);
+          final SplayTreeMap<IT, List<int>> mapper = labelsToPosMapper(labels);
           return new DataFrame._(columns, labels, seriesAll, mapper);
         }
       }

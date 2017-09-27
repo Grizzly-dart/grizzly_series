@@ -32,8 +32,7 @@ class DoubleSeries<IT> extends Object
     _pos = new SeriesPositioned<IT, double>(this);
   }
 
-  factory DoubleSeries(Iterable<double> data,
-      {dynamic name, List<IT> labels}) {
+  factory DoubleSeries(Iterable<double> data, {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
     final mapper = labelsToPosMapper(madeIndices);
 

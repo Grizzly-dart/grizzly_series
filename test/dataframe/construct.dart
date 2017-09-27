@@ -43,8 +43,8 @@ void main() {
       }, series: [
         new StringSeries<int>(['A', 'B', 'C', 'D'], name: 'alphabets')
       ], lists: {
-          'three': [1000, 2000, 3000, 4000],
-          'four': ['AA', 'BB', 'CC', 'DD']
+        'three': [1000, 2000, 3000, 4000],
+        'four': ['AA', 'BB', 'CC', 'DD']
       });
 
       expect(df.labels, [0, 1, 2, 3]);

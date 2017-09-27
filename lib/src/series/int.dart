@@ -57,7 +57,7 @@ class IntSeries<IT> extends Object
   }
 
   IntSeries<IIT> makeNew<IIT>(Iterable<int> data,
-          {dynamic name, List<IIT> labels}) {
+      {dynamic name, List<IIT> labels}) {
     return new IntSeries<IIT>(data, name: name, labels: labels);
   }
 
@@ -198,8 +198,7 @@ class IntSeriesView<IT> extends IntSeries<IT>
     });
   }
 
-  IntSeries<IT> toSeries() =>
-      new IntSeries(_data, name: name, labels: _labels);
+  IntSeries<IT> toSeries() => new IntSeries(_data, name: name, labels: _labels);
 
   @override
   IntSeriesView<IT> toView() => this;

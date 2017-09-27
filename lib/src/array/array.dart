@@ -18,7 +18,7 @@ abstract class Index {
   int get dim;
 
   /// Get index at dimension [d]
-  int operator[](int d);
+  int operator [](int d);
 
   List<int> toList();
 }
@@ -30,17 +30,17 @@ class Index1D {
 
   int get dim => 1;
 
-  int operator[](int d) {
-    if(d >= dim) throw new RangeError.range(d, 0, 0, 'd', 'Out of range!');
+  int operator [](int d) {
+    if (d >= dim) throw new RangeError.range(d, 0, 0, 'd', 'Out of range!');
     return x;
   }
 
   List<int> toList() => <int>[x];
 
-  bool operator==(other) {
-    if(other is! Index1D) return false;
+  bool operator ==(other) {
+    if (other is! Index1D) return false;
 
-    if(other is Index1D) {
+    if (other is Index1D) {
       return other.x == this.x;
     }
 
@@ -55,11 +55,13 @@ abstract class Array<E> implements Iterable<E> {
 
   Index1D get shape;
 
-  E operator[](int i);
+  E operator [](int i);
 
-  operator[]=(int i, E val);
+  operator []=(int i, E val);
 
   // TODO [Index] based indexing
+
+  void add(E a);
 
   E get min;
 
@@ -94,6 +96,12 @@ abstract class Array<E> implements Iterable<E> {
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Array<E> sample([int count = 10]);
+
+  Array2D<E> to2D();
+
+  Array2D<E> repeat({int repeat: 1, bool transpose: false});
+
+  Array2D<E> transpose();
 }
 
 abstract class NumericArray<E extends num> implements Array<E> {
@@ -105,6 +113,8 @@ abstract class NumericArray<E extends num> implements Array<E> {
 
   E get prod;
 
+  double average(Iterable<num> weights);
+
   NumericArray<E> get cumsum;
 
   NumericArray<E> get cumprod;
@@ -112,6 +122,26 @@ abstract class NumericArray<E extends num> implements Array<E> {
   double get variance;
 
   double get std;
+
+  NumericArray<E> operator +(/* E | Iterable<E> */ other);
+
+  NumericArray<E> addition(/* E | Iterable<E> */ other);
+
+  NumericArray<E> operator -(/* E | Iterable<E> */ other);
+
+  NumericArray<E> subtract(/* E | Iterable<E> */ other);
+
+  NumericArray<E> operator *(/* E | Iterable<E> */ other);
+
+  NumericArray<E> multiple(/* E | Iterable<E> */ other);
+
+  NumericArray<double> operator /(/* E | Iterable<E> */ other);
+
+  NumericArray<double> divide(/* E | Iterable<E> */ other);
+
+  NumericArray<int> operator ~/(/* E | Iterable<E> */ other);
+
+  NumericArray<int> truncDiv(/* E | Iterable<E> */ other);
 }
 
 final math.Random _rand = new math.Random();
@@ -125,21 +155,21 @@ List<E> _sample<E>(List<E> population, int k) {
 
   final samples = new List<E>(k);
 
-  if(n < 1000) {
+  if (n < 1000) {
     final unpicked = new List<E>.from(population);
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       final sampleIdx = _rand.nextInt(n - i);
       samples[i] = unpicked[sampleIdx];
-      unpicked[sampleIdx] = unpicked[n-i-1];
+      unpicked[sampleIdx] = unpicked[n - i - 1];
     }
   } else {
     final picked = new SplayTreeSet<int>();
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       final int sampleIdx = () {
         int newIdx;
         do {
           newIdx = _rand.nextInt(n);
-        } while(picked.contains(newIdx));
+        } while (picked.contains(newIdx));
         return newIdx;
       }();
       picked.add(sampleIdx);

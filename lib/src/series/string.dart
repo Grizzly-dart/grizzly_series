@@ -32,8 +32,7 @@ class StringSeries<IT> extends Object
     _pos = new SeriesPositioned<IT, String>(this);
   }
 
-  factory StringSeries(Iterable<String> data,
-      {dynamic name, List<IT> labels}) {
+  factory StringSeries(Iterable<String> data, {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
     final mapper = labelsToPosMapper(madeIndices);
 
