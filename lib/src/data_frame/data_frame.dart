@@ -283,28 +283,27 @@ class DataFrame<IT, CT> {
     }
   }
 
-  NumSeries<CT> max({dynamic name, bool numericOnly: false}) {
-    final ret = new NumSeries<CT>([], name: name, labels: []);
+  DynamicSeries<CT> max({dynamic name, bool numericOnly: false}) {
+    final ret = new DynamicSeries<CT>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
-      if (numericOnly && _data[i] is! NumericSeries) continue;
       ret[_columns[i]] = _data[i].max();
     }
 
     return ret;
   }
 
-  NumSeries<CT> min({dynamic name, bool numericOnly: false}) {
-    final ret = new NumSeries<CT>([], name: name, labels: []);
+  DynamicSeries<CT> min({dynamic name, bool numericOnly: false}) {
+    final ret = new DynamicSeries<CT>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
-      if (numericOnly && _data[i] is! NumericSeries) continue;
       ret[_columns[i]] = _data[i].min();
     }
 
     return ret;
   }
 
+  // TODO test
   DataFrame<int, CT> mode() {
     final ret = new DataFrame<int, CT>({});
 

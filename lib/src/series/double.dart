@@ -5,7 +5,7 @@ class DoubleSeries<IT> extends Object
     implements Series<IT, double> {
   final List<IT> _labels;
 
-  final List<double> _data;
+  final Float64List _data;
 
   final SplayTreeMap<IT, List<int>> _mapper;
 
@@ -36,12 +36,13 @@ class DoubleSeries<IT> extends Object
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
     final mapper = labelsToPosMapper(madeIndices);
 
-    return new DoubleSeries._(data.toList(), madeIndices, name, mapper);
+    return new DoubleSeries._(
+        new Float64List.fromList(data), madeIndices, name, mapper);
   }
 
   factory DoubleSeries.fromMap(Map<IT, List<double>> map, {dynamic name}) {
     final List<IT> indices = [];
-    final List<double> data = [];
+    final data = new Float64List(0);
     final mapper = new SplayTreeMap<IT, List<int>>();
 
     for (IT index in map.keys) {
@@ -53,12 +54,35 @@ class DoubleSeries<IT> extends Object
       }
     }
 
-    return new DoubleSeries._(data.toList(), indices, name, mapper);
+    return new DoubleSeries._(data, indices, name, mapper);
+  }
+
+  factory DoubleSeries.fromLabels(
+      Iterable<IT> keys, double value(IT key, int index),
+      {dynamic name}) {
+    final List<IT> indices = keys.toList();
+    final data = new Float64List(keys.length);
+    final mapper = new SplayTreeMap<IT, List<int>>();
+
+    for (int i = 0; i < keys.length; i++) {
+      final index = indices[i];
+      data[i] = value(index, i);
+
+      List<int> maps = mapper[index];
+      if (maps == null) {
+        maps = mapper[index] = <int>[];
+      }
+
+      maps.add(i);
+    }
+
+    return new DoubleSeries._(data, indices, name, mapper);
   }
 
   DoubleSeries<IIT> makeNew<IIT>(Iterable<double> data,
           {dynamic name, List<IIT> labels}) =>
-      new DoubleSeries<IIT>(data, name: name, labels: labels);
+      new DoubleSeries<IIT>(new Float64List.fromList(data),
+          name: name, labels: labels.toList());
 
   double sum({bool skipNull: true}) {
     double ret = 0.0;
@@ -70,105 +94,660 @@ class DoubleSeries<IT> extends Object
     return ret;
   }
 
-  DoubleSeries<IT> _op<VVT extends num>(
-      NumericSeries<IT, VVT> a, num func(double a, num b),
-      {int fillVal, dynamic name}) {
-    final map = new SplayTreeMap<IT, List<double>>();
-
+  void _selfAdd(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
     for (IT index in _mapper.keys) {
       if (a._mapper.containsKey(index)) {
-        List<int> sourcePos = _mapper[index];
-        List<int> destPos = a._mapper[index];
-
-        final List<double> res = [];
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
 
         if (sourcePos.length == destPos.length) {
           for (int i = 0; i < sourcePos.length; i++) {
-            final double source = _data[sourcePos[i]];
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
             final num dest = a._data[destPos[i]];
-            if (source == null)
-              res.add(null);
-            else if (dest == null) {
-              if (fillVal == null)
-                res.add(null);
-              else
-                res.add(func(source, fillVal));
-            } else
-              res.add(func(source, dest));
-          }
-        } else {
-          for (int i = 0; i < sourcePos.length; i++) {
-            final double source = _data[sourcePos[i]];
-            for (int j = 0; j < destPos.length; j++) {
-              final num dest = a._data[destPos[j]];
-              if (source == null)
-                res.add(null);
-              else if (dest == null) {
-                if (fillVal == null)
-                  res.add(null);
-                else
-                  res.add(func(source, fillVal));
-              } else
-                res.add(func(source, dest));
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) + (dest ?? ofv);
             }
           }
-        }
-        map[index] = res;
-      } else {
-        if (fillVal == null) {
-          map[index] = new List<double>.filled(_mapper[index].length, null);
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) + (dest ?? ofv);
+            }
+          }
         } else {
-          map[index] = _mapper[index].map((int pos) {
-            final double data = _data[pos];
-            if (data == null) return null;
-            return func(data, fillVal);
-          }).toList();
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) + (dest ?? ofv);
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]];
+            }
+            appendAll(index, lst);
+          }
         }
       }
     }
 
     for (IT index in a._mapper.keys) {
       if (_mapper.containsKey(index)) continue;
-      map[index] = new List<double>.filled(a._mapper[index].length, null);
-    }
 
-    return new DoubleSeries<IT>.fromMap(map, name: name);
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
   }
 
-  DoubleSeries<IT> add<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => opa + opb, fillVal: fillVal, name: name);
+  DoubleSeries<IT> addition(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
 
-  DoubleSeries<IT> sub<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => opa - opb, fillVal: fillVal, name: name);
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
 
-  DoubleSeries<IT> mul<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => opa * opb, fillVal: fillVal, name: name);
+    if (a is DoubleSeries<IT>) {
+      ret._selfAdd(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfAdd(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] += a;
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] += a.elementAt(i);
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
 
-  DoubleSeries<IT> div<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => opa / opb, fillVal: fillVal, name: name);
+    return ret;
+  }
 
-  DoubleSeries<IT> floorDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => (opa / opb).floor(),
-          fillVal: fillVal, name: name);
+  DoubleSeries<IT> operator +(a) => addition(a);
 
-  DoubleSeries<IT> ceilDiv<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => (opa / opb).ceil(),
-          fillVal: fillVal, name: name);
+  void _selfSub(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
+    for (IT index in _mapper.keys) {
+      if (a._mapper.containsKey(index)) {
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
 
-  DoubleSeries<IT> mod<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => opa % opb, fillVal: fillVal, name: name);
+        if (sourcePos.length == destPos.length) {
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) - (dest ?? ofv);
+            }
+          }
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) - (dest ?? ofv);
+            }
+          }
+        } else {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) - (dest ?? ofv);
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]];
+            }
+            appendAll(index, lst);
+          }
+        }
+      }
+    }
 
-  DoubleSeries<IT> pow<VVT extends num>(NumericSeries<IT, VVT> a,
-          {int fillVal, dynamic name}) =>
-      _op(a, (num opa, num opb) => math.pow(opa, opb),
-          fillVal: fillVal, name: name);
+    for (IT index in a._mapper.keys) {
+      if (_mapper.containsKey(index)) continue;
+
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
+  }
+
+  DoubleSeries<IT> subtract(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
+
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
+
+    if (a is DoubleSeries<IT>) {
+      ret._selfSub(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfSub(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] -= a;
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] -= a.elementAt(i);
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
+
+    return ret;
+  }
+
+  DoubleSeries<IT> operator -(a) => subtract(a);
+
+  void _selfMul(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
+    for (IT index in _mapper.keys) {
+      if (a._mapper.containsKey(index)) {
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
+
+        if (sourcePos.length == destPos.length) {
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) * (dest ?? ofv);
+            }
+          }
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) * (dest ?? ofv);
+            }
+          }
+        } else {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) * (dest ?? ofv);
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]];
+            }
+            appendAll(index, lst);
+          }
+        }
+      }
+    }
+
+    for (IT index in a._mapper.keys) {
+      if (_mapper.containsKey(index)) continue;
+
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
+  }
+
+  DoubleSeries<IT> multiply(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
+
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
+
+    if (a is DoubleSeries<IT>) {
+      ret._selfMul(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfMul(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] *= a;
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] *= a.elementAt(i);
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
+
+    return ret;
+  }
+
+  DoubleSeries<IT> operator *(a) => multiply(a);
+
+  void _selfDiv(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
+    for (IT index in _mapper.keys) {
+      if (a._mapper.containsKey(index)) {
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
+
+        if (sourcePos.length == destPos.length) {
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) / (dest ?? ofv);
+            }
+          }
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) / (dest ?? ofv);
+            }
+          }
+        } else {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = (source ?? mfv) / (dest ?? ofv);
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]];
+            }
+            appendAll(index, lst);
+          }
+        }
+      }
+    }
+
+    for (IT index in a._mapper.keys) {
+      if (_mapper.containsKey(index)) continue;
+
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
+  }
+
+  DoubleSeries<IT> divide(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
+
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
+
+    if (a is DoubleSeries<IT>) {
+      ret._selfDiv(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfDiv(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] /= a;
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] /= a.elementAt(i);
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
+
+    return ret;
+  }
+
+  DoubleSeries<IT> operator /(a) => divide(a);
+
+  void _selfModNum(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
+    for (IT index in _mapper.keys) {
+      if (a._mapper.containsKey(index)) {
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
+
+        if (sourcePos.length == destPos.length) {
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = ((source ?? mfv) % (dest ?? ofv)).toDouble();
+            }
+          }
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = ((source ?? mfv) % (dest ?? ofv)).toDouble();
+            }
+          }
+        } else {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = ((source ?? mfv) % (dest ?? ofv)).toDouble();
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]]?.toDouble();
+            }
+            appendAll(index, lst);
+          }
+        }
+      }
+    }
+
+    for (IT index in a._mapper.keys) {
+      if (_mapper.containsKey(index)) continue;
+
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
+  }
+
+  DoubleSeries<IT> mod(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
+
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
+
+    if (a is DoubleSeries<IT>) {
+      ret._selfModNum(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfModNum(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] = ret._data[i] % a;
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] = ret._data[i] % a.elementAt(i);
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
+
+    return ret;
+  }
+
+  DoubleSeries<IT> operator %(a) => mod(a);
+
+  void _selfPowNum(NumericSeries<IT, num> a,
+      {double mfv, double ofv, bool strict: true}) {
+    for (IT index in _mapper.keys) {
+      if (a._mapper.containsKey(index)) {
+        final List<int> sourcePos = _mapper[index];
+        final List<int> destPos = a._mapper[index];
+
+        if (sourcePos.length == destPos.length) {
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = math.pow((source ?? mfv), (dest ?? ofv));
+            }
+          }
+        } else if (sourcePos.length > destPos.length) {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < destPos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = math.pow((source ?? mfv), (dest ?? ofv));
+            }
+          }
+        } else {
+          if (strict) throw new Exception('Invalid lengths at label $index!');
+          for (int i = 0; i < sourcePos.length; i++) {
+            final int srcIdx = sourcePos[i];
+            final double source = _data[srcIdx];
+            final num dest = a._data[destPos[i]];
+            if ((source == null && mfv == null) ||
+                (dest == null && ofv == null)) {
+              _data[srcIdx] = null;
+            } else {
+              _data[srcIdx] = math.pow((source ?? mfv), (dest ?? ofv));
+            }
+          }
+          // Add remaining
+          {
+            final lst = new List<double>(destPos.length - sourcePos.length);
+            for (int i = sourcePos.length; i < destPos.length; i++) {
+              lst[i] = a._data[destPos[i]]?.toDouble();
+            }
+            appendAll(index, lst);
+          }
+        }
+      }
+    }
+
+    for (IT index in a._mapper.keys) {
+      if (_mapper.containsKey(index)) continue;
+
+      if (strict) throw new Exception('Invalid lengths at label $index!');
+
+      appendAll(index, a.getByLabelMulti(index).map((v) => v.toDouble()));
+    }
+  }
+
+  DoubleSeries<IT> pow(a,
+      {double myFillValue,
+      double otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true}) {
+    DoubleSeries<IT> ret = this;
+
+    if (!self)
+      ret = new DoubleSeries._(new Float64List.fromList(_data),
+          _labels.toList(), name, cloneMapper());
+
+    if (a is DoubleSeries<IT>) {
+      ret._selfPowNum(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is NumericSeries<IT, num>) {
+      ret._selfPowNum(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
+    } else if (a is num) {
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] = math.pow(ret._data[i], a);
+      }
+    } else if (a is Iterable<num>) {
+      if (length != a.length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < _data.length; i++) {
+        ret._data[i] = math.pow(ret._data[i], a.elementAt(i));
+      }
+    } else {
+      throw new Exception('Unknown type!');
+    }
+
+    return ret;
+  }
+
+  DoubleSeries<IT> log({double fillValue = 1.0, bool self: true}) {
+    if (self) {
+      for (int i = 0; i < length; i++) {
+        if (_data[i] == null && fillValue != null) {
+          _data[i] = math.log(fillValue);
+        } else {
+          _data[i] = math.log(_data[i]);
+        }
+      }
+      return this;
+    } else {
+      throw new UnimplementedError();
+    }
+  }
+
+  DoubleSeries<IT> logN(num n, {double fillValue = 1.0, bool self: true}) {
+    if (self) {
+      for (int i = 0; i < length; i++) {
+        if (_data[i] == null && fillValue != null) {
+          _data[i] = math.log(fillValue) / math.log(n);
+        } else {
+          _data[i] = math.log(_data[i]) / math.log(n);
+        }
+      }
+      return this;
+    } else {
+      throw new UnimplementedError();
+    }
+  }
+
+  DoubleSeries<IT> log10({double fillValue = 1.0, bool self: true}) {
+    if (self) {
+      for (int i = 0; i < length; i++) {
+        if (_data[i] == null && fillValue != null) {
+          _data[i] = math.log(fillValue) / math.LN10;
+        } else {
+          _data[i] = math.log(_data[i]) / math.LN10;
+        }
+      }
+      return this;
+    } else {
+      throw new UnimplementedError();
+    }
+  }
 
   IntSeries<IT> toInt() {
     return new IntSeries<IT>(_data.map((double v) => v.toInt()).toList(),

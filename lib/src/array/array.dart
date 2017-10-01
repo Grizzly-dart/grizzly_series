@@ -125,23 +125,23 @@ abstract class NumericArray<E extends num> implements Array<E> {
 
   NumericArray<E> operator +(/* E | Iterable<E> */ other);
 
-  NumericArray<E> addition(/* E | Iterable<E> */ other);
+  NumericArray<E> addition(/* E | Iterable<E> */ other, {bool self: false});
 
   NumericArray<E> operator -(/* E | Iterable<E> */ other);
 
-  NumericArray<E> subtract(/* E | Iterable<E> */ other);
+  NumericArray<E> subtract(/* E | Iterable<E> */ other, {bool self: false});
 
   NumericArray<E> operator *(/* E | Iterable<E> */ other);
 
-  NumericArray<E> multiple(/* E | Iterable<E> */ other);
+  NumericArray<E> multiple(/* E | Iterable<E> */ other, {bool self: false});
 
   NumericArray<double> operator /(/* E | Iterable<E> */ other);
 
-  NumericArray<double> divide(/* E | Iterable<E> */ other);
+  NumericArray<double> divide(/* E | Iterable<E> */ other, {bool self: false});
 
   NumericArray<int> operator ~/(/* E | Iterable<E> */ other);
 
-  NumericArray<int> truncDiv(/* E | Iterable<E> */ other);
+  NumericArray<int> truncDiv(/* E | Iterable<E> */ other, {bool self: false});
 }
 
 final math.Random _rand = new math.Random();

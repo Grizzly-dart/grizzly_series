@@ -58,7 +58,7 @@ void main() {
     test('add', () {
       final series1 = new IntSeries<int>([1, 2, 3, 4]);
       final series2 = new IntSeries<int>([1, 2, 3, 4]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [0, 1, 2, 3]);
       expect(res.data, [2, 4, 6, 8]);
     });
@@ -66,7 +66,7 @@ void main() {
     test('add dup1', () {
       final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
       final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [1, 2, 2, 3]);
       expect(res.data, [11, 22, 23, 34]);
     });
@@ -75,7 +75,7 @@ void main() {
       final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
       final series2 =
           new IntSeries<int>([10, 20, 30, 40], labels: [1, 2, 2, 3]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [1, 2, 2, 3]);
       expect(res.data, [11, 22, 33, 44]);
     });
@@ -84,7 +84,7 @@ void main() {
       final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
       final series2 =
           new IntSeries<int>([10, 20, 30, 40, 50], labels: [1, 2, 2, 2, 3]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [1, 2, 2, 2, 2, 2, 2, 3]);
       expect(res.data, [11, 22, 32, 42, 23, 33, 43, 54]);
     });
@@ -93,7 +93,7 @@ void main() {
       final series1 =
           new IntSeries<int>([1, 2, 3, 4, 5], labels: [1, 2, 3, 4, 5]);
       final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [1, 2, 3, 4, 5]);
       expect(res.data, [11, 22, 33, null, null]);
     });
@@ -102,7 +102,7 @@ void main() {
       final series1 = new IntSeries<int>([1, 2, 3], labels: [1, 2, 3]);
       final series2 =
           new IntSeries<int>([10, 20, 30, 40, 50], labels: [1, 2, 3, 4, 4]);
-      final res = series1.add(series2);
+      final res = series1.addition(series2);
       expect(res.labels, [1, 2, 3, 4, 4]);
       expect(res.data, [11, 22, 33, null, null]);
     });
@@ -111,7 +111,7 @@ void main() {
       final series1 =
           new IntSeries<int>([1, 2, 3, 4, 5], labels: [1, 2, 3, 4, 4]);
       final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
-      final res = series1.add(series2, fillVal: 100);
+      final res = series1.addition(series2, myFillValue: 100, otherFillValue: 100);
       expect(res.labels, [1, 2, 3, 4, 4]);
       expect(res.data, [11, 22, 33, 104, 105]);
     });
