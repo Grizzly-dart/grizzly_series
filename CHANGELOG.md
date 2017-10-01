@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+- Mathematical operations for `NumericSeries`
+
 ## 0.0.2
 
 - `Array`, `IntArray`, `DoubleArray`

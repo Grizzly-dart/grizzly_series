@@ -1,6 +1,6 @@
 name: grizzly_series
 description: Pandas-like Series and DataFrame for Dart
-version: 0.0.2-dev
+version: 0.0.3-dev
 homepage: https://github.com/tejainece/grizzly_series
 author: Ravi Teja Gudapati <tejainece@gmail.com>
 documentation:

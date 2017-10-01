@@ -56,7 +56,6 @@ class Int2DArray extends Object
 
   Int2DArray.row(Iterable<int> column) : _data = new List<IntArray>(1) {
     _data[0] = new IntArray.from(column);
-
   }
 
   Int2DArray.column(Iterable<int> row)

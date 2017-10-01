@@ -289,7 +289,7 @@ class IntArray extends Object
 
   IntArray addition(/* num | Iterable<num> */ other, {bool self: false}) {
     IntArray ret = this;
-    if(!self) ret = new IntArray.sized(length);
+    if (!self) ret = new IntArray.sized(length);
 
     if (other is IntArray) {
       if (other.length != length) {
@@ -335,7 +335,7 @@ class IntArray extends Object
 
   IntArray subtract(/* num | Iterable<num> */ other, {bool self: false}) {
     IntArray ret = this;
-    if(!self) {
+    if (!self) {
       ret = new IntArray.sized(length);
     }
 

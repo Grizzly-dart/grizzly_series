@@ -116,37 +116,37 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
 
   NumericSeries<IT, num> addition(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   NumericSeries<IT, num> operator +(a);
 
   NumericSeries<IT, num> subtract(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   NumericSeries<IT, num> operator -(a);
 
   NumericSeries<IT, num> multiply(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   NumericSeries<IT, num> operator *(a);
 
   NumericSeries<IT, num> divide(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   NumericSeries<IT, num> operator /(a);
 
@@ -156,19 +156,19 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
 
   NumericSeries<IT, num> mod(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   NumericSeries<IT, num> operator %(a);
 
   NumericSeries<IT, num> pow(a,
       {VT myFillValue,
-        VT otherFillValue,
-        dynamic name,
-        bool self: false,
-        bool strict: true});
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
   DoubleSeries<IT> log({VT fillValue, bool self: true});
 

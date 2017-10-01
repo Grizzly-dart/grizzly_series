@@ -111,7 +111,8 @@ void main() {
       final series1 =
           new IntSeries<int>([1, 2, 3, 4, 5], labels: [1, 2, 3, 4, 4]);
       final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
-      final res = series1.addition(series2, myFillValue: 100, otherFillValue: 100);
+      final res =
+          series1.addition(series2, myFillValue: 100, otherFillValue: 100);
       expect(res.labels, [1, 2, 3, 4, 4]);
       expect(res.data, [11, 22, 33, 104, 105]);
     });

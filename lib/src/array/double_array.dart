@@ -276,7 +276,7 @@ class DoubleArray extends Object
   DoubleArray addition(/* num | Iterable<num> */ other, {bool self: false}) {
     DoubleArray ret = this;
 
-    if(!self) ret = new DoubleArray.sized(length);
+    if (!self) ret = new DoubleArray.sized(length);
 
     if (other is NumericArray) {
       if (other.length != length) {
@@ -313,7 +313,7 @@ class DoubleArray extends Object
   DoubleArray subtract(/* num | Iterable<num> */ other, {bool self: false}) {
     DoubleArray ret = this;
 
-    if(!self) ret = new DoubleArray.sized(length);
+    if (!self) ret = new DoubleArray.sized(length);
 
     if (other is NumericArray) {
       if (other.length != length) {
@@ -350,7 +350,7 @@ class DoubleArray extends Object
   DoubleArray multiple(/* num | Iterable<num> */ other, {bool self: false}) {
     DoubleArray ret = this;
 
-    if(!self) ret = new DoubleArray.sized(length);
+    if (!self) ret = new DoubleArray.sized(length);
 
     if (other is NumericArray) {
       if (other.length != length) {
@@ -387,7 +387,7 @@ class DoubleArray extends Object
   DoubleArray divide(/* E | Iterable<E> */ other, {bool self: false}) {
     DoubleArray ret = this;
 
-    if(!self) ret = new DoubleArray.sized(length);
+    if (!self) ret = new DoubleArray.sized(length);
 
     if (other is NumericArray) {
       if (other.length != length) {
