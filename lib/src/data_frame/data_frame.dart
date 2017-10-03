@@ -76,7 +76,7 @@ class DataFrame<IT, CT> {
     }
 
     final List<CT> c = [];
-    final List<DynamicSeries<IT>> d = [];
+    final d = <Series<IT, dynamic>>[];
 
     {
       final Map<CT, bool> colCheck = {};
@@ -187,18 +187,32 @@ class DataFrame<IT, CT> {
   operator []=(CT column, Series<IT, dynamic> value) {
     final int colPos = _columns.indexOf(column);
     if (colPos == -1) {
-      final temp = value.makeNew(new List.filled(length, null),
-          name: column, labels: _labels.toList());
-      temp.assign(value);
-      _columns.add(column);
-      _data.add(temp);
+      if (length != 0) {
+        // No such column present. Insert new column.
+        final temp = value.makeNew(new List.filled(length, 0.0),
+            name: column, labels: _labels.toList());
+        temp.assign(value);
+        _columns.add(column);
+        _data.add(temp);
+      } else {
+        _labels.clear();
+        _labels.addAll(value.labels.toList());
+        _mapper.clear();
+        _mapper.addAll(value.cloneMapper());
+
+        // No such column present. Insert new column.
+        final temp = value.makeNew(value.data,
+            name: column, labels: value.labels.toList());
+        _columns.add(column);
+        _data.add(temp);
+      }
       return;
     }
 
     _data[colPos].assign(value);
   }
 
-  DynamicSeries<CT> getByPos(int position) {
+  Series<CT, dynamic> getByPos(int position) {
     if (position >= _labels.length)
       throw new RangeError.range(position, 0, _labels.length);
 

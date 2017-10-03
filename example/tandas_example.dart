@@ -1,6 +1,7 @@
 // Copyright (c) 2017, Teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+import 'dart:math';
 import 'package:grizzly_series/grizzly_series.dart';
 
 main() {
@@ -58,6 +59,7 @@ main() {
   print(g3.indices);
   */
 
+  /* TODO
   final s1 =
       new IntSeries<String>([2, 4, 2, 1, 4], labels: ['A', 'B', 'C', 'D', 'E']);
   print(s1.valueCounts(sortByValue: true));
@@ -72,4 +74,10 @@ main() {
     'two': ['five', 'two', 'two', 'four']
   });
   print(ret.mode());
+  */
+
+  final df = new DataFrame<String, String>({});
+  df['x'] = new DoubleSeries<String>(new List.generate(1000, (i) => log(i)),
+      labels: new List.generate(1000, (i) => i.toString()));
+  print(df);
 }

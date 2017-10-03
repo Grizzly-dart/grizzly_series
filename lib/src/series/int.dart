@@ -5,7 +5,7 @@ class IntSeries<IT> extends Object
     implements Series<IT, int> {
   final List<IT> _labels;
 
-  final Int64List _data;
+  final List<int> _data;
 
   final SplayTreeMap<IT, List<int>> _mapper;
 
@@ -36,13 +36,12 @@ class IntSeries<IT> extends Object
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
     final mapper = labelsToPosMapper(madeIndices);
 
-    return new IntSeries._(
-        new Int64List.fromList(data), madeIndices, name, mapper);
+    return new IntSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory IntSeries.fromMap(Map<IT, List<int>> map, {dynamic name}) {
     final List<IT> indices = [];
-    final data = new Int64List(0);
+    final data = new List<int>();
     final mapper = new SplayTreeMap<IT, List<int>>();
 
     for (IT index in map.keys) {
@@ -147,7 +146,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfAdd(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
@@ -260,7 +259,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfSub(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
@@ -373,7 +372,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfMul(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
@@ -503,7 +502,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfTruncDiv(a,
@@ -617,7 +616,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfMod(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);
@@ -730,7 +729,7 @@ class IntSeries<IT> extends Object
 
     if (!self)
       ret = new IntSeries._(
-          new Int64List.fromList(_data), _labels.toList(), name, cloneMapper());
+          _data.toList(), _labels.toList(), name, cloneMapper());
 
     if (a is IntSeries<IT>) {
       ret._selfPow(a, mfv: myFillValue, ofv: otherFillValue, strict: strict);

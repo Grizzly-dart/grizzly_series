@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:test/test.dart';
 
@@ -54,6 +55,12 @@ void main() {
       expect(df.pos[1].data, [2, 20, 'B', 2000, 'BB']);
       expect(df.pos[2].data, [3, 30, 'C', 3000, 'CC']);
       expect(df.pos[3].data, [4, 40, 'D', 4000, 'DD']);
+    });
+
+    test('empty', () {
+      final df = new DataFrame<String, String>({});
+      df['x'] = new DoubleSeries<String>(new List.generate(1000, (i) => log(i)),
+          labels: new List.generate(1000, (i) => i.toString()));
     });
   });
 }
