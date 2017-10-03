@@ -3,7 +3,6 @@ library grizzly.series;
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:collection';
-import '../data_frame/data_frame.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';

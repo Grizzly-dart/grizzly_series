@@ -2,8 +2,9 @@ library grizzly.data_frame;
 
 import 'dart:collection';
 
-import 'package:grizzly_series/src/series/series.dart';
+import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
+import 'package:grizzly_scales/grizzly_scales.dart';
 
 class DataFrame<IT, CT> {
   final List<CT> _columns;
@@ -197,6 +198,92 @@ class DataFrame<IT, CT> {
     _data[colPos].assign(value);
   }
 
+  DynamicSeries<CT> getByPos(int position) {
+    if (position >= _labels.length)
+      throw new RangeError.range(position, 0, _labels.length);
+
+    final List d = _data.map((Series l) => l.pos[position]).toList();
+
+    return new DynamicSeries<CT>(d,
+        labels: _columns.toList(), name: _labels[position]);
+  }
+
+  void setByPos(int position, List value) {
+    if (position >= _labels.length)
+      throw new RangeError.range(position, 0, _labels.length);
+    if (value.length != _columns.length)
+      throw new Exception('Value does not match number of columns!');
+
+    for (int i = 0; i < _columns.length; i++) {
+      _data[i][position] = value[i];
+    }
+  }
+
+  DynamicSeries<CT> getByLabel(IT label) {
+    if (!_mapper.containsKey(label)) {
+      throw new Exception("Index named $label not found!");
+    }
+
+    final int pos = _mapper[label].first;
+
+    final List d = _data.map((Series l) => l.pos[pos]).toList();
+
+    return new DynamicSeries<CT>(d, labels: _columns.toList(), name: label);
+  }
+
+  List<DynamicSeries<CT>> getByLabelMulti(IT label) {
+    if (!_mapper.containsKey(label)) {
+      throw new Exception("Index named $label not found!");
+    }
+
+    return _mapper[label].map((int pos) {
+      final List d = _data.map((Series l) => l.pos[pos]).toList();
+      return new DynamicSeries<CT>(d, labels: _columns.toList(), name: label);
+    }).toList();
+  }
+
+  void setByLabel(IT index, List value) {
+    if (!_mapper.containsKey(index)) {
+      throw new Exception("Index named $index not found!");
+    }
+
+    for (final int position in _mapper[index]) {
+      if (value.length != _columns.length)
+        throw new Exception('Value does not match number of columns!');
+
+      for (int i = 0; i < _columns.length; i++) {
+        _data[i][position] = value[i];
+      }
+    }
+  }
+
+  Pair<IT, DynamicSeries<CT>> pairByLabel(IT label) =>
+      pair<IT, DynamicSeries<CT>>(label, getByLabel(label));
+
+  Pair<IT, DynamicSeries<CT>> pairByPos(int position) {
+    if (position >= length) throw new RangeError.range(position, 0, length);
+    return pair<IT, DynamicSeries<CT>>(_labels[position], getByPos(position));
+  }
+
+  Iterable<Pair<IT, DynamicSeries<CT>>> enumerate() =>
+      Ranger.indices(length - 1).map(pairByPos);
+
+  Iterable<Pair<IT, DynamicSeries<CT>>> enumerateSliced(int start, [int end]) {
+    if (end == null)
+      end = length - 1;
+    else {
+      if (end > length - 1) {
+        throw new ArgumentError.value(end, 'end', 'Out of range');
+      }
+    }
+
+    if (start > length - 1) {
+      throw new ArgumentError.value(start, 'start', 'Out of range');
+    }
+
+    return Ranger.range(start, end).map(pairByPos);
+  }
+
   void addColumnFromList<VVT>(CT column, List<VVT> value,
       {SeriesMaker<IT, VVT> maker}) {
     if (value.length != _labels.length)
@@ -222,65 +309,6 @@ class DataFrame<IT, CT> {
     }
 
     _data[colPos] = series;
-  }
-
-  DynamicSeries<CT> getByIndex(IT index) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception("Index named $index not found!");
-    }
-
-    final int pos = _mapper[index].first;
-
-    final List d = _data.map((Series l) => l.pos[pos]).toList();
-
-    return new DynamicSeries<CT>(d, labels: _columns.toList(), name: index);
-  }
-
-  List<DynamicSeries<CT>> getByIndexMulti(IT index) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception("Index named $index not found!");
-    }
-
-    return _mapper[index].map((int pos) {
-      final List d = _data.map((Series l) => l.pos[pos]).toList();
-      return new DynamicSeries<CT>(d, labels: _columns.toList(), name: index);
-    }).toList();
-  }
-
-  void setByIndex(IT index, List value) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception("Index named $index not found!");
-    }
-
-    for (final int position in _mapper[index]) {
-      if (value.length != _columns.length)
-        throw new Exception('Value does not match number of columns!');
-
-      for (int i = 0; i < _columns.length; i++) {
-        _data[i][position] = value[i];
-      }
-    }
-  }
-
-  DynamicSeries<CT> getByPos(int position) {
-    if (position >= _labels.length)
-      throw new RangeError.range(position, 0, _labels.length);
-
-    final List d = _data.map((Series l) => l.pos[position]).toList();
-
-    return new DynamicSeries<CT>(d,
-        labels: _columns.toList(), name: _labels[position]);
-  }
-
-  void setByPos(int position, List value) {
-    if (position >= _labels.length)
-      throw new RangeError.range(position, 0, _labels.length);
-    if (value.length != _columns.length)
-      throw new Exception('Value does not match number of columns!');
-
-    for (int i = 0; i < _columns.length; i++) {
-      _data[i][position] = value[i];
-    }
   }
 
   DynamicSeries<CT> max({dynamic name, bool numericOnly: false}) {
@@ -358,13 +386,13 @@ class DataFrameIndexed<IT, CT> {
 
   DataFrameIndexed(this.frame);
 
-  DynamicSeries<CT> operator [](IT index) => frame.getByIndex(index);
+  DynamicSeries<CT> operator [](IT index) => frame.getByLabel(index);
 
-  operator []=(IT index, List value) => frame.setByIndex(index, value);
+  operator []=(IT index, List value) => frame.setByLabel(index, value);
 
-  DynamicSeries<CT> get(IT index) => frame.getByIndex(index);
+  DynamicSeries<CT> get(IT index) => frame.getByLabel(index);
 
-  void set(IT index, List value) => frame.setByIndex(index, value);
+  void set(IT index, List value) => frame.setByLabel(index, value);
 
-  List<DynamicSeries<CT>> getMulti(IT index) => frame.getByIndexMulti(index);
+  List<DynamicSeries<CT>> getMulti(IT index) => frame.getByLabelMulti(index);
 }

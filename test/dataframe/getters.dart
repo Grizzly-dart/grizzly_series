@@ -38,16 +38,16 @@ void main() {
     });
 
     test('getByIndex', () {
-      expect(df.getByIndex('Jon').data, [20, 'Stark']);
-      expect(df.getByIndex('Jon').labels, ['age', 'house']);
-      expect(df.getByIndex('Jon').name, 'Jon');
-      expect(df.getByIndex('Dany').data, [22, 'Targaryan']);
-      expect(df.getByIndex('Dany').labels, ['age', 'house']);
-      expect(df.getByIndex('Dany').name, 'Dany');
-      expect(df.getByIndex('Tyrion').data, [35, 'Lannister']);
-      expect(df.getByIndex('Tyrion').labels, ['age', 'house']);
-      expect(df.getByIndex('Tyrion').name, 'Tyrion');
-      expect(() => df.getByIndex('Cersei'), throwsA(isException));
+      expect(df.getByLabel('Jon').data, [20, 'Stark']);
+      expect(df.getByLabel('Jon').labels, ['age', 'house']);
+      expect(df.getByLabel('Jon').name, 'Jon');
+      expect(df.getByLabel('Dany').data, [22, 'Targaryan']);
+      expect(df.getByLabel('Dany').labels, ['age', 'house']);
+      expect(df.getByLabel('Dany').name, 'Dany');
+      expect(df.getByLabel('Tyrion').data, [35, 'Lannister']);
+      expect(df.getByLabel('Tyrion').labels, ['age', 'house']);
+      expect(df.getByLabel('Tyrion').name, 'Tyrion');
+      expect(() => df.getByLabel('Cersei'), throwsA(isException));
     });
 
     /* TODO

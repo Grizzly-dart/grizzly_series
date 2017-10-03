@@ -44,8 +44,6 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
 
   VT getByLabel(IT label) => this[label];
 
-  void setByLabel(IT label, VT value) => this[label] = value;
-
   List<VT> getByLabelMulti(IT label) {
     if (!_mapper.containsKey(label)) {
       throw new Exception("Index named $label not found!");
@@ -53,6 +51,8 @@ abstract class SeriesBase<IT, VT> implements Series<IT, VT> {
 
     return _mapper[label].map((int pos) => _data[pos]).toList();
   }
+
+  void setByLabel(IT label, VT value) => this[label] = value;
 
   IT labelAt(int position) {
     if (position >= length) throw new RangeError.range(position, 0, length);
