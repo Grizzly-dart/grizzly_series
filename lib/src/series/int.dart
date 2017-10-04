@@ -765,17 +765,17 @@ class IntSeries<IT> extends Object
     return ret;
   }
 
-  DoubleSeries<IT> log({int fillValue = 1, bool self: true}) {
+  DoubleSeries<IT> log({int fillValue = 1, bool self: false}) {
     if (self) throw new UnsupportedError('Log results are double!');
     return toDouble().log(fillValue: fillValue.toDouble(), self: true);
   }
 
-  DoubleSeries<IT> logN(num n, {int fillValue = 1, bool self: true}) {
+  DoubleSeries<IT> logN(num n, {int fillValue = 1, bool self: false}) {
     if (self) throw new UnsupportedError('Log results are double!');
     return toDouble().logN(n, fillValue: fillValue.toDouble(), self: true);
   }
 
-  DoubleSeries<IT> log10({int fillValue = 1, bool self: true}) {
+  DoubleSeries<IT> log10({int fillValue = 1, bool self: false}) {
     if (self) throw new UnsupportedError('Log results are double!');
     return toDouble().log10(fillValue: fillValue.toDouble(), self: true);
   }
