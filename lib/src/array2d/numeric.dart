@@ -5,9 +5,9 @@ abstract class Numeric2DArray<E extends num> implements Array2D<E> {
 
   double get mean;
 
-  DoubleArray get meanX;
+  DoubleArray get meanRow;
 
-  DoubleArray get meanY;
+  DoubleArray get meanCol;
 
   // TODO E get sum;
 
@@ -15,9 +15,9 @@ abstract class Numeric2DArray<E extends num> implements Array2D<E> {
 
   double average(Iterable<Iterable<num>> weights);
 
-  DoubleArray averageX(Iterable<num> weights);
+  DoubleArray averageRow(Iterable<num> weights);
 
-  DoubleArray averageY(Iterable<num> weights);
+  DoubleArray averageCol(Iterable<num> weights);
 
 // TODO NumericArray<E> get cumsum;
 

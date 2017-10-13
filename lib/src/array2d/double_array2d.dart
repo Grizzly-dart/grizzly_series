@@ -10,7 +10,7 @@ class Double2DArray extends Object
       final int len = data.first.length;
       for (Iterable<double> item in data) {
         if (item.length != len) {
-          throw new Exception('All columns must have same number of rows!');
+          throw new Exception('All rows must have same number of columns!');
         }
       }
 
@@ -22,16 +22,16 @@ class Double2DArray extends Object
 
   Double2DArray.make(this._data);
 
-  Double2DArray.sized(int columns, int rows, {double data: 0.0})
+  Double2DArray.sized(int numRows, int numCols, {double data: 0.0})
       : _data = new List<DoubleArray>.generate(
-            columns, (_) => new DoubleArray.sized(rows, data: data));
+            numRows, (_) => new DoubleArray.sized(numCols, data: data));
 
   Double2DArray.shaped(Index2D shape, {double data: 0.0})
       : _data = new List<DoubleArray>.generate(
-            shape.x, (_) => new DoubleArray.sized(shape.y, data: data));
+            shape.row, (_) => new DoubleArray.sized(shape.column, data: data));
 
   factory Double2DArray.shapedLike(Array2D like, {double data: 0.0}) =>
-      new Double2DArray.sized(like.numCols, like.numRows, data: data);
+      new Double2DArray.sized(like.numRows, like.numCols, data: data);
 
   Double2DArray.fromNum(Iterable<Iterable<num>> data)
       : _data = <DoubleArray>[] {
@@ -39,7 +39,7 @@ class Double2DArray extends Object
       final int len = data.first.length;
       for (Iterable<num> item in data) {
         if (item.length != len) {
-          throw new Exception('All columns must have same number of rows!');
+          throw new Exception('All rows must have same number of columns!');
         }
       }
 
@@ -67,66 +67,63 @@ class Double2DArray extends Object
     */
   }
 
-  Double2DArray.columns(Iterable<double> column, int columns)
-      : _data = new List<DoubleArray>(columns) {
+  Double2DArray.rows(Iterable<double> row, [int numRows = 1])
+      : _data = new List<DoubleArray>(numRows) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new DoubleArray(column);
+      _data[i] = new DoubleArray(row);
     }
   }
 
-  Double2DArray.rows(Iterable<double> row, int rows)
-      : _data = new List<DoubleArray>(row.length) {
+  Double2DArray.columns(Iterable<double> column, [int numCols = 1])
+      : _data = new List<DoubleArray>(column.length) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new DoubleArray.sized(rows, data: row.elementAt(i));
+      _data[i] = new DoubleArray.sized(numCols, data: column.elementAt(i));
     }
   }
 
-  Double2DArray.row(Iterable<double> column)
-      : _data = new List<DoubleArray>(1) {
-    _data[0] = new DoubleArray(column);
+  Double2DArray.row(Iterable<double> row) : _data = new List<DoubleArray>(1) {
+    _data[0] = new DoubleArray(row);
   }
 
-  Double2DArray.column(Iterable<double> row)
-      : _data = new List<DoubleArray>(row.length) {
+  Double2DArray.column(Iterable<double> column)
+      : _data = new List<DoubleArray>(column.length) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new DoubleArray.single(row.elementAt(i));
+      _data[i] = new DoubleArray.single(column.elementAt(i));
     }
   }
 
   Double2DArray makeFrom(Iterable<Iterable<double>> newData) =>
       new Double2DArray(newData);
 
-  int get _yLength {
-    if (_data.length == 0) return 0;
+  int get numCols {
+    if (numRows == 0) return 0;
     return _data.first.length;
   }
 
-  int get numCols => length;
+  int get numRows => length;
 
-  int get numRows => _yLength;
-
-  Index2D get shape => new Index2D(_data.length, _yLength);
+  Index2D get shape => new Index2D(numRows, numCols);
 
   DoubleArrayFix operator [](int i) => _data[i].fixed;
 
-  operator []=(final int i, Array<double> val) {
-    if (i > _data.length) {
-      throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');
+  operator []=(final int i, Iterable<double> val) {
+    if (i > numRows) {
+      throw new RangeError.range(i, 0, numRows - 1, 'i', 'Out of range!');
     }
 
-    if (_data.length == 0) {
+    if (numRows == 0) {
       final arr = new DoubleArray(val);
       _data.add(arr);
       return;
     }
 
-    if (val.length != _yLength) {
+    if (val.length != numCols) {
       throw new Exception('Invalid size!');
     }
 
     final arr = new DoubleArray(val);
 
-    if (i == _data.length) {
+    if (i == numRows) {
       _data.add(arr);
       return;
     }
@@ -154,8 +151,8 @@ class Double2DArray extends Object
 
     final list = <DoubleArray>[];
 
-    for (int c = start.x; c < end.x; c++) {
-      list.add(_data[c].slice(start.y, end.y));
+    for (int c = start.row; c < end.row; c++) {
+      list.add(_data[c].slice(start.column, end.column));
     }
 
     return new Double2DArray.make(list);
@@ -164,77 +161,14 @@ class Double2DArray extends Object
   @override
   Iterator<DoubleArray> get iterator => _data.iterator;
 
-  DoubleArray getRow(int r) {
-    final ret = new DoubleArray.sized(numCols);
+  Double2DColumns _cols;
 
-    for (int i = 0; i < numCols; i++) {
-      ret[i] = _data[i][r];
-    }
-
-    return ret;
-  }
-
-  void addRow(Iterable<double> row) {
-    if (row.length != length) {
-      throw new Exception('Size mismatch!');
-    }
-    for (int i = 0; i < _data.length; i++) {
-      _data[i].add(row.elementAt(i));
-    }
-  }
-
-  void addRowScalar(double v) {
-    for (int i = 0; i < _data.length; i++) {
-      _data[i].add(v);
-    }
-  }
-
-  void assign(int index, Iterable<double> v, {bool column: false}) {
-    if (column) {
-      if (index < 0 || index >= length) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      if (v.length != _yLength) {
-        throw new Exception('Size mismatch!');
-      }
-      for (int i = 0; i < _yLength; i++) {
-        _data[index][i] = v.elementAt(i);
-      }
-    } else {
-      if (index < 0 || index >= _yLength) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      if (v.length != length) {
-        throw new Exception('Size mismatch!');
-      }
-      for (int i = 0; i < length; i++) {
-        _data[i][index] = v.elementAt(i);
-      }
-    }
-  }
-
-  void assignScalar(int index, double v, {bool column: false}) {
-    if (column) {
-      if (index < 0 || index >= length) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      for (int i = 0; i < _yLength; i++) {
-        _data[index][i] = v;
-      }
-    } else {
-      if (index < 0 || index >= _yLength) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      for (int i = 0; i < length; i++) {
-        _data[i][index] = v;
-      }
-    }
-  }
+  Double2DColumns get col => _cols ??= new Double2DColumns(this);
 
   /// Sets all elements in the array to given value [v]
   void set(double v) {
     for (int c = 0; c < length; c++) {
-      for (int r = 0; r < _yLength; r++) {
+      for (int r = 0; r < numCols; r++) {
         _data[c][r] = v;
       }
     }
@@ -242,9 +176,9 @@ class Double2DArray extends Object
 
   @override
   double get min {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     double min;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final double d = _data[i][j];
 
@@ -258,9 +192,9 @@ class Double2DArray extends Object
 
   @override
   double get max {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     double max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final double d = _data[i][j];
 
@@ -273,10 +207,10 @@ class Double2DArray extends Object
   }
 
   Extent<double> get extent {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     double min;
     double max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final double d = _data[i][j];
 
@@ -290,10 +224,10 @@ class Double2DArray extends Object
   }
 
   Index2D get argMin {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     Index2D ret;
     double min;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final double d = _data[i][j];
 
@@ -309,10 +243,10 @@ class Double2DArray extends Object
   }
 
   Index2D get argMax {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     Index2D ret;
     double max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final double d = _data[i][j];
 
@@ -328,10 +262,10 @@ class Double2DArray extends Object
   }
 
   void clip({double min, double max}) {
-    if (_data.length == 0) return;
+    if (numRows == 0) return;
 
     if (min != null && max != null) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < _data.first.length; j++) {
           final double d = _data[i][j];
 
@@ -342,7 +276,7 @@ class Double2DArray extends Object
       return;
     }
     if (min != null) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < _data.first.length; j++) {
           final double d = _data[i][j];
 
@@ -353,7 +287,7 @@ class Double2DArray extends Object
     }
     if (max != null) {
       for (int j = 0; j < _data.first.length; j++) {
-        for (int i = 0; i < _data.length; i++) {
+        for (int i = 0; i < numRows; i++) {
           final double d = _data[i][j];
 
           if (d > max) _data[i][j] = max;
@@ -366,30 +300,29 @@ class Double2DArray extends Object
   IntPair<DoubleArray> pairAt(int index) =>
       intPair<DoubleArray>(index, _data[index]);
 
-  Iterable<IntPair<DoubleArray>> enumerate() => Ranger
-      .indices(_data.length)
-      .map((i) => intPair<DoubleArray>(i, _data[i]));
+  Iterable<IntPair<DoubleArray>> enumerate() =>
+      Ranger.indices(numRows).map((i) => intPair<DoubleArray>(i, _data[i]));
 
   double get mean {
-    if (_data.length == 0) return 0.0;
+    if (numRows == 0) return 0.0;
 
     double sum = 0.0;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       sum += _data[i].sum;
     }
 
-    return sum / (length * _yLength);
+    return sum / (length * numCols);
   }
 
-  DoubleArray get meanX {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get meanRow {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       double sum = 0.0;
 
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final double d = _data[i][j];
         if (d == null) continue;
         sum += d;
@@ -401,12 +334,12 @@ class Double2DArray extends Object
     return ret;
   }
 
-  DoubleArray get meanY {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get meanCol {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(length);
 
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].mean;
     }
 
@@ -417,13 +350,13 @@ class Double2DArray extends Object
     if (weights.length != length) {
       throw new Exception('Weights have mismatching length!');
     }
-    if (_data.length == 0) return 0.0;
+    if (numRows == 0) return 0.0;
 
-    final int yL = _yLength;
+    final int yL = numCols;
 
     double sum = 0.0;
     num denom = 0.0;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       final weightsI = weights.elementAt(i);
 
       if (weightsI.length != yL) {
@@ -442,12 +375,12 @@ class Double2DArray extends Object
     return sum / denom;
   }
 
-  DoubleArray averageX(Iterable<num> weights) {
+  DoubleArray averageRow(Iterable<num> weights) {
     if (weights.length != length) {
       throw new Exception('Weights have mismatching length!');
     }
 
-    if (_data.length == 0) return new DoubleArray.sized(0);
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
@@ -455,7 +388,7 @@ class Double2DArray extends Object
       double sum = 0.0;
       num denom = 0.0;
 
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final double d = _data[i][j];
         final num w = weights.elementAt(i);
         if (d == null) continue;
@@ -470,8 +403,8 @@ class Double2DArray extends Object
     return ret;
   }
 
-  DoubleArray averageY(Iterable<num> weights) {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray averageCol(Iterable<num> weights) {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     if (weights.length != _data.first.length) {
       throw new Exception('Weights have mismatching length!');
@@ -479,7 +412,7 @@ class Double2DArray extends Object
 
     final ret = new DoubleArray.sized(length);
 
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       double sum = 0.0;
       num denom = 0.0;
 
@@ -501,11 +434,11 @@ class Double2DArray extends Object
     if (numCols != other.numRows)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
-    final ret = new Double2DArray.sized(other.numCols, numRows);
+    final ret = new Double2DArray.sized(numRows, other.numCols);
 
     for (int r = 0; r < ret.numRows; r++) {
       for (int c = 0; c < numCols; c++) {
-        ret[c][r] = getRow(r).dot(other[c]);
+        ret[r][c] = _data[r].dot(other.col[c]);
       }
     }
 
@@ -528,14 +461,14 @@ class Double2DArray extends Object
   }
 
   /// Minimum along x-axis
-  DoubleArray get minX {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get minRow {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       double min;
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final double d = _data[i][j];
 
         if (d == null) continue;
@@ -549,23 +482,23 @@ class Double2DArray extends Object
   }
 
   /// Minimum along y-axis
-  DoubleArray get minY {
-    final ret = new DoubleArray.sized(_data.length);
-    for (int i = 0; i < _data.length; i++) {
+  DoubleArray get minCol {
+    final ret = new DoubleArray.sized(numRows);
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].min;
     }
     return ret;
   }
 
   /// Maximum along x-axis
-  DoubleArray get maxX {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get maxRow {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       double max;
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final double d = _data[i][j];
 
         if (d == null) continue;
@@ -579,23 +512,65 @@ class Double2DArray extends Object
   }
 
   /// Maximum along y-axis
-  DoubleArray get maxY {
-    final ret = new DoubleArray.sized(_data.length);
-    for (int i = 0; i < _data.length; i++) {
+  DoubleArray get maxCol {
+    final ret = new DoubleArray.sized(numRows);
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].max;
     }
     return ret;
   }
 
   Double2DArray get transpose {
-    final ret = new Double2DArray.sized(_yLength, length);
+    final ret = new Double2DArray.sized(numCols, length);
 
     for (int j = 0; j < _data.first.length; j++) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         ret[j][i] = _data[i][j];
       }
     }
 
     return ret;
+  }
+}
+
+class Double2DColumns implements Array2DColumns<double> {
+  final Double2DArray inner;
+
+  Double2DColumns(this.inner);
+
+  DoubleArray operator [](int r) {
+    final ret = new DoubleArray.sized(inner.numRows);
+
+    for (int i = 0; i < inner.numRows; i++) {
+      ret[i] = inner[i][r];
+    }
+
+    return ret;
+  }
+
+  operator []=(int index, Iterable<double> col) {
+    if (index >= inner.numCols) {
+      throw new RangeError.range(index, 0, inner.numCols - 1, 'index');
+    }
+    if (col.length != inner.numRows) {
+      throw new ArgumentError.value(col, 'col', 'Size mismatch!');
+    }
+    for (int i = 0; i < inner.numRows; i++) {
+      inner[i][index] = col.elementAt(i);
+    }
+  }
+
+  void add(Iterable<double> col) {
+    if (col.length != inner.numRows)
+      throw new ArgumentError.value(col, 'col', 'Size mismatch');
+    for (int i = 0; i < inner.numRows; i++) {
+      inner._data[i].add(col.elementAt(i));
+    }
+  }
+
+  void addScalar(double v) {
+    for (int i = 0; i < inner.numRows; i++) {
+      inner._data[i].add(v);
+    }
   }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.6
+
+**Breaking**
+- Made `Array2D` row major
+
 ## 0.0.5
 
 - Slicing of `Array`, `Array2D`

@@ -12,18 +12,11 @@ part 'int_array2d.dart';
 part 'numeric.dart';
 
 abstract class Array2D<E> implements Array2DFixBase<E>, Iterable<Array<E>> {
-  void addRow(Iterable<E> row);
-
-  void addRowScalar(E v);
 }
 
 abstract class Array2DFix<E>
     implements Array2DFixBase<E>, Iterable<ArrayFix<E>> {
   operator []=(int i, Array<E> val);
-
-  void assign(int index, Iterable<E> v, {bool column: false});
-
-  void assignScalar(int index, E v, {bool column: false});
 
   void set(E v);
 
@@ -32,10 +25,6 @@ abstract class Array2DFix<E>
 
 abstract class Array2DFixBase<E> implements Array2DBase<E> {
   operator []=(int i, Array<E> val);
-
-  void assign(int index, Iterable<E> v, {bool column: false});
-
-  void assignScalar(int index, E v, {bool column: false});
 
   void set(E v);
 
@@ -49,29 +38,29 @@ abstract class Array2DBase<E> {
   Array2D<E> makeFrom(Iterable<Iterable<E>> newData);
 
   /// Number of rows in the array
-  int get numRows;
+  int get numCols;
 
   /// Number of columns in the array
-  int get numCols;
+  int get numRows;
 
   /// Shape of the array
   Index2D get shape;
 
   ArrayView<E> operator [](int i);
 
-  Array<E> getRow(int r);
+  Array2DColumns<E> get col;
 
   E get min;
 
-  Array<E> get minX;
+  Array<E> get minRow;
 
-  Array<E> get minY;
+  Array<E> get minCol;
 
   E get max;
 
-  Array<E> get maxX;
+  Array<E> get maxRow;
 
-  Array<E> get maxY;
+  Array<E> get maxCol;
 
   Extent<E> get extent;
 
@@ -102,4 +91,16 @@ abstract class Array2DBase<E> {
   Array2D<E> sample([int count = 10]);
 
   Array2D<E> get transpose;
+}
+
+abstract class Array2DColumns<E> {
+  Array<E> operator [](int r);
+
+  void add(Iterable<E> col);
+
+  void addScalar(E v);
+
+// TODO pairAt
+
+// TODO enumerate
 }

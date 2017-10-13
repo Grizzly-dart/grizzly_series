@@ -10,7 +10,7 @@ class Int2DArray extends Object
       final int len = data.first.length;
       for (Iterable<int> item in data) {
         if (item.length != len) {
-          throw new Exception('All columns must have same number of rows!');
+          throw new Exception('All rows must have same number of columns!');
         }
       }
 
@@ -20,13 +20,13 @@ class Int2DArray extends Object
     }
   }
 
-  Int2DArray.sized(int columns, int rows, {int data: 0})
+  Int2DArray.sized(int rows, int columns, {int data: 0})
       : _data = new List<IntArray>.generate(
-            columns, (_) => new IntArray.sized(rows));
+            rows, (_) => new IntArray.sized(columns));
 
   Int2DArray.shaped(Index2D shape, {int data: 0})
       : _data = new List<IntArray>.generate(
-            shape.x, (_) => new IntArray.sized(shape.y, data: data));
+            shape.row, (_) => new IntArray.sized(shape.column, data: data));
 
   factory Int2DArray.shapedLike(Array2D like, {int data: 0}) =>
       new Int2DArray.sized(like.numCols, like.numRows, data: data);
@@ -50,65 +50,63 @@ class Int2DArray extends Object
     */
   }
 
-  Int2DArray.columns(Iterable<int> column, int columns)
-      : _data = new List<IntArray>(columns) {
+  Int2DArray.rows(Iterable<int> row, [int numRows = 1])
+      : _data = new List<IntArray>(numRows) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new IntArray(column);
+      _data[i] = new IntArray(row);
     }
   }
 
-  Int2DArray.rows(Iterable<int> row, int rows)
-      : _data = new List<IntArray>(row.length) {
+  Int2DArray.columns(Iterable<int> column, [int numCols = 1])
+      : _data = new List<IntArray>(column.length) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new IntArray.sized(rows, data: row.elementAt(i));
+      _data[i] = new IntArray.sized(numCols, data: column.elementAt(i));
     }
   }
 
-  Int2DArray.row(Iterable<int> column) : _data = new List<IntArray>(1) {
-    _data[0] = new IntArray(column);
+  Int2DArray.row(Iterable<int> row) : _data = new List<IntArray>(1) {
+    _data[0] = new IntArray(row);
   }
 
-  Int2DArray.column(Iterable<int> row)
-      : _data = new List<IntArray>(row.length) {
+  Int2DArray.column(Iterable<int> column)
+      : _data = new List<IntArray>(column.length) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new IntArray.single(row.elementAt(i));
+      _data[i] = new IntArray.single(column.elementAt(i));
     }
   }
 
   Int2DArray makeFrom(Iterable<Iterable<int>> newData) =>
       new Int2DArray(newData);
 
-  int get _yLength {
-    if (_data.length == 0) return 0;
+  int get numCols {
+    if (numRows == 0) return 0;
     return _data.first.length;
   }
 
-  int get numCols => length;
+  int get numRows => length;
 
-  int get numRows => _yLength;
-
-  Index2D get shape => new Index2D(_data.length, _yLength);
+  Index2D get shape => new Index2D(numRows, numCols);
 
   IntArrayFix operator [](int i) => _data[i].fixed;
 
-  operator []=(final int i, Array<int> val) {
-    if (i > _data.length) {
-      throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');
+  operator []=(final int i, Iterable<int> val) {
+    if (i > numRows) {
+      throw new RangeError.range(i, 0, numRows - 1, 'i', 'Out of range!');
     }
 
-    if (_data.length == 0) {
+    if (numRows == 0) {
       final arr = new IntArray(val);
       _data.add(arr);
       return;
     }
 
-    if (val.length != _yLength) {
+    if (val.length != numCols) {
       throw new Exception('Invalid size!');
     }
 
     final arr = new IntArray(val);
 
-    if (i == _data.length) {
+    if (i == numRows) {
       _data.add(arr);
       return;
     }
@@ -136,8 +134,8 @@ class Int2DArray extends Object
 
     final list = <IntArray>[];
 
-    for (int c = start.x; c < end.x; c++) {
-      list.add(_data[c].slice(start.y, end.y));
+    for (int c = start.row; c < end.row; c++) {
+      list.add(_data[c].slice(start.column, end.column));
     }
 
     return new Int2DArray.make(list);
@@ -146,87 +144,24 @@ class Int2DArray extends Object
   @override
   Iterator<IntArray> get iterator => _data.iterator;
 
-  IntArray getRow(int r) {
-    final ret = new IntArray.sized(numCols);
+  Int2DColumns _col;
 
-    for (int i = 0; i < numCols; i++) {
-      ret[i] = _data[i][r];
-    }
-
-    return ret;
-  }
-
-  void addRow(Iterable<int> row) {
-    if (row.length != length) {
-      throw new Exception('Size mismatch!');
-    }
-    for (int i = 0; i < _data.length; i++) {
-      _data[i].add(row.elementAt(i));
-    }
-  }
-
-  void addRowScalar(int v) {
-    for (int i = 0; i < _data.length; i++) {
-      _data[i].add(v);
-    }
-  }
-
-  void assign(int index, Iterable<int> v, {bool column: false}) {
-    if (column) {
-      if (index < 0 || index >= length) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      if (v.length != _yLength) {
-        throw new Exception('Size mismatch!');
-      }
-      for (int i = 0; i < _yLength; i++) {
-        _data[index][i] = v.elementAt(i);
-      }
-    } else {
-      if (index < 0 || index >= _yLength) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      if (v.length != length) {
-        throw new Exception('Size mismatch!');
-      }
-      for (int i = 0; i < length; i++) {
-        _data[i][index] = v.elementAt(i);
-      }
-    }
-  }
-
-  void assignScalar(int index, int v, {bool column: false}) {
-    if (column) {
-      if (index < 0 || index >= length) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      for (int i = 0; i < _yLength; i++) {
-        _data[index][i] = v;
-      }
-    } else {
-      if (index < 0 || index >= _yLength) {
-        throw new RangeError.range(index, 0, length - 1, 'index');
-      }
-      for (int i = 0; i < length; i++) {
-        _data[i][index] = v;
-      }
-    }
-  }
+  Int2DColumns get col => _col ??= new Int2DColumns(this);
 
   /// Sets all elements in the array to given value [v]
   void set(int v) {
-    for (int c = 0; c < length; c++) {
-      for (int r = 0; r < _yLength; r++) {
-        _data[c][r] = v;
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
+        _data[r][c] = v;
       }
     }
   }
 
   @override
   int get min {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     int min;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final int d = _data[i][j];
 
@@ -240,9 +175,9 @@ class Int2DArray extends Object
 
   @override
   int get max {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     int max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final int d = _data[i][j];
 
@@ -255,10 +190,10 @@ class Int2DArray extends Object
   }
 
   Extent<int> get extent {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     int min;
     int max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final int d = _data[i][j];
 
@@ -272,10 +207,10 @@ class Int2DArray extends Object
   }
 
   Index2D get argMin {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     Index2D ret;
     int min;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final int d = _data[i][j];
 
@@ -291,10 +226,10 @@ class Int2DArray extends Object
   }
 
   Index2D get argMax {
-    if (_data.length == 0) return null;
+    if (numRows == 0) return null;
     Index2D ret;
     int max;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < _data.first.length; j++) {
         final int d = _data[i][j];
 
@@ -310,10 +245,10 @@ class Int2DArray extends Object
   }
 
   void clip({int min, int max}) {
-    if (_data.length == 0) return;
+    if (numRows == 0) return;
 
     if (min != null && max != null) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < _data.first.length; j++) {
           final int d = _data[i][j];
 
@@ -324,7 +259,7 @@ class Int2DArray extends Object
       return;
     }
     if (min != null) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < _data.first.length; j++) {
           final int d = _data[i][j];
 
@@ -335,7 +270,7 @@ class Int2DArray extends Object
     }
     if (max != null) {
       for (int j = 0; j < _data.first.length; j++) {
-        for (int i = 0; i < _data.length; i++) {
+        for (int i = 0; i < numRows; i++) {
           final int d = _data[i][j];
 
           if (d > max) _data[i][j] = max;
@@ -345,31 +280,35 @@ class Int2DArray extends Object
     }
   }
 
+  // TODO return lazy
+  // TODO return view
   IntPair<IntArray> pairAt(int index) => intPair<IntArray>(index, _data[index]);
 
+  // TODO return lazy
+  // TODO return view
   Iterable<IntPair<IntArray>> enumerate() =>
-      Ranger.indices(_data.length).map((i) => intPair<IntArray>(i, _data[i]));
+      Ranger.indices(numRows).map((i) => intPair<IntArray>(i, _data[i]));
 
   double get mean {
-    if (_data.length == 0) return 0.0;
+    if (numRows == 0) return 0.0;
 
     int sum = 0;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       sum += _data[i].sum;
     }
 
-    return sum / (length * _yLength);
+    return sum / (length * numCols);
   }
 
-  DoubleArray get meanX {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get meanRow {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       double sum = 0.0;
 
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final int d = _data[i][j];
         if (d == null) continue;
         sum += d;
@@ -381,12 +320,12 @@ class Int2DArray extends Object
     return ret;
   }
 
-  DoubleArray get meanY {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray get meanCol {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(length);
 
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].mean;
     }
 
@@ -394,16 +333,15 @@ class Int2DArray extends Object
   }
 
   double average(Iterable<Iterable<num>> weights) {
-    if (weights.length != length) {
-      throw new Exception('Weights have mismatching length!');
-    }
-    if (_data.length == 0) return 0.0;
+    if (weights.length != length)
+      throw new ArgumentError.value(weights, 'weights', 'Size mismatch');
+    if (numRows == 0) return 0.0;
 
-    final int yL = _yLength;
+    final int yL = numCols;
 
     double sum = 0.0;
     num denom = 0.0;
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       final weightsI = weights.elementAt(i);
 
       if (weightsI.length != yL) {
@@ -422,12 +360,12 @@ class Int2DArray extends Object
     return sum / denom;
   }
 
-  DoubleArray averageX(Iterable<num> weights) {
+  DoubleArray averageRow(Iterable<num> weights) {
     if (weights.length != length) {
       throw new Exception('Weights have mismatching length!');
     }
 
-    if (_data.length == 0) return new DoubleArray.sized(0);
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     final ret = new DoubleArray.sized(_data.first.length);
 
@@ -435,7 +373,7 @@ class Int2DArray extends Object
       double sum = 0.0;
       num denom = 0.0;
 
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final int d = _data[i][j];
         final num w = weights.elementAt(i);
         if (d == null) continue;
@@ -450,8 +388,8 @@ class Int2DArray extends Object
     return ret;
   }
 
-  DoubleArray averageY(Iterable<num> weights) {
-    if (_data.length == 0) return new DoubleArray.sized(0);
+  DoubleArray averageCol(Iterable<num> weights) {
+    if (numRows == 0) return new DoubleArray.sized(0);
 
     if (weights.length != _data.first.length) {
       throw new Exception('Weights have mismatching length!');
@@ -459,7 +397,7 @@ class Int2DArray extends Object
 
     final ret = new DoubleArray.sized(length);
 
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < numRows; i++) {
       double sum = 0.0;
       num denom = 0.0;
 
@@ -481,11 +419,11 @@ class Int2DArray extends Object
     if (numCols != other.numRows)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
-    final ret = new Int2DArray.sized(other.numCols, numRows);
+    final ret = new Int2DArray.sized(numRows, other.numCols);
 
     for (int r = 0; r < ret.numRows; r++) {
       for (int c = 0; c < numCols; c++) {
-        ret[c][r] = getRow(r).dot(other[c]);
+        ret[r][c] = _data[r].dot(other.col[c]);
       }
     }
 
@@ -508,14 +446,14 @@ class Int2DArray extends Object
   }
 
   /// Minimum along x-axis
-  IntArray get minX {
-    if (_data.length == 0) return new IntArray.sized(0);
+  IntArray get minRow {
+    if (numRows == 0) return new IntArray.sized(0);
 
     final ret = new IntArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       int min;
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final int d = _data[i][j];
 
         if (d == null) continue;
@@ -529,23 +467,23 @@ class Int2DArray extends Object
   }
 
   /// Minimum along y-axis
-  IntArray get minY {
-    final ret = new IntArray.sized(_data.length);
-    for (int i = 0; i < _data.length; i++) {
+  IntArray get minCol {
+    final ret = new IntArray.sized(numRows);
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].min;
     }
     return ret;
   }
 
   /// Maximum along x-axis
-  IntArray get maxX {
-    if (_data.length == 0) return new IntArray.sized(0);
+  IntArray get maxRow {
+    if (numRows == 0) return new IntArray.sized(0);
 
     final ret = new IntArray.sized(_data.first.length);
 
     for (int j = 0; j < _data.first.length; j++) {
       int max;
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         final int d = _data[i][j];
 
         if (d == null) continue;
@@ -559,23 +497,67 @@ class Int2DArray extends Object
   }
 
   /// Maximum along y-axis
-  IntArray get maxY {
-    final ret = new IntArray.sized(_data.length);
-    for (int i = 0; i < _data.length; i++) {
+  IntArray get maxCol {
+    final ret = new IntArray.sized(numRows);
+    for (int i = 0; i < numRows; i++) {
       ret[i] = _data[i].max;
     }
     return ret;
   }
 
   Int2DArray get transpose {
-    final ret = new Int2DArray.sized(_yLength, length);
+    final ret = new Int2DArray.sized(numCols, length);
 
     for (int j = 0; j < _data.first.length; j++) {
-      for (int i = 0; i < _data.length; i++) {
+      for (int i = 0; i < numRows; i++) {
         ret[j][i] = _data[i][j];
       }
     }
 
     return ret;
+  }
+
+  Double2DArray get toDouble => new Double2DArray.fromNum(this);
+}
+
+class Int2DColumns implements Array2DColumns<int> {
+  final Int2DArray inner;
+
+  Int2DColumns(this.inner);
+
+  IntArray operator [](int r) {
+    final ret = new IntArray.sized(inner.numRows);
+
+    for (int i = 0; i < inner.numRows; i++) {
+      ret[i] = inner[i][r];
+    }
+
+    return ret;
+  }
+
+  operator []=(int index, Iterable<int> col) {
+    if (index >= inner.numCols) {
+      throw new RangeError.range(index, 0, inner.numCols - 1, 'index');
+    }
+    if (col.length != inner.numRows) {
+      throw new ArgumentError.value(col, 'col', 'Size mismatch!');
+    }
+    for (int i = 0; i < inner.numRows; i++) {
+      inner[i][index] = col.elementAt(i);
+    }
+  }
+
+  void add(Iterable<int> col) {
+    if (col.length != inner.numRows)
+      throw new ArgumentError.value(col, 'col', 'Size mismatch');
+    for (int i = 0; i < inner.numRows; i++) {
+      inner._data[i].add(col.elementAt(i));
+    }
+  }
+
+  void addScalar(int v) {
+    for (int i = 0; i < inner.numRows; i++) {
+      inner._data[i].add(v);
+    }
   }
 }

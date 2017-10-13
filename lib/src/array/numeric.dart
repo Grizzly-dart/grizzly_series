@@ -66,5 +66,5 @@ abstract class NumericArrayView<E extends num> implements ArrayView<E> {
 
   Numeric2DArray<E> transpose();
 
-  E dot(NumericArrayView other);
+  E dot(Iterable<num> other);
 }

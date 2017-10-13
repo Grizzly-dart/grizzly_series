@@ -283,7 +283,7 @@ class DoubleArrayView extends Object
   final Float64List _data;
 
   DoubleArrayView(Iterable<double> iterable)
-      : _data = new Float64List.fromList(iterable);
+      : _data = new Float64List.fromList(iterable.toList());
 
   DoubleArrayView.make(this._data);
 
@@ -779,12 +779,12 @@ class DoubleArrayView extends Object
     return ret;
   }
 
-  double dot(NumericArrayView other) {
+  double dot(Iterable<num> other) {
     if (length != other.length) throw new Exception('Lengths must match!');
     double ret = 0.0;
 
     for (int i = 0; i < length; i++) {
-      ret += _data[i] * other[i];
+      ret += _data[i] * other.elementAt(i);
     }
 
     return ret;

@@ -768,12 +768,12 @@ class IntArrayView extends Object
     return ret;
   }
 
-  int dot(NumericArrayView other) {
+  int dot(Iterable<num> other) {
     if (length != other.length) throw new Exception('Lengths must match!');
     num ret = 0;
 
     for (int i = 0; i < length; i++) {
-      ret += _data[i] * other[i];
+      ret += _data[i] * other.elementAt(i);
     }
 
     return ret.toInt();

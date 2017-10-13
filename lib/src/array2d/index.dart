@@ -1,44 +1,44 @@
 part of grizzly.series.array2d;
 
 class Index2D implements Index {
-  final int x;
+  final int row;
 
-  final int y;
+  final int column;
 
-  const Index2D(this.x, this.y);
+  const Index2D(this.row, this.column);
 
   int get dim => 2;
 
   int operator [](int d) {
     if (d >= dim)
       throw new RangeError.range(d, 0, dim - 1, 'd', 'Out of range!');
-    if (d == 0) return x;
-    return y;
+    if (d == 0) return row;
+    return column;
   }
 
-  List<int> toList() => <int>[x, y];
+  List<int> toList() => <int>[row, column];
 
   bool operator ==(other) {
     if (other is! Index2D) return false;
 
     if (other is Index2D) {
-      return other.x == this.x && other.y == this.y;
+      return other.row == this.row && other.column == this.column;
     }
 
     return false;
   }
 
-  bool operator >(@checked Index2D other) => x > other.x && y > other.y;
+  bool operator >(@checked Index2D other) => row > other.row && column > other.column;
 
-  bool operator <(@checked Index2D other) => x < other.x && y < other.y;
+  bool operator <(@checked Index2D other) => row < other.row && column < other.column;
 
-  bool operator >=(@checked Index2D other) => x >= other.x && y >= other.y;
+  bool operator >=(@checked Index2D other) => row >= other.row && column >= other.column;
 
-  bool operator <=(@checked Index2D other) => x <= other.x && y <= other.y;
+  bool operator <=(@checked Index2D other) => row <= other.row && column <= other.column;
 
-  Index2D makeWithY(int y) => new Index2D(x, y);
+  Index2D makeWithY(int y) => new Index2D(row, y);
 
-  Index2D makeWithX(int x) => new Index2D(x, y);
+  Index2D makeWithX(int x) => new Index2D(x, column);
 
   static const Index2D zero = const Index2D(0, 0);
 }
