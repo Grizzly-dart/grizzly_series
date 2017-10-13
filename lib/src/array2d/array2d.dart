@@ -46,11 +46,20 @@ Index2D idx2D(int x, int y) => new Index2D(x, y);
 abstract class Array2D<E> implements Iterable<Array<E>> {
   Array2D<E> makeFrom(Iterable<Iterable<E>> newData);
 
+  /// Number of rows in the array
+  int get numRows;
+
+  /// Number of columns in the array
+  int get numCols;
+
+  /// Shape of the array
   Index2D get shape;
 
-  Array<E> operator [](int i);
+  ReadOnlyArray<E> operator [](int i);
 
   operator []=(int i, Array<E> val);
+
+  Array<E> getRow(int r);
 
   void addRow(Iterable<E> row);
 
@@ -59,6 +68,8 @@ abstract class Array2D<E> implements Iterable<Array<E>> {
   void assign(int index, Iterable<E> v, {bool column: false});
 
   void assignScalar(int index, E v, {bool column: false});
+
+  void set(E v);
 
   E get min;
 
@@ -102,7 +113,7 @@ abstract class Array2D<E> implements Iterable<Array<E>> {
   /// returned
   Array2D<E> sample([int count = 10]);
 
-  Array2D<E> transpose();
+  Array2D<E> get transpose;
 }
 
 abstract class Numeric2DArray<E extends num> implements Array2D<E> {

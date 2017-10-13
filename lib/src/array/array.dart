@@ -6,62 +6,37 @@ import 'dart:typed_data';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
+part 'index.dart';
 part 'int_array.dart';
 part 'double_array.dart';
+part 'numeric.dart';
+part 'sample.dart';
 
 //TODO DateTime
 //TODO String
 //TODO bool
 
-abstract class Index {
-  /// Number of dimensions
-  int get dim;
-
-  /// Get index at dimension [d]
-  int operator [](int d);
-
-  List<int> toList();
+/// A mutable 1 dimensional array of element [E]
+abstract class Array<E> implements ArrayFix<E> {
+  void add(E a);
 }
 
-class Index1D {
-  final int x;
+/// A mutable 1 dimensional fixed sized array of element [E]
+abstract class ArrayFix<E> implements ReadOnlyArray<E> {
+  operator []=(int i, E val);
 
-  const Index1D(this.x);
+  // TODO [Index] based indexing
 
-  int get dim => 1;
-
-  int operator [](int d) {
-    if (d >= dim) throw new RangeError.range(d, 0, 0, 'd', 'Out of range!');
-    return x;
-  }
-
-  List<int> toList() => <int>[x];
-
-  bool operator ==(other) {
-    if (other is! Index1D) return false;
-
-    if (other is Index1D) {
-      return other.x == this.x;
-    }
-
-    return false;
-  }
+  void clip({E min, E max});
 }
 
-Index1D idx1D(int x) => new Index1D(x);
-
-abstract class Array<E> implements Iterable<E> {
+/// A read-only 1 dimensional array of element [E]
+abstract class ReadOnlyArray<E> implements Iterable<E> {
   Array<E> makeFrom(Iterable<E> newData);
 
   Index1D get shape;
 
   E operator [](int i);
-
-  operator []=(int i, E val);
-
-  // TODO [Index] based indexing
-
-  void add(E a);
 
   E get min;
 
@@ -72,8 +47,6 @@ abstract class Array<E> implements Iterable<E> {
   int get argMin;
 
   int get argMax;
-
-  void clip({E min, E max});
 
   IntPair<E> pairAt(int index);
 
@@ -102,80 +75,6 @@ abstract class Array<E> implements Iterable<E> {
   Array2D<E> repeat({int repeat: 1, bool transpose: false});
 
   Array2D<E> transpose();
-}
 
-abstract class NumericArray<E extends num> implements Array<E> {
-  E get ptp;
-
-  double get mean;
-
-  E get sum;
-
-  E get prod;
-
-  double average(Iterable<num> weights);
-
-  NumericArray<E> get cumsum;
-
-  NumericArray<E> get cumprod;
-
-  double get variance;
-
-  double get std;
-
-  NumericArray<E> operator +(/* E | Iterable<E> */ other);
-
-  NumericArray<E> addition(/* E | Iterable<E> */ other, {bool self: false});
-
-  NumericArray<E> operator -(/* E | Iterable<E> */ other);
-
-  NumericArray<E> subtract(/* E | Iterable<E> */ other, {bool self: false});
-
-  NumericArray<E> operator *(/* E | Iterable<E> */ other);
-
-  NumericArray<E> multiple(/* E | Iterable<E> */ other, {bool self: false});
-
-  NumericArray<double> operator /(/* E | Iterable<E> */ other);
-
-  NumericArray<double> divide(/* E | Iterable<E> */ other, {bool self: false});
-
-  NumericArray<int> operator ~/(/* E | Iterable<E> */ other);
-
-  NumericArray<int> truncDiv(/* E | Iterable<E> */ other, {bool self: false});
-}
-
-final math.Random _rand = new math.Random();
-
-List<E> _sample<E>(List<E> population, int k) {
-  final int n = population.length;
-
-  if (k < 0 || k > n)
-    throw new ArgumentError.value(
-        k, 'k', 'Must be between 0 and population.length');
-
-  final samples = new List<E>(k);
-
-  if (n < 1000) {
-    final unpicked = new List<E>.from(population);
-    for (int i = 0; i < k; i++) {
-      final sampleIdx = _rand.nextInt(n - i);
-      samples[i] = unpicked[sampleIdx];
-      unpicked[sampleIdx] = unpicked[n - i - 1];
-    }
-  } else {
-    final picked = new SplayTreeSet<int>();
-    for (int i = 0; i < k; i++) {
-      final int sampleIdx = () {
-        int newIdx;
-        do {
-          newIdx = _rand.nextInt(n);
-        } while (picked.contains(newIdx));
-        return newIdx;
-      }();
-      picked.add(sampleIdx);
-      samples[i] = population[sampleIdx];
-    }
-  }
-
-  return samples;
+  // TODO
 }

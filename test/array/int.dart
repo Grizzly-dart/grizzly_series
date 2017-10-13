@@ -6,18 +6,18 @@ void main() {
     setUp(() {});
 
     test('average', () {
-      IntArray s1 = new IntArray.from([1, 5]);
+      IntArray s1 = new IntArray([1, 5]);
       expect(s1.average([1, 2]), 3.6666666666666665);
-      s1 = new IntArray.from([2, 6]);
+      s1 = new IntArray([2, 6]);
       expect(s1.average([1, 2]), 4.6666666666666667);
-      s1 = new IntArray.from([3, 7]);
+      s1 = new IntArray([3, 7]);
       expect(s1.average([1, 2]), 5.6666666666666667);
-      s1 = new IntArray.from([4, 8]);
+      s1 = new IntArray([4, 8]);
       expect(s1.average([1, 2]), 6.6666666666666667);
     });
 
     test('to2D', () {
-      IntArray s1 = new IntArray.from([1, 5]);
+      IntArray s1 = new IntArray([1, 5]);
       expect(s1.to2D(), [
         [1, 5]
       ]);

@@ -5,8 +5,16 @@ class Int2DArray extends Object
     implements Numeric2DArray<int> {
   final List<IntArray> _data;
 
-  Int2DArray.sized(int x, int y)
-      : _data = new List<IntArray>.generate(x, (_) => new IntArray.sized(y));
+  Int2DArray.sized(int columns, int rows, {int data: 0})
+      : _data = new List<IntArray>.generate(
+            columns, (_) => new IntArray.sized(rows));
+
+  Int2DArray.shaped(Index2D shape, {int data: 0})
+      : _data = new List<IntArray>.generate(
+            shape.x, (_) => new IntArray.sized(shape.y, data: data));
+
+  factory Int2DArray.shapedLike(Array2D like, {int data: 0}) =>
+      new Int2DArray.sized(like.numCols, like.numRows, data: data);
 
   Int2DArray.from(Iterable<Iterable<int>> data) : _data = <IntArray>[] {
     if (data.length != 0) {
@@ -18,7 +26,7 @@ class Int2DArray extends Object
       }
 
       for (Iterable<int> item in data) {
-        _data.add(new IntArray.from(item));
+        _data.add(new IntArray(item));
       }
     }
   }
@@ -43,7 +51,7 @@ class Int2DArray extends Object
   Int2DArray.columns(Iterable<int> column, int columns)
       : _data = new List<IntArray>(columns) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new IntArray.from(column);
+      _data[i] = new IntArray(column);
     }
   }
 
@@ -55,7 +63,7 @@ class Int2DArray extends Object
   }
 
   Int2DArray.row(Iterable<int> column) : _data = new List<IntArray>(1) {
-    _data[0] = new IntArray.from(column);
+    _data[0] = new IntArray(column);
   }
 
   Int2DArray.column(Iterable<int> row)
@@ -73,10 +81,13 @@ class Int2DArray extends Object
     return _data.first.length;
   }
 
+  int get numCols => length;
+
+  int get numRows => _yLength;
+
   Index2D get shape => new Index2D(_data.length, _yLength);
 
-  // TODO return view
-  IntArray operator [](int i) => _data[i];
+  IntArrayFix operator [](int i) => _data[i].fixed;
 
   operator []=(final int i, Array<int> val) {
     if (i > _data.length) {
@@ -84,7 +95,7 @@ class Int2DArray extends Object
     }
 
     if (_data.length == 0) {
-      final arr = new IntArray.from(val);
+      final arr = new IntArray(val);
       _data.add(arr);
       return;
     }
@@ -93,7 +104,7 @@ class Int2DArray extends Object
       throw new Exception('Invalid size!');
     }
 
-    final arr = new IntArray.from(val);
+    final arr = new IntArray(val);
 
     if (i == _data.length) {
       _data.add(arr);
@@ -105,6 +116,16 @@ class Int2DArray extends Object
 
   @override
   Iterator<IntArray> get iterator => _data.iterator;
+
+  IntArray getRow(int r) {
+    final ret = new IntArray.sized(numCols);
+
+    for(int i = 0; i < numCols; i++) {
+      ret[i] = _data[i][r];
+    }
+
+    return ret;
+  }
 
   void addRow(Iterable<int> row) {
     if (row.length != length) {
@@ -159,6 +180,15 @@ class Int2DArray extends Object
       }
       for (int i = 0; i < length; i++) {
         _data[i][index] = v;
+      }
+    }
+  }
+
+  /// Sets all elements in the array to given value [v]
+  void set(int v) {
+    for (int c = 0; c < length; c++) {
+      for (int r = 0; r < _yLength; r++) {
+        _data[c][r] = v;
       }
     }
   }
@@ -418,6 +448,21 @@ class Int2DArray extends Object
     return ret;
   }
 
+  Int2DArray dot(Numeric2DArray other) {
+    if (numCols != other.numRows)
+      throw new ArgumentError.value(other, 'other', 'Invalid shape!');
+
+    final ret = new Int2DArray.sized(other.numCols, numRows);
+
+    for(int r = 0; r < ret.numRows; r++) {
+      for(int c = 0; c < numCols; c++) {
+        ret[c][r] = getRow(r).dot(other[c]);
+      }
+    }
+
+    return ret;
+  }
+
   Array2D<int> head([int count = 10]) {
     // TODO
     throw new UnimplementedError();
@@ -493,7 +538,7 @@ class Int2DArray extends Object
     return ret;
   }
 
-  Int2DArray transpose() {
+  Int2DArray get transpose {
     final ret = new Int2DArray.sized(_yLength, length);
 
     for (int j = 0; j < _data.first.length; j++) {

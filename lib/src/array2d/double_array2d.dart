@@ -5,9 +5,16 @@ class Double2DArray extends Object
     implements Numeric2DArray<double> {
   final List<DoubleArray> _data;
 
-  Double2DArray.sized(int x, int y)
-      : _data =
-            new List<DoubleArray>.generate(x, (_) => new DoubleArray.sized(y));
+  Double2DArray.sized(int columns, int rows, {double data: 0.0})
+      : _data = new List<DoubleArray>.generate(
+            columns, (_) => new DoubleArray.sized(rows, data: data));
+
+  Double2DArray.shaped(Index2D shape, {double data: 0.0})
+      : _data = new List<DoubleArray>.generate(
+            shape.x, (_) => new DoubleArray.sized(shape.y, data: data));
+
+  factory Double2DArray.shapedLike(Array2D like, {double data: 0.0}) =>
+      new Double2DArray.sized(like.numCols, like.numRows, data: data);
 
   Double2DArray.from(Iterable<Iterable<double>> data)
       : _data = <DoubleArray>[] {
@@ -20,7 +27,23 @@ class Double2DArray extends Object
       }
 
       for (Iterable<double> item in data) {
-        _data.add(new DoubleArray.from(item));
+        _data.add(new DoubleArray(item));
+      }
+    }
+  }
+
+  Double2DArray.fromNum(Iterable<Iterable<num>> data)
+      : _data = <DoubleArray>[] {
+    if (data.length != 0) {
+      final int len = data.first.length;
+      for (Iterable<num> item in data) {
+        if (item.length != len) {
+          throw new Exception('All columns must have same number of rows!');
+        }
+      }
+
+      for (Iterable<num> item in data) {
+        _data.add(new DoubleArray.fromNum(item));
       }
     }
   }
@@ -46,7 +69,7 @@ class Double2DArray extends Object
   Double2DArray.columns(Iterable<double> column, int columns)
       : _data = new List<DoubleArray>(columns) {
     for (int i = 0; i < length; i++) {
-      _data[i] = new DoubleArray.from(column);
+      _data[i] = new DoubleArray(column);
     }
   }
 
@@ -59,7 +82,7 @@ class Double2DArray extends Object
 
   Double2DArray.row(Iterable<double> column)
       : _data = new List<DoubleArray>(1) {
-    _data[0] = new DoubleArray.from(column);
+    _data[0] = new DoubleArray(column);
   }
 
   Double2DArray.column(Iterable<double> row)
@@ -77,10 +100,13 @@ class Double2DArray extends Object
     return _data.first.length;
   }
 
+  int get numCols => length;
+
+  int get numRows => _yLength;
+
   Index2D get shape => new Index2D(_data.length, _yLength);
 
-  // TODO return view
-  DoubleArray operator [](int i) => _data[i];
+  DoubleArrayFix operator [](int i) => _data[i].fixed;
 
   operator []=(final int i, Array<double> val) {
     if (i > _data.length) {
@@ -88,7 +114,7 @@ class Double2DArray extends Object
     }
 
     if (_data.length == 0) {
-      final arr = new DoubleArray.from(val);
+      final arr = new DoubleArray(val);
       _data.add(arr);
       return;
     }
@@ -97,7 +123,7 @@ class Double2DArray extends Object
       throw new Exception('Invalid size!');
     }
 
-    final arr = new DoubleArray.from(val);
+    final arr = new DoubleArray(val);
 
     if (i == _data.length) {
       _data.add(arr);
@@ -109,6 +135,16 @@ class Double2DArray extends Object
 
   @override
   Iterator<DoubleArray> get iterator => _data.iterator;
+
+  DoubleArray getRow(int r) {
+    final ret = new DoubleArray.sized(numCols);
+
+    for(int i = 0; i < numCols; i++) {
+      ret[i] = _data[i][r];
+    }
+
+    return ret;
+  }
 
   void addRow(Iterable<double> row) {
     if (row.length != length) {
@@ -163,6 +199,15 @@ class Double2DArray extends Object
       }
       for (int i = 0; i < length; i++) {
         _data[i][index] = v;
+      }
+    }
+  }
+
+  /// Sets all elements in the array to given value [v]
+  void set(double v) {
+    for (int c = 0; c < length; c++) {
+      for (int r = 0; r < _yLength; r++) {
+        _data[c][r] = v;
       }
     }
   }
@@ -424,6 +469,20 @@ class Double2DArray extends Object
     return ret;
   }
 
+  Double2DArray dot(Numeric2DArray other) {
+    if(numCols != other.numRows) throw new ArgumentError.value(other, 'other', 'Invalid shape!');
+
+    final ret = new Double2DArray.sized(other.numCols, numRows);
+
+    for(int r = 0; r < ret.numRows; r++) {
+      for(int c = 0; c < numCols; c++) {
+        ret[c][r] = getRow(r).dot(other[c]);
+      }
+    }
+
+    return ret;
+  }
+
   Array2D<double> head([int count = 10]) {
     // TODO
     throw new UnimplementedError();
@@ -499,7 +558,7 @@ class Double2DArray extends Object
     return ret;
   }
 
-  Double2DArray transpose() {
+  Double2DArray get transpose {
     final ret = new Double2DArray.sized(_yLength, length);
 
     for (int j = 0; j < _data.first.length; j++) {

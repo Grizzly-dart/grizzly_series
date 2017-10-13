@@ -1,32 +1,13 @@
 part of grizzly.series.array;
 
-class IntArray extends Object
-    with IterableMixin<int>
-    implements NumericArray<int>, Array<int> {
-  final Int64List _data;
+class IntArray extends IntArrayFix implements NumericArray<int> {
+  IntArray(Iterable<int> data) : super(data);
 
-  IntArray(this._data);
+  IntArray.sized(int length, {int data: 0}) : super.sized(length, data: data);
 
-  IntArray.sized(int length, {int data: 0}) : _data = new Int64List(length) {
-    for (int i = 0; i < length; i++) {
-      _data[i] = data;
-    }
-  }
+  IntArray.single(int data) : super.single(data);
 
-  IntArray.single(int data) : _data = new Int64List(1) {
-    _data[0] = data;
-  }
-
-  IntArray.from(Iterable<int> data) : _data = new Int64List.fromList(data);
-
-  IntArray makeFrom(Iterable<int> newData) => new IntArray(newData);
-
-  @override
-  Iterator<int> get iterator => _data.iterator;
-
-  Index1D get shape => new Index1D(_data.length);
-
-  int operator [](int i) => _data[i];
+  IntArray.make(Int32List data) : super.make(data);
 
   operator []=(int i, int val) {
     if (i > _data.length) {
@@ -41,25 +22,280 @@ class IntArray extends Object
     _data[i] = val;
   }
 
-  bool operator ==(other) {
-    if (other is! Array<int>) return false;
-
-    if (other is Array<int>) {
-      if (length != other.length) return false;
-
-      for (int i = 0; i < length; i++) {
-        if (_data[i] != other[i]) return false;
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-
   void add(int a) {
     _data.add(a);
   }
+
+  IntArrayFix get fixed => new IntArrayFix.make(_data);
+}
+
+class IntArrayFix extends IntArrayView implements NumericArrayFix<int> {
+  IntArrayFix(Iterable<int> data) : super(data);
+
+  IntArrayFix.sized(int length, {int data: 0}) : super.sized(length, data: data);
+
+  IntArrayFix.single(int data) : super.single(data);
+
+  IntArrayFix.make(Int32List data) : super.make(data);
+
+  operator []=(int i, int val) {
+    if (i > _data.length) {
+      throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');
+    }
+
+    _data[i] = val;
+  }
+
+  @override
+  void clip({int min, int max}) {
+    if (min != null && max != null) {
+      for (int i = 0; i < _data.length; i++) {
+        final int d = _data[i];
+
+        if (d < min) _data[i] = min;
+        if (d > max) _data[i] = max;
+      }
+      return;
+    }
+    if (min != null) {
+      for (int i = 0; i < _data.length; i++) {
+        final int d = _data[i];
+
+        if (d < min) _data[i] = min;
+      }
+      return;
+    }
+    if (max != null) {
+      for (int i = 0; i < _data.length; i++) {
+        final int d = _data[i];
+
+        if (d > max) _data[i] = max;
+      }
+      return;
+    }
+  }
+
+  IntArray addition(/* num | Iterable<num> */ other, {bool self: false}) {
+    IntArray ret = this;
+    if (!self) ret = new IntArray.sized(length);
+
+    if (other is IntArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is int) {
+      // Nothing here
+    } else if (other is num) {
+      other = other.toInt();
+    } else if (other is Iterable<int>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other.elementAt(i);
+      }
+      return ret;
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other.elementAt(i).toInt();
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is int) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other;
+      }
+    } else if (other is IntArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] + other[i];
+      }
+    }
+    return ret;
+  }
+
+  IntArray subtract(/* num | Iterable<num> */ other, {bool self: false}) {
+    IntArray ret = this;
+    if (!self) {
+      ret = new IntArray.sized(length);
+    }
+
+    if (other is IntArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is int) {
+      // Nothing here
+    } else if (other is num) {
+      other = other.toInt();
+    } else if (other is Iterable<int>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other.elementAt(i);
+      }
+      return ret;
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other.elementAt(i).toInt();
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is int) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other;
+      }
+    } else if (other is IntArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] - other[i];
+      }
+    }
+    return ret;
+  }
+
+  IntArray multiple(/* num | Iterable<num> */ other, {bool self: false}) {
+    IntArray ret = this;
+
+    if (!self) {
+      ret = new IntArray.sized(length);
+    }
+
+    if (other is IntArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is int) {
+      // Nothing here
+    } else if (other is num) {
+      other = other.toInt();
+    } else if (other is Iterable<int>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other.elementAt(i);
+      }
+      return ret;
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other.elementAt(i).toInt();
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is int) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other;
+      }
+    } else if (other is IntArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] * other[i];
+      }
+    }
+    return ret;
+  }
+
+  NumericArray<double> divide(/* E | Iterable<E> */ other, {bool self: false}) {
+    if (!self) return this / other;
+
+    throw new Exception('Operation not supported!');
+  }
+
+  IntArray truncDiv(/* num | Iterable<num> */ other, {bool self: false}) {
+    IntArray ret = this;
+
+    if (!self) {
+      ret = new IntArray.sized(length);
+    }
+
+    if (other is IntArray) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+    } else if (other is int) {
+      // Nothing here
+    } else if (other is num) {
+      other = other.toInt();
+    } else if (other is Iterable<int>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other.elementAt(i);
+      }
+      return ret;
+    } else if (other is Iterable<num>) {
+      if (other.length != length) {
+        throw new Exception('Length mismatch!');
+      }
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other.elementAt(i).toInt();
+      }
+      return ret;
+    } else {
+      throw new Exception('Expects num or Iterable<num>');
+    }
+
+    if (other is int) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other;
+      }
+    } else if (other is IntArray) {
+      for (int i = 0; i < length; i++) {
+        ret[i] = _data[i] ~/ other[i];
+      }
+    }
+    return ret;
+  }
+
+  IntArrayView get view => new IntArrayView.make(_data);
+}
+
+class IntArrayView extends Object
+    with IterableMixin<int>
+    implements ReadOnlyNumericArray<int> {
+  final Int32List _data;
+
+  IntArrayView(Iterable<int> data) : _data = new Int32List.fromList(data);
+
+  IntArrayView.make(this._data);
+
+  IntArrayView.sized(int length, {int data: 0})
+      : _data = new Int32List(length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = data;
+    }
+  }
+
+  IntArrayView.single(int data) : _data = new Int32List(1) {
+    _data[0] = data;
+  }
+
+  IntArray makeFrom(Iterable<int> newData) => new IntArray(newData);
+
+  @override
+  Iterator<int> get iterator => _data.iterator;
+
+  Index1D get shape => new Index1D(_data.length);
+
+  int operator [](int i) => _data[i];
 
   @override
   int get min {
@@ -134,35 +370,6 @@ class IntArray extends Object
       }
     }
     return ret;
-  }
-
-  @override
-  void clip({int min, int max}) {
-    if (min != null && max != null) {
-      for (int i = 0; i < _data.length; i++) {
-        final int d = _data[i];
-
-        if (d < min) _data[i] = min;
-        if (d > max) _data[i] = max;
-      }
-      return;
-    }
-    if (min != null) {
-      for (int i = 0; i < _data.length; i++) {
-        final int d = _data[i];
-
-        if (d < min) _data[i] = min;
-      }
-      return;
-    }
-    if (max != null) {
-      for (int i = 0; i < _data.length; i++) {
-        final int d = _data[i];
-
-        if (d > max) _data[i] = max;
-      }
-      return;
-    }
   }
 
   IntPair<int> pairAt(int index) => intPair<int>(index, _data[index]);
@@ -243,7 +450,7 @@ class IntArray extends Object
 
   @override
   IntArray get cumsum {
-    final ret = new IntArray(new Int64List(_data.length));
+    final ret = new IntArray(new Int32List(_data.length));
     int sum = 0;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -259,7 +466,7 @@ class IntArray extends Object
 
   @override
   IntArray get cumprod {
-    final ret = new IntArray(new Int64List(_data.length));
+    final ret = new IntArray(new Int32List(_data.length));
     int prod = 1;
     for (int i = 0; i < _data.length; i++) {
       final int d = _data[i];
@@ -288,8 +495,7 @@ class IntArray extends Object
   IntArray operator +(/* num | Iterable<num> */ other) => addition(other);
 
   IntArray addition(/* num | Iterable<num> */ other, {bool self: false}) {
-    IntArray ret = this;
-    if (!self) ret = new IntArray.sized(length);
+    IntArray ret = new IntArray.sized(length);
 
     if (other is IntArray) {
       if (other.length != length) {
@@ -333,11 +539,8 @@ class IntArray extends Object
 
   IntArray operator -(/* num | Iterable<num> */ other) => subtract(other);
 
-  IntArray subtract(/* num | Iterable<num> */ other, {bool self: false}) {
-    IntArray ret = this;
-    if (!self) {
-      ret = new IntArray.sized(length);
-    }
+  IntArray subtract(/* num | Iterable<num> */ other) {
+    IntArray ret = new IntArray.sized(length);
 
     if (other is IntArray) {
       if (other.length != length) {
@@ -381,12 +584,8 @@ class IntArray extends Object
 
   IntArray operator *(/* num | Iterable<num> */ other) => multiple(other);
 
-  IntArray multiple(/* num | Iterable<num> */ other, {bool self: false}) {
-    IntArray ret = this;
-
-    if (!self) {
-      ret = new IntArray.sized(length);
-    }
+  IntArray multiple(/* num | Iterable<num> */ other) {
+    IntArray ret = new IntArray.sized(length);
 
     if (other is IntArray) {
       if (other.length != length) {
@@ -472,20 +671,14 @@ class IntArray extends Object
     return ret;
   }
 
-  NumericArray<double> divide(/* E | Iterable<E> */ other, {bool self: false}) {
-    if (!self) return this / other;
-
-    throw new Exception('Operation not supported!');
+  NumericArray<double> divide(/* E | Iterable<E> */ other) {
+    return this / other;
   }
 
   IntArray operator ~/(/* num | Iterable<num> */ other) => truncDiv(other);
 
-  IntArray truncDiv(/* num | Iterable<num> */ other, {bool self: false}) {
-    IntArray ret = this;
-
-    if (!self) {
-      ret = new IntArray.sized(length);
-    }
+  IntArray truncDiv(/* num | Iterable<num> */ other) {
+    IntArray ret = new IntArray.sized(length);
 
     if (other is IntArray) {
       if (other.length != length) {
@@ -524,16 +717,6 @@ class IntArray extends Object
         ret[i] = _data[i] ~/ other[i];
       }
     }
-    return ret;
-  }
-
-  DoubleArray toDouble() {
-    final ret = new DoubleArray.sized(length);
-
-    for (int i = 0; i < length; i++) {
-      ret[i] = _data[i].toDouble();
-    }
-
     return ret;
   }
 
@@ -579,5 +762,42 @@ class IntArray extends Object
     }
 
     return ret;
+  }
+
+  int dot(NumericArray other) {
+    if (length != other.length) throw new Exception('Lengths must match!');
+    num ret = 0;
+
+    for (int i = 0; i < length; i++) {
+      ret += _data[i] * other[i];
+    }
+
+    return ret.toInt();
+  }
+
+  DoubleArray toDouble() {
+    final ret = new DoubleArray.sized(length);
+
+    for (int i = 0; i < length; i++) {
+      ret[i] = _data[i].toDouble();
+    }
+
+    return ret;
+  }
+
+  bool operator ==(other) {
+    if (other is! Array<int>) return false;
+
+    if (other is Array<int>) {
+      if (length != other.length) return false;
+
+      for (int i = 0; i < length; i++) {
+        if (_data[i] != other[i]) return false;
+      }
+
+      return true;
+    }
+
+    return false;
   }
 }

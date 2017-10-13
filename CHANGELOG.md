@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+- Read-only views and fixed size for `Array`
+
 ## 0.0.3
 
 - Mathematical operations for `NumericSeries`
