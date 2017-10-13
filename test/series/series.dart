@@ -65,7 +65,8 @@ void main() {
 
     test('add dup1', () {
       final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
-      final series2 = new IntSeries<int>([10, 20, 20, 30], labels: [1, 2, 2, 3]);
+      final series2 =
+          new IntSeries<int>([10, 20, 20, 30], labels: [1, 2, 2, 3]);
       final res = series1 + series2;
       expect(res.labels, [1, 2, 2, 3]);
       expect(res.data, [11, 22, 23, 34]);

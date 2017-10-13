@@ -8,7 +8,7 @@ abstract class NumericArray<E extends num>
 
 /// A mutable 1 dimensional fixed sized array of numbers
 abstract class NumericArrayFix<E extends num>
-    implements ArrayFix<E>, ReadOnlyNumericArray<E> {
+    implements ArrayFix<E>, NumericArrayView<E> {
   NumericArray<E> addition(/* E | Iterable<E> */ other, {bool self: false});
 
   NumericArray<E> subtract(/* E | Iterable<E> */ other, {bool self: false});
@@ -19,11 +19,11 @@ abstract class NumericArrayFix<E extends num>
 
   NumericArray<int> truncDiv(/* E | Iterable<E> */ other, {bool self: false});
 
-  ReadOnlyNumericArray<E> get view;
+  NumericArrayView<E> get view;
 }
 
 /// A read-only 1 dimensional array of numbers
-abstract class ReadOnlyNumericArray<E extends num> implements ReadOnlyArray<E> {
+abstract class NumericArrayView<E extends num> implements ArrayView<E> {
   E get ptp;
 
   double get mean;
@@ -66,5 +66,5 @@ abstract class ReadOnlyNumericArray<E extends num> implements ReadOnlyArray<E> {
 
   Numeric2DArray<E> transpose();
 
-  E dot(NumericArray other);
+  E dot(NumericArrayView other);
 }

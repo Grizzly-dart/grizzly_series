@@ -9,10 +9,20 @@ abstract class Index {
   /// Get index at dimension [d]
   int operator [](int d);
 
+  bool operator ==(other);
+
+  bool operator >(Index other);
+
+  bool operator <(Index other);
+
+  bool operator >=(Index other);
+
+  bool operator <=(Index other);
+
   List<int> toList();
 }
 
-class Index1D {
+class Index1D implements Index {
   final int x;
 
   const Index1D(this.x);
@@ -35,4 +45,12 @@ class Index1D {
 
     return false;
   }
+
+  bool operator >(@checked Index1D other) => x > other.x;
+
+  bool operator <(@checked Index1D other) => x < other.x;
+
+  bool operator >=(@checked Index1D other) => x >= other.x;
+
+  bool operator <=(@checked Index1D other) => x <= other.x;
 }

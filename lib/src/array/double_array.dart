@@ -279,7 +279,7 @@ class DoubleArrayFix extends DoubleArrayView
 
 class DoubleArrayView extends Object
     with IterableMixin<double>
-    implements ReadOnlyNumericArray<double> {
+    implements NumericArrayView<double> {
   final Float64List _data;
 
   DoubleArrayView(Iterable<double> iterable)
@@ -320,6 +320,9 @@ class DoubleArrayView extends Object
   Index1D get shape => new Index1D(_data.length);
 
   double operator [](int i) => _data[i];
+
+  DoubleArray slice(int start, [int end]) =>
+      new DoubleArray(_data.sublist(start, end));
 
   @override
   double get min {
@@ -756,7 +759,7 @@ class DoubleArrayView extends Object
   DoubleArray sample([int count = 10]) =>
       makeFrom(_sample<double>(_data, count));
 
-  Double2DArray to2D() => new Double2DArray.from([_data]);
+  Double2DArray to2D() => new Double2DArray.make([new DoubleArray(_data)]);
 
   Double2DArray repeat({int repeat: 1, bool transpose: false}) {
     if (!transpose) {
@@ -776,7 +779,7 @@ class DoubleArrayView extends Object
     return ret;
   }
 
-  double dot(NumericArray other) {
+  double dot(NumericArrayView other) {
     if (length != other.length) throw new Exception('Lengths must match!');
     double ret = 0.0;
 

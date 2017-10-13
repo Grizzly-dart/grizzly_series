@@ -32,9 +32,3 @@ main() {
 [ ] Numpy functionality
 [ ] Interactive web interface
 [ ] Statistical functions
-
-### Advanced
-
-[ ] Linear regression
-[ ] Logistic regression
-[ ] Classification

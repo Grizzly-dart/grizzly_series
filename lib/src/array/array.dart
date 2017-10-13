@@ -3,6 +3,7 @@ library grizzly.series.array;
 import 'dart:math' as math;
 import 'dart:collection';
 import 'dart:typed_data';
+import 'package:meta/meta.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
@@ -22,7 +23,7 @@ abstract class Array<E> implements ArrayFix<E> {
 }
 
 /// A mutable 1 dimensional fixed sized array of element [E]
-abstract class ArrayFix<E> implements ReadOnlyArray<E> {
+abstract class ArrayFix<E> implements ArrayView<E> {
   operator []=(int i, E val);
 
   // TODO [Index] based indexing
@@ -31,12 +32,14 @@ abstract class ArrayFix<E> implements ReadOnlyArray<E> {
 }
 
 /// A read-only 1 dimensional array of element [E]
-abstract class ReadOnlyArray<E> implements Iterable<E> {
+abstract class ArrayView<E> implements Iterable<E> {
   Array<E> makeFrom(Iterable<E> newData);
 
   Index1D get shape;
 
   E operator [](int i);
+
+  Array<E> slice(int start, [int end]);
 
   E get min;
 

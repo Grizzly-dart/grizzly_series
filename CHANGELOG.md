@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+- Slicing of `Array`, `Array2D`
+
 ## 0.0.4
 
 - Read-only views and fixed size for `Array`

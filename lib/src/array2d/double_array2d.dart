@@ -5,19 +5,7 @@ class Double2DArray extends Object
     implements Numeric2DArray<double> {
   final List<DoubleArray> _data;
 
-  Double2DArray.sized(int columns, int rows, {double data: 0.0})
-      : _data = new List<DoubleArray>.generate(
-            columns, (_) => new DoubleArray.sized(rows, data: data));
-
-  Double2DArray.shaped(Index2D shape, {double data: 0.0})
-      : _data = new List<DoubleArray>.generate(
-            shape.x, (_) => new DoubleArray.sized(shape.y, data: data));
-
-  factory Double2DArray.shapedLike(Array2D like, {double data: 0.0}) =>
-      new Double2DArray.sized(like.numCols, like.numRows, data: data);
-
-  Double2DArray.from(Iterable<Iterable<double>> data)
-      : _data = <DoubleArray>[] {
+  Double2DArray(Iterable<Iterable<double>> data) : _data = <DoubleArray>[] {
     if (data.length != 0) {
       final int len = data.first.length;
       for (Iterable<double> item in data) {
@@ -31,6 +19,19 @@ class Double2DArray extends Object
       }
     }
   }
+
+  Double2DArray.make(this._data);
+
+  Double2DArray.sized(int columns, int rows, {double data: 0.0})
+      : _data = new List<DoubleArray>.generate(
+            columns, (_) => new DoubleArray.sized(rows, data: data));
+
+  Double2DArray.shaped(Index2D shape, {double data: 0.0})
+      : _data = new List<DoubleArray>.generate(
+            shape.x, (_) => new DoubleArray.sized(shape.y, data: data));
+
+  factory Double2DArray.shapedLike(Array2D like, {double data: 0.0}) =>
+      new Double2DArray.sized(like.numCols, like.numRows, data: data);
 
   Double2DArray.fromNum(Iterable<Iterable<num>> data)
       : _data = <DoubleArray>[] {
@@ -93,7 +94,7 @@ class Double2DArray extends Object
   }
 
   Double2DArray makeFrom(Iterable<Iterable<double>> newData) =>
-      new Double2DArray.from(newData);
+      new Double2DArray(newData);
 
   int get _yLength {
     if (_data.length == 0) return 0;
@@ -133,13 +134,40 @@ class Double2DArray extends Object
     _data[i] = arr;
   }
 
+  Double2DArray slice(Index2D start, [Index2D end]) {
+    final Index2D myShape = shape;
+    if (end == null) {
+      end = myShape;
+    } else {
+      if (end < Index2D.zero)
+        throw new ArgumentError.value(end, 'end', 'Index out of range!');
+      if (end >= myShape)
+        throw new ArgumentError.value(end, 'end', 'Index out of range!');
+      if (start > end)
+        throw new ArgumentError.value(
+            end, 'end', 'Must be greater than start!');
+    }
+    if (start < Index2D.zero)
+      throw new ArgumentError.value(start, 'start', 'Index out of range!');
+    if (start >= myShape)
+      throw new ArgumentError.value(start, 'start', 'Index out of range!');
+
+    final list = <DoubleArray>[];
+
+    for (int c = start.x; c < end.x; c++) {
+      list.add(_data[c].slice(start.y, end.y));
+    }
+
+    return new Double2DArray.make(list);
+  }
+
   @override
   Iterator<DoubleArray> get iterator => _data.iterator;
 
   DoubleArray getRow(int r) {
     final ret = new DoubleArray.sized(numCols);
 
-    for(int i = 0; i < numCols; i++) {
+    for (int i = 0; i < numCols; i++) {
       ret[i] = _data[i][r];
     }
 
@@ -470,12 +498,13 @@ class Double2DArray extends Object
   }
 
   Double2DArray dot(Numeric2DArray other) {
-    if(numCols != other.numRows) throw new ArgumentError.value(other, 'other', 'Invalid shape!');
+    if (numCols != other.numRows)
+      throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
     final ret = new Double2DArray.sized(other.numCols, numRows);
 
-    for(int r = 0; r < ret.numRows; r++) {
-      for(int c = 0; c < numCols; c++) {
+    for (int r = 0; r < ret.numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
         ret[c][r] = getRow(r).dot(other[c]);
       }
     }

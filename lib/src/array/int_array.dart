@@ -32,7 +32,8 @@ class IntArray extends IntArrayFix implements NumericArray<int> {
 class IntArrayFix extends IntArrayView implements NumericArrayFix<int> {
   IntArrayFix(Iterable<int> data) : super(data);
 
-  IntArrayFix.sized(int length, {int data: 0}) : super.sized(length, data: data);
+  IntArrayFix.sized(int length, {int data: 0})
+      : super.sized(length, data: data);
 
   IntArrayFix.single(int data) : super.single(data);
 
@@ -270,7 +271,7 @@ class IntArrayFix extends IntArrayView implements NumericArrayFix<int> {
 
 class IntArrayView extends Object
     with IterableMixin<int>
-    implements ReadOnlyNumericArray<int> {
+    implements NumericArrayView<int> {
   final Int32List _data;
 
   IntArrayView(Iterable<int> data) : _data = new Int32List.fromList(data);
@@ -296,6 +297,9 @@ class IntArrayView extends Object
   Index1D get shape => new Index1D(_data.length);
 
   int operator [](int i) => _data[i];
+
+  IntArray slice(int start, [int end]) =>
+      new IntArray(_data.sublist(start, end));
 
   @override
   int get min {
@@ -744,7 +748,7 @@ class IntArrayView extends Object
   /// returned
   IntArray sample([int count = 10]) => makeFrom(_sample<int>(_data, count));
 
-  Int2DArray to2D() => new Int2DArray.from([_data]);
+  Int2DArray to2D() => new Int2DArray.make([new IntArray(_data)]);
 
   Int2DArray repeat({int repeat: 1, bool transpose: false}) {
     if (!transpose) {
@@ -764,7 +768,7 @@ class IntArrayView extends Object
     return ret;
   }
 
-  int dot(NumericArray other) {
+  int dot(NumericArrayView other) {
     if (length != other.length) throw new Exception('Lengths must match!');
     num ret = 0;
 

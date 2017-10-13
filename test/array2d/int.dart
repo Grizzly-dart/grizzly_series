@@ -6,7 +6,7 @@ void main() {
     setUp(() {});
 
     test('construct', () {
-      final s1 = new Int2DArray.from([
+      final s1 = new Int2DArray([
         [1, 2, 3, 4],
         [5, 6, 7, 8]
       ]);
@@ -20,7 +20,7 @@ void main() {
     });
 
     test('average', () {
-      final s1 = new Int2DArray.from([
+      final s1 = new Int2DArray([
         [15, 2],
         [5, 6]
       ]);
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('transpose', () {
-      final s1 = new Int2DArray.from([
+      final s1 = new Int2DArray([
         [15, 2],
         [5, 6]
       ]);
@@ -44,11 +44,11 @@ void main() {
     });
 
     test('dot.square', () {
-      final a = new Int2DArray.from([
+      final a = new Int2DArray([
         [1, 0],
         [0, 1]
       ]);
-      final b = new Int2DArray.from([
+      final b = new Int2DArray([
         [4, 1],
         [2, 2]
       ]);
@@ -59,11 +59,11 @@ void main() {
     });
 
     test('dot.rectangle', () {
-      final a = new Int2DArray.from([
+      final a = new Int2DArray([
         [1, 2, 3],
         [4, 5, 6]
       ]);
-      final b = new Int2DArray.from([
+      final b = new Int2DArray([
         [4, 2],
         [2, 2]
       ]);

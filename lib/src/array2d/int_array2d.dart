@@ -5,18 +5,7 @@ class Int2DArray extends Object
     implements Numeric2DArray<int> {
   final List<IntArray> _data;
 
-  Int2DArray.sized(int columns, int rows, {int data: 0})
-      : _data = new List<IntArray>.generate(
-            columns, (_) => new IntArray.sized(rows));
-
-  Int2DArray.shaped(Index2D shape, {int data: 0})
-      : _data = new List<IntArray>.generate(
-            shape.x, (_) => new IntArray.sized(shape.y, data: data));
-
-  factory Int2DArray.shapedLike(Array2D like, {int data: 0}) =>
-      new Int2DArray.sized(like.numCols, like.numRows, data: data);
-
-  Int2DArray.from(Iterable<Iterable<int>> data) : _data = <IntArray>[] {
+  Int2DArray(Iterable<Iterable<int>> data) : _data = <IntArray>[] {
     if (data.length != 0) {
       final int len = data.first.length;
       for (Iterable<int> item in data) {
@@ -30,6 +19,19 @@ class Int2DArray extends Object
       }
     }
   }
+
+  Int2DArray.sized(int columns, int rows, {int data: 0})
+      : _data = new List<IntArray>.generate(
+            columns, (_) => new IntArray.sized(rows));
+
+  Int2DArray.shaped(Index2D shape, {int data: 0})
+      : _data = new List<IntArray>.generate(
+            shape.x, (_) => new IntArray.sized(shape.y, data: data));
+
+  factory Int2DArray.shapedLike(Array2D like, {int data: 0}) =>
+      new Int2DArray.sized(like.numCols, like.numRows, data: data);
+
+  Int2DArray.make(this._data);
 
   Int2DArray.transposed(Iterable<Iterable<int>> data) : _data = <IntArray>[] {
     /* TODO
@@ -74,7 +76,7 @@ class Int2DArray extends Object
   }
 
   Int2DArray makeFrom(Iterable<Iterable<int>> newData) =>
-      new Int2DArray.from(newData);
+      new Int2DArray(newData);
 
   int get _yLength {
     if (_data.length == 0) return 0;
@@ -114,13 +116,40 @@ class Int2DArray extends Object
     _data[i] = arr;
   }
 
+  Int2DArray slice(Index2D start, [Index2D end]) {
+    final Index2D myShape = shape;
+    if (end == null) {
+      end = myShape;
+    } else {
+      if (end < Index2D.zero)
+        throw new ArgumentError.value(end, 'end', 'Index out of range!');
+      if (end >= myShape)
+        throw new ArgumentError.value(end, 'end', 'Index out of range!');
+      if (start > end)
+        throw new ArgumentError.value(
+            end, 'end', 'Must be greater than start!');
+    }
+    if (start < Index2D.zero)
+      throw new ArgumentError.value(start, 'start', 'Index out of range!');
+    if (start >= myShape)
+      throw new ArgumentError.value(start, 'start', 'Index out of range!');
+
+    final list = <IntArray>[];
+
+    for (int c = start.x; c < end.x; c++) {
+      list.add(_data[c].slice(start.y, end.y));
+    }
+
+    return new Int2DArray.make(list);
+  }
+
   @override
   Iterator<IntArray> get iterator => _data.iterator;
 
   IntArray getRow(int r) {
     final ret = new IntArray.sized(numCols);
 
-    for(int i = 0; i < numCols; i++) {
+    for (int i = 0; i < numCols; i++) {
       ret[i] = _data[i][r];
     }
 
@@ -454,8 +483,8 @@ class Int2DArray extends Object
 
     final ret = new Int2DArray.sized(other.numCols, numRows);
 
-    for(int r = 0; r < ret.numRows; r++) {
-      for(int c = 0; c < numCols; c++) {
+    for (int r = 0; r < ret.numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
         ret[c][r] = getRow(r).dot(other[c]);
       }
     }
