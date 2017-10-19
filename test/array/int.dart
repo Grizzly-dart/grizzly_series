@@ -6,27 +6,27 @@ void main() {
     setUp(() {});
 
     test('average', () {
-      IntArray s1 = new IntArray([1, 5]);
+      Int1D s1 = new Int1D([1, 5]);
       expect(s1.average([1, 2]), 3.6666666666666665);
-      s1 = new IntArray([2, 6]);
+      s1 = new Int1D([2, 6]);
       expect(s1.average([1, 2]), 4.6666666666666667);
-      s1 = new IntArray([3, 7]);
+      s1 = new Int1D([3, 7]);
       expect(s1.average([1, 2]), 5.6666666666666667);
-      s1 = new IntArray([4, 8]);
+      s1 = new Int1D([4, 8]);
       expect(s1.average([1, 2]), 6.6666666666666667);
     });
 
     test('to2D', () {
-      IntArray s1 = new IntArray([1, 5]);
+      Int1D s1 = new Int1D([1, 5]);
       expect(s1.to2D(), [
         [1, 5]
       ]);
-      expect(s1.transpose(), [
+      expect(s1.transpose, [
         [1],
         [5]
       ]);
       expect(s1.to2D().shape, idx2D(1, 2));
-      expect(s1.transpose().shape, idx2D(2, 1));
+      expect(s1.transpose.shape, idx2D(2, 1));
     });
   });
 }

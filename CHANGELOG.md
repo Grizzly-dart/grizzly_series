@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.7
+
+- Introduced `row` and `col` accessors in `Array2D`
+- Row and column based numerical methods
+- Added cool constructors and static constructor methods to
+`Int2D` and `Double2D`
+- Implemented class hierarchy for `Array2DView` -> `Array2DFix` -> `Array2D`
+
 ## 0.0.6
 
 **Breaking**

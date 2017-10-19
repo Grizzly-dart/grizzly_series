@@ -28,13 +28,17 @@ class Index2D implements Index {
     return false;
   }
 
-  bool operator >(@checked Index2D other) => row > other.row && column > other.column;
+  bool operator >(@checked Index2D other) =>
+      row > other.row && column > other.column;
 
-  bool operator <(@checked Index2D other) => row < other.row && column < other.column;
+  bool operator <(@checked Index2D other) =>
+      row < other.row && column < other.column;
 
-  bool operator >=(@checked Index2D other) => row >= other.row && column >= other.column;
+  bool operator >=(@checked Index2D other) =>
+      row >= other.row && column >= other.column;
 
-  bool operator <=(@checked Index2D other) => row <= other.row && column <= other.column;
+  bool operator <=(@checked Index2D other) =>
+      row <= other.row && column <= other.column;
 
   Index2D makeWithY(int y) => new Index2D(row, y);
 

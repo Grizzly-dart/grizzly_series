@@ -7,9 +7,15 @@ import 'package:meta/meta.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
+part 'int/int_array.dart';
+part 'int/int_fix_array.dart';
+part 'int/int_view_array.dart';
+
+part 'double/double_array.dart';
+part 'double/double_view_array.dart';
+part 'double/double_fix_array.dart';
+
 part 'index.dart';
-part 'int_array.dart';
-part 'double_array.dart';
 part 'numeric.dart';
 part 'sample.dart';
 
@@ -20,6 +26,8 @@ part 'sample.dart';
 /// A mutable 1 dimensional array of element [E]
 abstract class Array<E> implements ArrayFix<E> {
   void add(E a);
+
+  void insert(int index, E a);
 }
 
 /// A mutable 1 dimensional fixed sized array of element [E]
@@ -29,6 +37,8 @@ abstract class ArrayFix<E> implements ArrayView<E> {
   // TODO [Index] based indexing
 
   void clip({E min, E max});
+
+  ArrayFix<E> get fixed;
 }
 
 /// A read-only 1 dimensional array of element [E]
@@ -77,7 +87,9 @@ abstract class ArrayView<E> implements Iterable<E> {
 
   Array2D<E> repeat({int repeat: 1, bool transpose: false});
 
-  Array2D<E> transpose();
+  Array2D<E> get transpose;
 
   // TODO
+
+  ArrayView<E> get view;
 }

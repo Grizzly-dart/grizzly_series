@@ -1,41 +1,82 @@
 library grizzly.series.array2d;
 
-// TODO import 'dart:math' as math;
+import 'dart:math' as math;
 import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
+part 'int/int_array2d.dart';
+part 'int/int_fix_array2d.dart';
+part 'int/int_view_array2d.dart';
+part 'int/int_axis.dart';
+
+part 'double/double_array2d.dart';
+part 'double/double_fix_array2d.dart';
+part 'double/double_axis.dart';
+part 'double/double_view_array2d.dart';
+
 part 'index.dart';
 part 'double_array2d.dart';
-part 'int_array2d.dart';
 part 'numeric.dart';
 
-abstract class Array2D<E> implements Array2DFixBase<E>, Iterable<Array<E>> {
+Double2D array2D(Iterable<Iterable<num>> matrix) =>
+    new Double2D.fromNum(matrix);
+
+abstract class Array2D<E> implements Iterable<Array<E>>, Array2DFix<E> {
+  ArrayFix<E> operator [](int i);
+
+  Axis2D<E> get row;
+
+  Axis2D<E> get col;
+
+  void add(Iterable<E> row);
+
+  void addScalar(E v);
+
+  void insert(int index, Iterable<E> row);
+
+  void insertScalar(int index, E v);
+
+  Array<E> firstWhere(bool test(Array<E> element), {Array<E> orElse()});
+
+  Array<E> lastWhere(bool test(Array<E> element), {Array<E> orElse()});
+
+  Array<E> reduce(Array<E> combine(Array<E> value, Array<E> element));
 }
 
-abstract class Array2DFix<E>
-    implements Array2DFixBase<E>, Iterable<ArrayFix<E>> {
-  operator []=(int i, Array<E> val);
+abstract class Array2DFix<E> implements Iterable<ArrayFix<E>>, Array2DView<E> {
+  ArrayFix<E> operator [](int i);
+
+  operator []=(int i, ArrayView<E> val);
+
+  Axis2DFix<E> get row;
+
+  Axis2DFix<E> get col;
 
   void set(E v);
 
   void clip({E min, E max});
+
+  Array2DView<E> get view;
+
+  Array2DFix<E> get fixed;
+
+  ArrayFix<E> firstWhere(bool test(ArrayFix<E> element),
+      {ArrayFix<E> orElse()});
+
+  ArrayFix<E> lastWhere(bool test(ArrayFix<E> element), {ArrayFix<E> orElse()});
+
+  ArrayFix<E> reduce(
+      ArrayFix<E> combine(ArrayFix<E> value, ArrayFix<E> element));
 }
 
-abstract class Array2DFixBase<E> implements Array2DBase<E> {
-  operator []=(int i, Array<E> val);
+abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
+  Array2DView<E> makeView(Iterable<Iterable<E>> newData);
 
-  void set(E v);
+  Array2DFix<E> makeFix(Iterable<Iterable<E>> newData);
 
-  void clip({E min, E max});
-}
-
-abstract class Array2DView<E>
-    implements Array2DBase<E>, Iterable<ArrayView<E>> {}
-
-abstract class Array2DBase<E> {
-  Array2D<E> makeFrom(Iterable<Iterable<E>> newData);
+  Array2D<E> make(Iterable<Iterable<E>> newData);
 
   /// Number of rows in the array
   int get numCols;
@@ -46,21 +87,17 @@ abstract class Array2DBase<E> {
   /// Shape of the array
   Index2D get shape;
 
+  bool get isSquare;
+
   ArrayView<E> operator [](int i);
 
-  Array2DColumns<E> get col;
+  Axis2DView<E> get row;
+
+  Axis2DView<E> get col;
 
   E get min;
 
-  Array<E> get minRow;
-
-  Array<E> get minCol;
-
   E get max;
-
-  Array<E> get maxRow;
-
-  Array<E> get maxCol;
 
   Extent<E> get extent;
 
@@ -68,9 +105,9 @@ abstract class Array2DBase<E> {
 
   Index2D get argMax;
 
-  IntPair<Array<E>> pairAt(int index);
+  // TODO IntPair<Array<E>> pairAt(int index);
 
-  Iterable<IntPair<Array<E>>> enumerate();
+  // TODO Iterable<IntPair<Array<E>>> enumerate();
 
   /// Returns a new  [Array] containing first [count] elements of this array
   ///
@@ -91,16 +128,41 @@ abstract class Array2DBase<E> {
   Array2D<E> sample([int count = 10]);
 
   Array2D<E> get transpose;
+
+  Array<E> get diagonal;
+
+  Array2DView<E> get view;
 }
 
-abstract class Array2DColumns<E> {
-  Array<E> operator [](int r);
-
+abstract class Axis2D<E> implements Axis2DFix<E> {
   void add(Iterable<E> col);
 
   void addScalar(E v);
 
-// TODO pairAt
+  void insert(int index, Iterable<E> col);
 
-// TODO enumerate
+  void insertScalar(int index, E v);
+}
+
+abstract class Axis2DFix<E> implements Axis2DView<E> {
+  ArrayFix<E> operator [](int r);
+
+  operator[]=(int index, Iterable<E> v);
+  // TODO set?
+}
+
+abstract class Axis2DView<E> {
+  ArrayView<E> operator [](int r);
+
+  int get length;
+
+  int get otherDLength;
+
+  // TODO pairAt
+
+  // TODO enumerate
+
+  Array<E> get min;
+
+  Array<E> get max;
 }

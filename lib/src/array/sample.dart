@@ -2,7 +2,7 @@ part of grizzly.series.array;
 
 final math.Random _rand = new math.Random();
 
-List<E> _sample<E>(List<E> population, int k) {
+List<E> _sample<E>(Iterable<E> population, int k) {
   final int n = population.length;
 
   if (k < 0 || k > n)
@@ -29,7 +29,7 @@ List<E> _sample<E>(List<E> population, int k) {
         return newIdx;
       }();
       picked.add(sampleIdx);
-      samples[i] = population[sampleIdx];
+      samples[i] = population.elementAt(sampleIdx);
     }
   }
 

@@ -6,7 +6,7 @@ void main() {
     setUp(() {});
 
     test('construct', () {
-      final s1 = new Int2DArray([
+      final s1 = new Int2D([
         [1, 2, 3, 4],
         [5, 6, 7, 8]
       ]);
@@ -15,12 +15,12 @@ void main() {
       expect(s1.min, 1);
       expect(s1.max, 8);
 
-      expect(s1[0], new IntArray([1, 2, 3, 4]));
-      expect(s1[1], new IntArray([5, 6, 7, 8]));
+      expect(s1[0], new Int1D([1, 2, 3, 4]));
+      expect(s1[1], new Int1D([5, 6, 7, 8]));
     });
 
     test('average', () {
-      final s1 = new Int2DArray([
+      final s1 = new Int2D([
         [15, 2],
         [5, 6]
       ]);
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('transpose', () {
-      final s1 = new Int2DArray([
+      final s1 = new Int2D([
         [15, 2],
         [5, 6]
       ]);
@@ -44,11 +44,11 @@ void main() {
     });
 
     test('dot.square', () {
-      final a = new Int2DArray([
+      final a = new Int2D([
         [1, 0],
         [0, 1]
       ]);
-      final b = new Int2DArray([
+      final b = new Int2D([
         [4, 2],
         [1, 2]
       ]);
@@ -59,12 +59,12 @@ void main() {
     });
 
     test('dot.rectangle', () {
-      final a = new Int2DArray([
+      final a = new Int2D([
         [1, 4],
         [2, 5],
         [3, 6],
       ]);
-      final b = new Int2DArray([
+      final b = new Int2D([
         [4, 2],
         [2, 2]
       ]);
