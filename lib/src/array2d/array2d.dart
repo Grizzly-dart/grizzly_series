@@ -132,6 +132,12 @@ abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
   Array<E> get diagonal;
 
   Array2DView<E> get view;
+
+  IntSeries<E> valueCounts(
+      {bool sortByValue: false,
+        bool ascending: false,
+        bool dropNull: false,
+        dynamic name});
 }
 
 abstract class Axis2D<E> implements Axis2DFix<E> {
@@ -148,7 +154,10 @@ abstract class Axis2DFix<E> implements Axis2DView<E> {
   ArrayFix<E> operator [](int r);
 
   operator[]=(int index, Iterable<E> v);
+
   // TODO set?
+
+  //TODO
 }
 
 abstract class Axis2DView<E> {
@@ -165,4 +174,6 @@ abstract class Axis2DView<E> {
   Array<E> get min;
 
   Array<E> get max;
+
+  // TODO slice?
 }

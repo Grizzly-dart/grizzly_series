@@ -293,4 +293,27 @@ abstract class Int2DBase {
   }
 
   double get std => math.sqrt(variance);
+
+  IntSeries<int> valueCounts(
+      {bool sortByValue: false,
+        bool ascending: false,
+        bool dropNull: false,
+        dynamic name: ''}) {
+    final groups = new Map<int, List<int>>();
+    for (int r = 0; r < numRows; r++) {
+      for(int c = 0; c < numCols; c++) {
+        final int v = _data[r][c];
+        if (!groups.containsKey(v)) groups[v] = <int>[0];
+        groups[v][0]++;
+      }
+    }
+    final ret = new IntSeries<int>.fromMap(groups, name: name);
+    // Sort
+    if (sortByValue) {
+      ret.sortByIndex(ascending: ascending, inplace: true);
+    } else {
+      ret.sortByValue(ascending: ascending, inplace: true);
+    }
+    return ret;
+  }
 }

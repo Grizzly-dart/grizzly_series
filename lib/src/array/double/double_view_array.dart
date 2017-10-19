@@ -216,15 +216,15 @@ class Double1DView extends Object
   }
 
   double get variance {
-    if(length == 0) return 0.0;
+    if (length == 0) return 0.0;
 
     final double mean = this.mean;
     double ret = 0.0;
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final double val = _data[i] - mean;
       ret += val * val;
     }
-    return ret/length;
+    return ret / length;
   }
 
   double get std => math.sqrt(variance);
@@ -464,8 +464,7 @@ class Double1DView extends Object
   ///
   /// If the length of the array is shorter than [count], all elements are
   /// returned
-  Double1D sample([int count = 10]) =>
-      makeFrom(_sample<double>(_data, count));
+  Double1D sample([int count = 10]) => makeFrom(_sample<double>(_data, count));
 
   Double2D to2D() => new Double2D.make([new Double1D(_data)]);
 
@@ -506,4 +505,26 @@ class Double1DView extends Object
   }
 
   Double1DView get view => this;
+
+  @override
+  IntSeries<double> valueCounts(
+      {bool sortByValue: false,
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name: ''}) {
+    final groups = new Map<double, List<int>>();
+    for (int i = 0; i < length; i++) {
+      final double v = _data[i];
+      if (!groups.containsKey(v)) groups[v] = <int>[0];
+      groups[v][0]++;
+    }
+    final ret = new IntSeries<double>.fromMap(groups, name: name);
+    // Sort
+    if (sortByValue) {
+      ret.sortByIndex(ascending: ascending, inplace: true);
+    } else {
+      ret.sortByValue(ascending: ascending, inplace: true);
+    }
+    return ret;
+  }
 }

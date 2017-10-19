@@ -89,7 +89,11 @@ abstract class ArrayView<E> implements Iterable<E> {
 
   Array2D<E> get transpose;
 
-  // TODO
-
   ArrayView<E> get view;
+
+  IntSeries<E> valueCounts(
+      {bool sortByValue: false,
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name});
 }

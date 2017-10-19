@@ -514,4 +514,30 @@ class Int1DView extends Object
   }
 
   Int1DView get view => this;
+
+  @override
+  IntSeries<int> valueCounts(
+      {bool sortByValue: false,
+        bool ascending: false,
+        bool dropNull: false,
+        dynamic name: ''}) {
+    final groups = new Map<int, List<int>>();
+
+    for (int i = 0; i < length; i++) {
+      final int v = _data[i];
+      if (!groups.containsKey(v)) groups[v] = <int>[0];
+      groups[v][0]++;
+    }
+
+    final ret = new IntSeries<int>.fromMap(groups, name: name);
+
+    // Sort
+    if (sortByValue) {
+      ret.sortByIndex(ascending: ascending, inplace: true);
+    } else {
+      ret.sortByValue(ascending: ascending, inplace: true);
+    }
+
+    return ret;
+  }
 }

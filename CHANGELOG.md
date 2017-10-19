@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8
+
+- `valueCounts` for `Array` and `Array2D`
+
 ## 0.0.7
 
 - Introduced `row` and `col` accessors in `Array2D`
