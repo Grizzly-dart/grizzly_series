@@ -41,14 +41,17 @@ abstract class Int2DBase {
 
   int get length;
 
-  Int2DView makeView(Iterable<Iterable<int>> newData) =>
-      new Int2DView(newData);
+  Int2DColView get col;
 
-  Int2DFix makeFix(Iterable<Iterable<int>> newData) =>
-      new Int2DFix(newData);
+  Int2DRowView get row;
 
-  Int2D make(Iterable<Iterable<int>> newData) =>
-      new Int2D(newData);
+  Int2DView get view;
+
+  Int2DView makeView(Iterable<Iterable<int>> newData) => new Int2DView(newData);
+
+  Int2DFix makeFix(Iterable<Iterable<int>> newData) => new Int2DFix(newData);
+
+  Int2D make(Iterable<Iterable<int>> newData) => new Int2D(newData);
 
   int get numCols {
     if (numRows == 0) return 0;
@@ -284,7 +287,7 @@ abstract class Int2DBase {
     final double mean = this.mean;
     double sum = 0.0;
     for (int i = 0; i < numRows; i++) {
-      for(int j = 0; j < numCols; j++) {
+      for (int j = 0; j < numCols; j++) {
         final double v = _data[i][j] - mean;
         sum += v * v;
       }
@@ -296,12 +299,12 @@ abstract class Int2DBase {
 
   IntSeries<int> valueCounts(
       {bool sortByValue: false,
-        bool ascending: false,
-        bool dropNull: false,
-        dynamic name: ''}) {
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name: ''}) {
     final groups = new Map<int, List<int>>();
     for (int r = 0; r < numRows; r++) {
-      for(int c = 0; c < numCols; c++) {
+      for (int c = 0; c < numCols; c++) {
         final int v = _data[r][c];
         if (!groups.containsKey(v)) groups[v] = <int>[0];
         groups[v][0]++;
@@ -313,6 +316,22 @@ abstract class Int2DBase {
       ret.sortByIndex(ascending: ascending, inplace: true);
     } else {
       ret.sortByValue(ascending: ascending, inplace: true);
+    }
+    return ret;
+  }
+
+  Double2D get covMatrix {
+    final ret = new Double2D.sized(numCols, numCols);
+    for (int c = 0; c < numCols; c++) {
+      ret[c] = col[c].covMatrix(view);
+    }
+    return ret;
+  }
+
+  Double2D get corrcoefMatrix {
+    final ret = new Double2D.sized(numCols, numCols);
+    for (int c = 0; c < numCols; c++) {
+      ret[c] = col[c].corrcoefMatrix(view);
     }
     return ret;
   }

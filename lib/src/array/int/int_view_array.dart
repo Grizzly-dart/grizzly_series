@@ -540,4 +540,37 @@ class Int1DView extends Object
 
     return ret;
   }
+
+  double cov(Numeric1DView y) {
+    if(y.length != length) throw new Exception('Size mismatch!');
+    if(length == 0) return 0.0;
+    final double meanX = mean;
+    final double meanY = y.mean;
+    double sum = 0.0;
+    for(int i = 0; i < length; i++) {
+      sum += (_data[i] - meanX) * (y[i] - meanY);
+    }
+    return sum/length;
+  }
+
+  Double1D covMatrix(Numeric2DView y) {
+    if(y.numRows != length) throw new Exception('Size mismatch!');
+    final double meanX = mean;
+    final Double1D meanY = y.col.mean;
+    Double1D sum = new Double1D.sized(y.numCols);
+    for(int i = 0; i < length; i++) {
+      sum += (y.col[i] - meanY) * (_data[i] - meanX);
+    }
+    return sum/length;
+  }
+
+  double corrcoef(Numeric1DView y) {
+    if(y.length != length) throw new Exception('Size mismatch!');
+    return cov(y)/(std * y.std);
+  }
+
+  Double1D corrcoefMatrix(Numeric2DView y) {
+    if(y.numRows != length) throw new Exception('Size mismatch!');
+    return covMatrix(y)/(y.std * std);
+  }
 }

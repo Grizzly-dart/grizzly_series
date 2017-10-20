@@ -138,6 +138,10 @@ abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
         bool ascending: false,
         bool dropNull: false,
         dynamic name});
+
+  Double2D get covMatrix;
+
+  Double2D get corrcoefMatrix;
 }
 
 abstract class Axis2D<E> implements Axis2DFix<E> {

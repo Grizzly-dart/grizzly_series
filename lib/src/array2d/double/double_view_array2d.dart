@@ -40,6 +40,12 @@ abstract class Double2DMixin {
 
   int get length;
 
+  Double2DColView get col;
+
+  Double2DRowView get row;
+
+  Double2DView get view;
+
   Double2DView makeView(Iterable<Iterable<double>> newData) =>
       new Double2DView(newData);
 
@@ -436,6 +442,22 @@ abstract class Double2DMixin {
       ret.sortByIndex(ascending: ascending, inplace: true);
     } else {
       ret.sortByValue(ascending: ascending, inplace: true);
+    }
+    return ret;
+  }
+
+  Double2D get covMatrix {
+    final ret = new Double2D.sized(numCols, numCols);
+    for (int c = 0; c < numCols; c++) {
+      ret[c] = col[c].covMatrix(view);
+    }
+    return ret;
+  }
+
+  Double2D get corrcoefMatrix {
+    final ret = new Double2D.sized(numCols, numCols);
+    for (int c = 0; c < numCols; c++) {
+      ret[c] = col[c].corrcoefMatrix(view);
     }
     return ret;
   }

@@ -83,4 +83,12 @@ abstract class Numeric1DView<E extends num> implements ArrayView<E> {
   E dot(Iterable<num> other);
 
   Double1D get toDouble;
+
+  double cov(Numeric1DView y);
+
+  Double1D covMatrix(Numeric2DView y);
+
+  double corrcoef(Numeric1DView y);
+
+  Double1D corrcoefMatrix(Numeric2DView y);
 }

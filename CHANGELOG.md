@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.9
+
+- Correlation and covariance methods on arrays
+
 ## 0.0.8
 
 - `valueCounts` for `Array` and `Array2D`
