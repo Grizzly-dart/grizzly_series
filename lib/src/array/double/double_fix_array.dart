@@ -12,17 +12,17 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
 
   factory Double1DFix.fromNum(Iterable<num> iterable) {
     final list = new Float64List(iterable.length);
-
     final Iterator<num> ite = iterable.iterator;
     ite.moveNext();
-
     for (int i = 0; i < list.length; i++) {
       list[i] = ite.current.toDouble();
       ite.moveNext();
     }
-
     return new Double1DFix.make(list);
   }
+
+  Double1DFix.gen(int length, double maker(int index))
+      : super.gen(length, maker);
 
   operator []=(int i, double val) {
     if (i >= _data.length) {

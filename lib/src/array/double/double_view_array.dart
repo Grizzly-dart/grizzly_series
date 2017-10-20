@@ -21,6 +21,13 @@ class Double1DView extends Object
     _data[0] = data;
   }
 
+  Double1DView.gen(int length, double maker(int index))
+      : _data = new Float64List(length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = maker(i);
+    }
+  }
+
   factory Double1DView.fromNum(Iterable<num> iterable) {
     final list = new Float64List(iterable.length);
     final Iterator<num> ite = iterable.iterator;
@@ -529,35 +536,35 @@ class Double1DView extends Object
   }
 
   double cov(Numeric1DView y) {
-    if(y.length != length) throw new Exception('Size mismatch!');
-    if(length == 0) return 0.0;
+    if (y.length != length) throw new Exception('Size mismatch!');
+    if (length == 0) return 0.0;
     final double meanX = mean;
     final double meanY = y.mean;
     double sum = 0.0;
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       sum += (_data[i] - meanX) * (y[i] - meanY);
     }
-    return sum/length;
+    return sum / length;
   }
 
   Double1D covMatrix(Numeric2DView y) {
-    if(y.numRows != length) throw new Exception('Size mismatch!');
+    if (y.numRows != length) throw new Exception('Size mismatch!');
     final double meanX = mean;
     final Double1D meanY = y.col.mean;
     Double1D sum = new Double1D.sized(y.numCols);
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       sum += (y.col[i] - meanY) * (_data[i] - meanX);
     }
-    return sum/length;
+    return sum / length;
   }
 
   double corrcoef(Numeric1DView y) {
-    if(y.length != length) throw new Exception('Size mismatch!');
-    return cov(y)/(std * y.std);
+    if (y.length != length) throw new Exception('Size mismatch!');
+    return cov(y) / (std * y.std);
   }
 
   Double1D corrcoefMatrix(Numeric2DView y) {
-    if(y.numRows != length) throw new Exception('Size mismatch!');
-    return covMatrix(y)/(y.std * std);
+    if (y.numRows != length) throw new Exception('Size mismatch!');
+    return covMatrix(y) / (y.std * std);
   }
 }

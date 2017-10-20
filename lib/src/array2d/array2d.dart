@@ -135,9 +135,9 @@ abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
 
   IntSeries<E> valueCounts(
       {bool sortByValue: false,
-        bool ascending: false,
-        bool dropNull: false,
-        dynamic name});
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name});
 
   Double2D get covMatrix;
 
@@ -157,7 +157,7 @@ abstract class Axis2D<E> implements Axis2DFix<E> {
 abstract class Axis2DFix<E> implements Axis2DView<E> {
   ArrayFix<E> operator [](int r);
 
-  operator[]=(int index, Iterable<E> v);
+  operator []=(int index, Iterable<E> v);
 
   // TODO set?
 

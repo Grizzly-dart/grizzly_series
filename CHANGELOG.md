@@ -3,6 +3,8 @@
 ## 0.0.9
 
 - Correlation and covariance methods on arrays
+- Generation based constructor for `Array1D`
+- Convenient methods for creation of Arrays
 
 ## 0.0.8
 

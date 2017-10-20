@@ -3,11 +3,13 @@ part of grizzly.series.array;
 class Int1D extends Int1DFix implements Numeric1D<int> {
   Int1D(Iterable<int> data) : super(data);
 
+  Int1D.make(Int32List data) : super.make(data);
+
   Int1D.sized(int length, {int data: 0}) : super.sized(length, data: data);
 
   Int1D.single(int data) : super.single(data);
 
-  Int1D.make(Int32List data) : super.make(data);
+  Int1D.gen(int length, int maker(int index)) : super.gen(length, maker);
 
   operator []=(int i, int val) {
     if (i > _data.length) {

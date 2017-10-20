@@ -9,8 +9,7 @@ class Int1DView extends Object
 
   Int1DView.make(this._data);
 
-  Int1DView.sized(int length, {int data: 0})
-      : _data = new Int32List(length) {
+  Int1DView.sized(int length, {int data: 0}) : _data = new Int32List(length) {
     for (int i = 0; i < length; i++) {
       _data[i] = data;
     }
@@ -18,6 +17,13 @@ class Int1DView extends Object
 
   Int1DView.single(int data) : _data = new Int32List(1) {
     _data[0] = data;
+  }
+
+  Int1DView.gen(int length, int maker(int index))
+      : _data = new Int32List(length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = maker(i);
+    }
   }
 
   Int1D makeFrom(Iterable<int> newData) => new Int1D(newData);
@@ -28,8 +34,7 @@ class Int1DView extends Object
 
   int operator [](int i) => _data[i];
 
-  Int1D slice(int start, [int end]) =>
-      new Int1D(_data.sublist(start, end));
+  Int1D slice(int start, [int end]) => new Int1D(_data.sublist(start, end));
 
   int get min {
     int ret;
@@ -192,15 +197,15 @@ class Int1DView extends Object
   }
 
   double get variance {
-    if(length == 0) return 0.0;
+    if (length == 0) return 0.0;
 
     final double mean = this.mean;
     double ret = 0.0;
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final double val = _data[i] - mean;
       ret += val * val;
     }
-    return ret/length;
+    return ret / length;
   }
 
   double get std => math.sqrt(variance);
@@ -518,9 +523,9 @@ class Int1DView extends Object
   @override
   IntSeries<int> valueCounts(
       {bool sortByValue: false,
-        bool ascending: false,
-        bool dropNull: false,
-        dynamic name: ''}) {
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name: ''}) {
     final groups = new Map<int, List<int>>();
 
     for (int i = 0; i < length; i++) {
@@ -542,35 +547,35 @@ class Int1DView extends Object
   }
 
   double cov(Numeric1DView y) {
-    if(y.length != length) throw new Exception('Size mismatch!');
-    if(length == 0) return 0.0;
+    if (y.length != length) throw new Exception('Size mismatch!');
+    if (length == 0) return 0.0;
     final double meanX = mean;
     final double meanY = y.mean;
     double sum = 0.0;
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       sum += (_data[i] - meanX) * (y[i] - meanY);
     }
-    return sum/length;
+    return sum / length;
   }
 
   Double1D covMatrix(Numeric2DView y) {
-    if(y.numRows != length) throw new Exception('Size mismatch!');
+    if (y.numRows != length) throw new Exception('Size mismatch!');
     final double meanX = mean;
     final Double1D meanY = y.col.mean;
     Double1D sum = new Double1D.sized(y.numCols);
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       sum += (y.col[i] - meanY) * (_data[i] - meanX);
     }
-    return sum/length;
+    return sum / length;
   }
 
   double corrcoef(Numeric1DView y) {
-    if(y.length != length) throw new Exception('Size mismatch!');
-    return cov(y)/(std * y.std);
+    if (y.length != length) throw new Exception('Size mismatch!');
+    return cov(y) / (std * y.std);
   }
 
   Double1D corrcoefMatrix(Numeric2DView y) {
-    if(y.numRows != length) throw new Exception('Size mismatch!');
-    return covMatrix(y)/(y.std * std);
+    if (y.numRows != length) throw new Exception('Size mismatch!');
+    return covMatrix(y) / (y.std * std);
   }
 }

@@ -28,5 +28,10 @@ void main() {
       expect(s1.to2D().shape, idx2D(1, 2));
       expect(s1.transpose.shape, idx2D(2, 1));
     });
+
+    test('covariance', () {
+      final s1 = int1D([1, 5]);
+      // TODO
+    });
   });
 }

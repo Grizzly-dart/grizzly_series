@@ -23,6 +23,15 @@ part 'sample.dart';
 //TODO String
 //TODO bool
 
+/// Creates a 1-dimensional array of integers from given [data]
+Int1D int1D(Iterable<num> data) => new Int1D(data);
+
+/// Creates a 1-dimensional array of double from given [data]
+Double1D double1D(Iterable<num> data) => new Double1D.fromNum(data);
+
+/// Creates a 1-dimensional array of double from given [data]
+Double1D array(Iterable<num> data) => new Double1D.fromNum(data);
+
 /// A mutable 1 dimensional array of element [E]
 abstract class Array<E> implements ArrayFix<E> {
   void add(E a);

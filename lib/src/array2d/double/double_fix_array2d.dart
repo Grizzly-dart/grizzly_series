@@ -25,16 +25,16 @@ class Double2DFix extends Object
   Iterator<Numeric1DFix<double>> get iterator => _data.iterator;
 
   Numeric1DFix<double> firstWhere(covariant bool test(Double1DFix element),
-      {covariant Double1DFix orElse()}) =>
+          {covariant Double1DFix orElse()}) =>
       super.firstWhere(test, orElse: orElse);
 
   Numeric1DFix<double> lastWhere(covariant bool test(Double1DFix element),
-      {covariant Double1DFix orElse()}) =>
+          {covariant Double1DFix orElse()}) =>
       super.lastWhere(test, orElse: orElse);
 
   Numeric1DFix<double> reduce(
-      covariant Double1DFix combine(
-          ArrayFix<double> value, ArrayFix<double> element)) =>
+          covariant Double1DFix combine(
+              ArrayFix<double> value, ArrayFix<double> element)) =>
       super.reduce(combine);
 
   covariant Double2DColFix _col;

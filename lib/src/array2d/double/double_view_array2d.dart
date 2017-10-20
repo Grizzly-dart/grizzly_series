@@ -52,8 +52,7 @@ abstract class Double2DMixin {
   Double2DFix makeFix(Iterable<Iterable<double>> newData) =>
       new Double2DFix(newData);
 
-  Double2D make(Iterable<Iterable<double>> newData) =>
-      new Double2D(newData);
+  Double2D make(Iterable<Iterable<double>> newData) => new Double2D(newData);
 
   int get numCols {
     if (numRows == 0) return 0;
@@ -413,7 +412,7 @@ abstract class Double2DMixin {
     final double mean = this.mean;
     double sum = 0.0;
     for (int i = 0; i < numRows; i++) {
-      for(int j = 0; j < numCols; j++) {
+      for (int j = 0; j < numCols; j++) {
         final double v = _data[i][j] - mean;
         sum += v * v;
       }
@@ -425,12 +424,12 @@ abstract class Double2DMixin {
 
   IntSeries<double> valueCounts(
       {bool sortByValue: false,
-        bool ascending: false,
-        bool dropNull: false,
-        dynamic name: ''}) {
+      bool ascending: false,
+      bool dropNull: false,
+      dynamic name: ''}) {
     final groups = new Map<double, List<int>>();
     for (int r = 0; r < numRows; r++) {
-      for(int c = 0; c < numCols; c++) {
+      for (int c = 0; c < numCols; c++) {
         final double v = _data[r][c];
         if (!groups.containsKey(v)) groups[v] = <int>[0];
         groups[v][0]++;

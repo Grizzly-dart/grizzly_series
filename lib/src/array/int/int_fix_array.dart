@@ -9,6 +9,8 @@ class Int1DFix extends Int1DView implements Numeric1DFix<int> {
 
   Int1DFix.single(int data) : super.single(data);
 
+  Int1DFix.gen(int length, int maker(int index)) : super.gen(length, maker);
+
   operator []=(int i, int val) {
     if (i > _data.length) {
       throw new RangeError.range(i, 0, _data.length, 'i', 'Out of range!');

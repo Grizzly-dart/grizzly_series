@@ -1,8 +1,7 @@
 part of grizzly.series.array;
 
 /// A mutable 1 dimensional array of numbers
-abstract class Numeric1D<E extends num>
-    implements Array<E>, Numeric1DFix<E> {
+abstract class Numeric1D<E extends num> implements Array<E>, Numeric1DFix<E> {
   Numeric1D<E> addition(/* E | Iterable<E> */ other, {bool self: false});
 
   Numeric1D<E> subtract(/* E | Iterable<E> */ other, {bool self: false});
@@ -31,13 +30,11 @@ abstract class Numeric1DFix<E extends num>
 
   Numeric1DFix<double> operator /(/* E | Iterable<E> */ other);
 
-  Numeric1DFix<double> divide(/* E | Iterable<E> */ other,
-      {bool self: false});
+  Numeric1DFix<double> divide(/* E | Iterable<E> */ other, {bool self: false});
 
   Numeric1DFix<int> operator ~/(/* E | Iterable<E> */ other);
 
-  Numeric1DFix<int> truncDiv(/* E | Iterable<E> */ other,
-      {bool self: false});
+  Numeric1DFix<int> truncDiv(/* E | Iterable<E> */ other, {bool self: false});
 }
 
 /// A read-only 1 dimensional array of numbers

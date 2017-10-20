@@ -3,26 +3,25 @@ part of grizzly.series.array;
 class Double1D extends Double1DFix implements Numeric1D<double> {
   Double1D(Iterable<double> data) : super(data);
 
+  Double1D.make(Iterable<double> iterable) : super.make(iterable);
+
   Double1D.sized(int length, {double data: 0.0})
       : super.sized(length, data: data);
 
   Double1D.single(double data) : super.single(data);
 
-  Double1D.make(Iterable<double> iterable) : super.make(iterable);
-
   factory Double1D.fromNum(Iterable<num> iterable) {
     final list = new Float64List(iterable.length);
-
     final Iterator<num> ite = iterable.iterator;
     ite.moveNext();
-
     for (int i = 0; i < list.length; i++) {
       list[i] = ite.current.toDouble();
       ite.moveNext();
     }
-
     return new Double1D.make(list);
   }
+
+  Double1D.gen(int length, double maker(int index)) : super.gen(length, maker);
 
   operator []=(int i, double val) {
     if (i > _data.length) {
