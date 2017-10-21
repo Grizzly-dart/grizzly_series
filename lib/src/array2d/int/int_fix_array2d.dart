@@ -32,7 +32,7 @@ class Int2DFix extends Object
 
   Int1DFix reduce(
           covariant Int1DFix combine(
-              ArrayFix<int> value, ArrayFix<int> element)) =>
+              ArrayView<int> value, ArrayView<int> element)) =>
       super.reduce(combine);
 
   @override

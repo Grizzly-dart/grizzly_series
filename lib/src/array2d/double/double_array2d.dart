@@ -30,8 +30,16 @@ class Double2D extends Object
       : _data = new List<Double1D>.generate(
             shape.row, (_) => new Double1D.sized(shape.column, data: data));
 
-  factory Double2D.shapedLike(Array2D like, {double data: 0.0}) =>
+  factory Double2D.shapedLike(Array2DView like, {double data: 0.0}) =>
       new Double2D.sized(like.numRows, like.numCols, data: data);
+
+  factory Double2D.diagonal(Iterable<double> diagonal) {
+    final ret = new Double2D.sized(diagonal.length, diagonal.length);
+    for (int i = 0; i < diagonal.length; i++) {
+      ret[i][i] = diagonal.elementAt(i);
+    }
+    return ret;
+  }
 
   Double2D.fromNum(Iterable<Iterable<num>> data) : _data = <Double1D>[] {
     if (data.length != 0) {
@@ -191,7 +199,7 @@ class Double2D extends Object
 
   Numeric1D<double> reduce(
           covariant Double1D combine(
-              Array<double> value, Array<double> element)) =>
+              ArrayView<double> value, ArrayView<double> element)) =>
       super.reduce(combine);
 
   covariant Double2DCol _col;
@@ -246,12 +254,16 @@ class Double2D extends Object
 
   @override
   void insert(int index, Iterable<double> row) {
-    // TODO
+    if (index > numRows) throw new RangeError.range(index, 0, numRows);
+    if (row.length != numCols)
+      throw new ArgumentError.value(row, 'row', 'Size mismatch!');
+    _data.insert(index, new Double1D(row));
   }
 
   @override
   void insertScalar(int index, double v) {
-    // TODO
+    if (index > numRows) throw new RangeError.range(index, 0, numRows);
+    _data.insert(index, new Double1D.sized(numCols, data: v));
   }
 
   Iterator<Double1D> get iterator => _data.iterator;

@@ -34,7 +34,7 @@ class Double2DFix extends Object
 
   Numeric1DFix<double> reduce(
           covariant Double1DFix combine(
-              ArrayFix<double> value, ArrayFix<double> element)) =>
+              ArrayView<double> value, ArrayView<double> element)) =>
       super.reduce(combine);
 
   covariant Double2DColFix _col;

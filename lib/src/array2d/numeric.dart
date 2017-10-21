@@ -11,7 +11,7 @@ abstract class Numeric2D<E extends num> implements Array2D<E>, Numeric2DFix<E> {
 
   Array<E> lastWhere(bool test(Array<E> element), {Array<E> orElse()});
 
-  Array<E> reduce(Array<E> combine(Array<E> value, Array<E> element));
+  Array<E> reduce(Array<E> combine(ArrayView<E> value, ArrayView<E> element));
 }
 
 abstract class Numeric2DFix<E extends num>
@@ -26,7 +26,7 @@ abstract class Numeric2DFix<E extends num>
   ArrayFix<E> lastWhere(bool test(ArrayFix<E> element), {ArrayFix<E> orElse()});
 
   ArrayFix<E> reduce(
-      ArrayFix<E> combine(ArrayFix<E> value, ArrayFix<E> element));
+      ArrayFix<E> combine(ArrayView<E> value, ArrayView<E> element));
 }
 
 abstract class Numeric2DView<E extends num> implements Array2DView<E> {

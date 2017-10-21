@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.10
+
+- view and fixed bug fixes
+- Flexible array creator convenient methods
+
 ## 0.0.9
 
 - Correlation and covariance methods on arrays

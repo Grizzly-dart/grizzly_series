@@ -29,7 +29,7 @@ class Int2D extends Object
       : _data = new List<Int1D>.generate(
             shape.row, (_) => new Int1D.sized(shape.column, data: data));
 
-  factory Int2D.shapedLike(Array2D like, {int data: 0}) =>
+  factory Int2D.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2D.sized(like.numCols, like.numRows, data: data);
 
   Int2D.repeatRow(Iterable<int> row, [int numRows = 1])
@@ -170,7 +170,9 @@ class Int2D extends Object
           {covariant Int1D orElse()}) =>
       super.lastWhere(test, orElse: orElse);
 
-  Int1D reduce(covariant Int1D combine(Array<int> value, Array<int> element)) =>
+  Int1D reduce(
+          covariant Int1D combine(
+              ArrayView<int> value, ArrayView<int> element)) =>
       super.reduce(combine);
 
   @override
@@ -228,12 +230,16 @@ class Int2D extends Object
 
   @override
   void insert(int index, Iterable<int> row) {
-    // TODO
+    if (index > numRows) throw new RangeError.range(index, 0, numRows);
+    if (row.length != numCols)
+      throw new ArgumentError.value(row, 'row', 'Size mismatch!');
+    _data.insert(index, new Int1D(row));
   }
 
   @override
   void insertScalar(int index, int v) {
-    // TODO
+    if (index > numRows) throw new RangeError.range(index, 0, numRows);
+    _data.insert(index, new Int1D.sized(numCols, data: v));
   }
 
   void clip({int min, int max}) {

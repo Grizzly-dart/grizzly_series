@@ -38,11 +38,14 @@ abstract class Array2D<E> implements Iterable<Array<E>>, Array2DFix<E> {
 
   void insertScalar(int index, E v);
 
-  Array<E> firstWhere(bool test(Array<E> element), {Array<E> orElse()});
+  Array<E> firstWhere(covariant bool test(Array<E> element),
+      {covariant Array<E> orElse()});
 
-  Array<E> lastWhere(bool test(Array<E> element), {Array<E> orElse()});
+  Array<E> lastWhere(covariant bool test(Array<E> element),
+      {covariant Array<E> orElse()});
 
-  Array<E> reduce(Array<E> combine(Array<E> value, Array<E> element));
+  Array<E> reduce(
+      covariant Array<E> combine(ArrayView<E> value, ArrayView<E> element));
 }
 
 abstract class Array2DFix<E> implements Iterable<ArrayFix<E>>, Array2DView<E> {
@@ -62,13 +65,14 @@ abstract class Array2DFix<E> implements Iterable<ArrayFix<E>>, Array2DView<E> {
 
   Array2DFix<E> get fixed;
 
-  ArrayFix<E> firstWhere(bool test(ArrayFix<E> element),
-      {ArrayFix<E> orElse()});
+  ArrayFix<E> firstWhere(covariant bool test(ArrayFix<E> element),
+      {covariant ArrayFix<E> orElse()});
 
-  ArrayFix<E> lastWhere(bool test(ArrayFix<E> element), {ArrayFix<E> orElse()});
+  ArrayFix<E> lastWhere(covariant bool test(ArrayFix<E> element),
+      {covariant ArrayFix<E> orElse()});
 
   ArrayFix<E> reduce(
-      ArrayFix<E> combine(ArrayFix<E> value, ArrayFix<E> element));
+      covariant ArrayFix<E> combine(ArrayView<E> value, ArrayView<E> element));
 }
 
 abstract class Array2DView<E> implements Iterable<ArrayView<E>> {

@@ -39,11 +39,15 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
   @override
   void add(double a) {
     _data = new Float64List.fromList(_data.toList()..add(a));
+    if(_view != null) _view._data = _data;
+    if(_fixed != null) _fixed._data = _data;
   }
 
   @override
   void insert(int index, double a) {
     _data = new Float64List.fromList(_data.toList()..insert(index, a));
+    if(_view != null) _view._data = _data;
+    if(_fixed != null) _fixed._data = _data;
   }
 
   @override
