@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
-  List<IT> get _indices;
+  List<IT> get _labels;
 
   List<VT> get _data;
 
@@ -114,84 +114,69 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   BoolSeries<IT> eq(NumericSeries<IT, num> other, {num fillVal}) =>
       _relOp(other, (num a, num b) => a == b, fillVal: fillVal);
 
-/* TODO
-  NumSeries<IT> _op(NumericSeries<IT, VT> a, VT func(VT a, VT b),
-      {VT fillVal, dynamic name}) {
-    final mapper = new SplayTreeMap<IT, List<num>>();
+  NumericSeries<IT, num> addition(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
-    for (IT index in _mapper.keys) {
-      if (a._mapper.containsKey(index)) {
-        List<int> sourcePos = _mapper[index];
-        List<int> destPos = a._mapper[index];
+  NumericSeries<IT, num> operator +(a);
 
-        final List<num> res = [];
+  NumericSeries<IT, num> subtract(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
-        if (sourcePos.length == destPos.length) {
-          for (int i = 0; i < sourcePos.length; i++) {
-            final num source = _data[sourcePos[i]];
-            final num dest = a._data[destPos[i]];
-            if (source == null)
-              res.add(null);
-            else if (dest == null) {
-              if (fillVal == null)
-                res.add(null);
-              else
-                res.add(func(source, fillVal));
-            } else
-              res.add(func(source, dest));
-          }
-        } else {
-          for (int i = 0; i < sourcePos.length; i++) {
-            final num source = _data[sourcePos[i]];
-            for (int j = 0; j < destPos.length; j++) {
-              final num dest = a._data[destPos[j]];
-              if (source == null)
-                res.add(null);
-              else if (dest == null) {
-                if (fillVal == null)
-                  res.add(null);
-                else
-                  res.add(func(source, fillVal));
-              } else
-                res.add(func(source, dest));
-            }
-          }
-        }
-        mapper[index] = res;
-      } else {
-        if (fillVal == null) {
-          mapper[index] = new List<int>.filled(_mapper[index].length, null);
-        } else {
-          mapper[index] = _mapper[index].map((int pos) {
-            num data = _data[pos];
-            if (data == null) return null;
-            return func(data, fillVal);
-          }).toList();
-        }
-      }
-    }
+  NumericSeries<IT, num> operator -(a);
 
-    for (IT index in a._mapper.keys) {
-      if (_mapper.containsKey(index)) continue;
-      mapper[index] = new List<int>.filled(a._mapper[index].length, null);
-    }
+  NumericSeries<IT, num> multiply(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
-    return new NumSeries<IT>.fromMap(mapper, name: name);
-  }
+  NumericSeries<IT, num> operator *(a);
 
-  NumSeries<IT> add(NumericSeries<IT, VT> a, {VT fillVal, dynamic name}) =>
-      _op(a, (VT opa, VT opb) => opa + opb, fillVal: fillVal, name: name);
+  NumericSeries<IT, num> divide(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
 
-  NumSeries<IT> sub(NumericSeries<IT, VT> a, {VT fillVal, dynamic name}) =>
-      _op(a, (VT opa, VT opb) => opa - opb, fillVal: fillVal, name: name);
+  NumericSeries<IT, num> operator /(a);
 
-  NumSeries<IT> mul(NumericSeries<IT, VT> a, {VT fillVal, dynamic name}) =>
-      _op(a, (VT opa, VT opb) => opa * opb, fillVal: fillVal, name: name);
+  // TODO truncDiv
 
-  NumSeries<IT> floorDiv(NumericSeries<IT, VT> a, {VT fillVal, dynamic name}) =>
-      _op(a, (VT opa, VT opb) => (opa / opb).floor(), fillVal: fillVal, name: name);
-      */
+  // TODO operator ~/
 
+  NumericSeries<IT, num> mod(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
+
+  NumericSeries<IT, num> operator %(a);
+
+  NumericSeries<IT, num> pow(a,
+      {VT myFillValue,
+      VT otherFillValue,
+      dynamic name,
+      bool self: false,
+      bool strict: true});
+
+  DoubleSeries<IT> log({VT fillValue, bool self: true});
+
+  DoubleSeries<IT> logN(num n, {VT fillValue, bool self: true});
+
+  DoubleSeries<IT> log10({VT fillValue, bool self: true});
+
+  /* TODO
   NumericSeriesGroupBy<IT, VT> groupByValue({VT apply(VT value)}) {
     final groups = new LinkedHashMap<VT, List<int>>();
 
@@ -210,7 +195,7 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     for (int i = 0; i < series.length; i++) {
       final VT v = series._data[i];
       if (!groups.containsKey(v)) groups[v] = <int>[];
-      final int idx = series._indices[i];
+      final int idx = series._labels[i];
       groups[v].add(idx);
     }
 
@@ -220,18 +205,20 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   NumericSeriesGroupBy<IT, VT> groupByMapping(Map<VT, List<int>> indexMap) {
     return new NumericSeriesGroupBy<IT, VT>(this, indexMap);
   }
+  */
 }
 
-class NumericSeriesGroupBy<IT, VT extends num> {
+/* TODO
+abstract class NumericSeriesGroupBy<IT, VT extends num> {
   final NumericSeries<IT, VT> series;
 
   UnmodifiableMapView<VT, UnmodifiableListView<int>> _groups;
 
   UnmodifiableMapView<VT, UnmodifiableListView<int>> get groups => _groups;
 
-  UnmodifiableMapView<VT, UnmodifiableListView<IT>> _indices;
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> _labels;
 
-  UnmodifiableMapView<VT, UnmodifiableListView<IT>> get indices => _indices;
+  UnmodifiableMapView<VT, UnmodifiableListView<IT>> get labels => _labels;
 
   NumericSeriesGroupBy(this.series, Map<VT, List<int>> groupMapping) {
     final temp = new LinkedHashMap<VT, UnmodifiableListView<int>>();
@@ -240,12 +227,12 @@ class NumericSeriesGroupBy<IT, VT extends num> {
     for (VT v in groupMapping.keys) {
       temp[v] = new UnmodifiableListView<int>(groupMapping[v]);
       tempIdx[v] = new UnmodifiableListView<IT>(groupMapping[v]
-          .map((int position) => series.indices[position])
+          .map((int position) => series.labels[position])
           .toList());
     }
 
     _groups = new UnmodifiableMapView<VT, UnmodifiableListView<int>>(temp);
-    _indices = new UnmodifiableMapView<VT, UnmodifiableListView<IT>>(tempIdx);
+    _labels = new UnmodifiableMapView<VT, UnmodifiableListView<IT>>(tempIdx);
   }
 
   IntSeries<VT> count({dynamic name}) {
@@ -257,10 +244,10 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(_groups[key].length);
     }
 
-    return new IntSeries<VT>(data, name: name, indices: idx);
+    return new IntSeries<VT>(data, name: name, labels: idx);
   }
 
-  NumSeries<VT> max({dynamic name}) {
+  NumericSeries<IT, VT> max({dynamic name}) {
     final List<VT> idx = [];
     final List<num> data = [];
 
@@ -280,7 +267,7 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(mx);
     }
 
-    return new NumSeries<VT>(data, name: name, indices: idx);
+    return new NumSeries<VT>(data, name: name, labels: idx);
   }
 
   NumSeries<VT> min({dynamic name}) {
@@ -303,6 +290,7 @@ class NumericSeriesGroupBy<IT, VT extends num> {
       data.add(min);
     }
 
-    return new NumSeries<VT>(data, name: name, indices: idx);
+    return new NumSeries<VT>(data, name: name, labels: idx);
   }
 }
+*/

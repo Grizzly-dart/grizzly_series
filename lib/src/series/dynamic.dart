@@ -3,7 +3,7 @@ part of grizzly.series;
 class DynamicSeries<IT> extends Object
     with SeriesBase<IT, dynamic>
     implements Series<IT, dynamic> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<dynamic> _data;
 
@@ -11,7 +11,7 @@ class DynamicSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<dynamic> data;
 
@@ -26,38 +26,18 @@ class DynamicSeries<IT> extends Object
     return _view;
   }
 
-  DynamicSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  DynamicSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, dynamic>(this);
   }
 
   factory DynamicSeries(Iterable<dynamic> data,
-      {dynamic name, List<IT> indices}) {
-    if (indices == null) {
-      if (IT.runtimeType == int) {
-        throw new Exception("Indices are required for non-int indexing!");
-      }
-      indices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
-    } else {
-      if (indices.length != data.length) {
-        throw new Exception("Indices and data must be same length!");
-      }
-    }
+      {dynamic name, List<IT> labels}) {
+    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
+    final mapper = labelsToPosMapper(madeIndices);
 
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
-      if (mapper.containsKey(index)) {
-        mapper[index].add(i);
-      } else {
-        mapper[index] = new List<int>()..add(i);
-      }
-    }
-
-    return new DynamicSeries._(data.toList(), indices, name, mapper);
+    return new DynamicSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory DynamicSeries.fromMap(Map<IT, List<dynamic>> map, {dynamic name}) {
@@ -78,8 +58,8 @@ class DynamicSeries<IT> extends Object
   }
 
   DynamicSeries<IIT> makeNew<IIT>(Iterable<dynamic> data,
-          {dynamic name, List<IIT> indices}) =>
-      new DynamicSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) =>
+      new DynamicSeries<IIT>(data, name: name, labels: labels);
 
   dynamic max({bool skipNan: true}) {
     dynamic ret;
@@ -133,7 +113,7 @@ class DynamicSeries<IT> extends Object
 class DynamicSeriesView<IT> extends DynamicSeries<IT>
     implements SeriesView<IT, dynamic> {
   DynamicSeriesView(DynamicSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -157,7 +137,7 @@ class DynamicSeriesView<IT> extends DynamicSeries<IT>
   }
 
   DynamicSeries<IT> toSeries() =>
-      new DynamicSeries(_data, name: name, indices: _indices);
+      new DynamicSeries(_data, name: name, labels: _labels);
 
   DynamicSeriesView<IT> toView() => this;
 }

@@ -1,4 +1,4 @@
-import 'package:grizzly/grizzly.dart';
+import 'package:grizzly_series/grizzly_series.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -7,7 +7,7 @@ void main() {
 
     test('drop.inplace', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.drop('two', inplace: true);
 
@@ -21,7 +21,7 @@ void main() {
 
     test('drop', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.drop('two');
 
@@ -40,7 +40,7 @@ void main() {
 
     test('drop.inplace with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.drop('two', inplace: true);
 
@@ -53,7 +53,7 @@ void main() {
 
     test('drop with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.drop('two');
 
@@ -62,7 +62,7 @@ void main() {
       expect(s1_dup['zero'], 1);
       expect(s1_dup['one'], 2);
       expect(s1_dup['two'], 3);
-      expect(s1_dup.getByIndexMulti('two'), [3, 4]);
+      expect(s1_dup.getByLabelMulti('two'), [3, 4]);
 
       expect(serRes['zero'], 1);
       expect(serRes['one'], 2);
@@ -71,7 +71,7 @@ void main() {
 
     test('dropMany.inplace', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.dropMany(['zero', 'one'], inplace: true);
 
@@ -85,7 +85,7 @@ void main() {
 
     test('dropMany', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.dropMany(['zero', 'one']);
 
@@ -104,7 +104,7 @@ void main() {
 
     test('drop.inplace with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.dropMany(['zero', 'two'], inplace: true);
 
@@ -117,7 +117,7 @@ void main() {
 
     test('drop with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.dropMany(['zero', 'two']);
 
@@ -126,7 +126,7 @@ void main() {
       expect(s1_dup['zero'], 1);
       expect(s1_dup['one'], 2);
       expect(s1_dup['two'], 3);
-      expect(s1_dup.getByIndexMulti('two'), [3, 4]);
+      expect(s1_dup.getByLabelMulti('two'), [3, 4]);
 
       expect(() => serRes['zero'], throwsA(isException));
       expect(serRes['one'], 2);
@@ -135,7 +135,7 @@ void main() {
 
     test('remove.inplace', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.remove(2, inplace: true);
 
@@ -149,7 +149,7 @@ void main() {
 
     test('remove', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.remove(2);
 
@@ -168,7 +168,7 @@ void main() {
 
     test('remove.inplace with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.remove(2, inplace: true);
 
@@ -176,12 +176,12 @@ void main() {
 
       expect(s1_dup['zero'], 1);
       expect(s1_dup['one'], 2);
-      expect(s1_dup.getByIndexMulti('two'), [4]);
+      expect(s1_dup.getByLabelMulti('two'), [4]);
     });
 
     test('remove with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.remove(2);
 
@@ -190,16 +190,16 @@ void main() {
       expect(s1_dup['zero'], 1);
       expect(s1_dup['one'], 2);
       expect(s1_dup['two'], 3);
-      expect(s1_dup.getByIndexMulti('two'), [3, 4]);
+      expect(s1_dup.getByLabelMulti('two'), [3, 4]);
 
       expect(serRes['zero'], 1);
       expect(serRes['one'], 2);
-      expect(serRes.getByIndexMulti('two'), [4]);
+      expect(serRes.getByLabelMulti('two'), [4]);
     });
 
     test('removeMany.inplace', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.removeMany([0, 1], inplace: true);
 
@@ -213,7 +213,7 @@ void main() {
 
     test('removeMany', () {
       final s1 = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'three']);
+          labels: ['zero', 'one', 'two', 'three']);
 
       final serRes = s1.removeMany([0, 1]);
 
@@ -233,7 +233,7 @@ void main() {
     /* TODO
     test('drop.inplace with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.removeMany([0, 1], inplace: true);
 
@@ -246,7 +246,7 @@ void main() {
 
     test('drop with duplicate', () {
       final s1_dup = new IntSeries<String>([1, 2, 3, 4],
-          indices: ['zero', 'one', 'two', 'two']);
+          labels: ['zero', 'one', 'two', 'two']);
 
       final serRes = s1_dup.removeMany([0, 2]);
 

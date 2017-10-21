@@ -3,7 +3,7 @@ part of grizzly.series;
 class StringSeries<IT> extends Object
     with SeriesBase<IT, String>
     implements Series<IT, String> {
-  final List<IT> _indices;
+  final List<IT> _labels;
 
   final List<String> _data;
 
@@ -11,7 +11,7 @@ class StringSeries<IT> extends Object
 
   dynamic name;
 
-  final UnmodifiableListView<IT> indices;
+  final UnmodifiableListView<IT> labels;
 
   final UnmodifiableListView<String> data;
 
@@ -26,60 +26,39 @@ class StringSeries<IT> extends Object
     return _view;
   }
 
-  StringSeries._(this._data, this._indices, this.name, this._mapper)
-      : indices = new UnmodifiableListView(_indices),
+  StringSeries._(this._data, this._labels, this.name, this._mapper)
+      : labels = new UnmodifiableListView(_labels),
         data = new UnmodifiableListView(_data) {
     _pos = new SeriesPositioned<IT, String>(this);
   }
 
-  factory StringSeries(Iterable<String> data,
-      {dynamic name, List<IT> indices}) {
-    if (indices == null) {
-      if (IT.runtimeType == int) {
-        throw new Exception("Indices are required for non-int indexing!");
-      }
-      indices =
-          new List<int>.generate(data.length, (int idx) => idx) as List<IT>;
-    } else {
-      if (indices.length != data.length) {
-        throw new Exception("Indices and data must be same length!");
-      }
-    }
+  factory StringSeries(Iterable<String> data, {dynamic name, List<IT> labels}) {
+    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
+    final mapper = labelsToPosMapper(madeIndices);
 
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < indices.length; i++) {
-      final IT index = indices[i];
-      if (mapper.containsKey(index)) {
-        mapper[index].add(i);
-      } else {
-        mapper[index] = new List<int>()..add(i);
-      }
-    }
-
-    return new StringSeries._(data.toList(), indices, name, mapper);
+    return new StringSeries._(data.toList(), madeIndices, name, mapper);
   }
 
   factory StringSeries.fromMap(Map<IT, List<String>> map, {dynamic name}) {
-    final List<IT> indices = [];
+    final List<IT> labels = [];
     final List<String> data = [];
     final mapper = new SplayTreeMap<IT, List<int>>();
 
     for (IT index in map.keys) {
       mapper[index] = <int>[];
       for (String val in map[index]) {
-        indices.add(index);
+        labels.add(index);
         data.add(val);
         mapper[index].add(data.length - 1);
       }
     }
 
-    return new StringSeries._(data.toList(), indices, name, mapper);
+    return new StringSeries._(data.toList(), labels, name, mapper);
   }
 
   StringSeries<IIT> makeNew<IIT>(Iterable<String> data,
-          {dynamic name, List<IIT> indices}) =>
-      new StringSeries<IIT>(data, name: name, indices: indices);
+          {dynamic name, List<IIT> labels}) =>
+      new StringSeries<IIT>(data, name: name, labels: labels);
 
   String max() {
     String ret;
@@ -114,21 +93,21 @@ class StringSeries<IT> extends Object
                 int.parse(v, radix: radix, onError: (_) => fillVal))
             .toList(),
         name: name,
-        indices: _indices.toList());
+        labels: _labels.toList());
   }
 
   DoubleSeries<IT> toDouble({double fillVal}) {
     return new DoubleSeries<IT>(
         _data.map((String v) => double.parse(v, (_) => fillVal)).toList(),
         name: name,
-        indices: _indices.toList());
+        labels: _labels.toList());
   }
 }
 
 class StringSeriesView<IT> extends StringSeries<IT>
     implements SeriesView<IT, String> {
   StringSeriesView(StringSeries<IT> series)
-      : super._(series._data, series._indices, null, series._mapper) {
+      : super._(series._data, series._labels, null, series._mapper) {
     _nameGetter = () => series.name;
   }
 
@@ -152,7 +131,7 @@ class StringSeriesView<IT> extends StringSeries<IT>
   }
 
   StringSeries<IT> toSeries() =>
-      new StringSeries(_data, name: name, indices: _indices);
+      new StringSeries(_data, name: name, labels: _labels);
 
   StringSeriesView<IT> toView() => this;
 }

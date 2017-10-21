@@ -1,4 +1,4 @@
-# Grizzly
+# Grizzly Series
 
 Pandas-like Series and DataFrames for Dart
 
@@ -32,9 +32,3 @@ main() {
 [ ] Numpy functionality
 [ ] Interactive web interface
 [ ] Statistical functions
-
-### Advanced
-
-[ ] Linear regression
-[ ] Logistic regression
-[ ] Classification

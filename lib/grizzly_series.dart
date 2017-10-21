@@ -4,8 +4,11 @@
 /// Support for doing something awesome.
 ///
 /// More dartdocs go here.
-library tandas;
+library grizzly_series;
 
+export 'src/primitives/primitives.dart';
+export 'src/array/array.dart';
+export 'src/array2d/array2d.dart';
 export 'src/data_frame/data_frame.dart';
 export 'src/series/series.dart';
 export 'src/loaders/loaders.dart';
