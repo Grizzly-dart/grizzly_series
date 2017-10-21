@@ -16,6 +16,11 @@ part 'double/double_fix_array2d.dart';
 part 'double/double_axis.dart';
 part 'double/double_view_array2d.dart';
 
+part 'bool/bool_array2d.dart';
+part 'bool/bool_fix_array2d.dart';
+part 'bool/bool_axis.dart';
+part 'bool/bool_view_array2d.dart';
+
 part 'index.dart';
 part 'double_array2d.dart';
 part 'numeric.dart';
@@ -59,8 +64,6 @@ abstract class Array2DFix<E> implements Iterable<ArrayFix<E>>, Array2DView<E> {
 
   void set(E v);
 
-  void clip({E min, E max});
-
   Array2DView<E> get view;
 
   Array2DFix<E> get fixed;
@@ -103,8 +106,6 @@ abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
 
   E get max;
 
-  Extent<E> get extent;
-
   Index2D get argMin;
 
   Index2D get argMax;
@@ -142,10 +143,6 @@ abstract class Array2DView<E> implements Iterable<ArrayView<E>> {
       bool ascending: false,
       bool dropNull: false,
       dynamic name});
-
-  Double2D get covMatrix;
-
-  Double2D get corrcoefMatrix;
 }
 
 abstract class Axis2D<E> implements Axis2DFix<E> {

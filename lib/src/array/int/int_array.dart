@@ -27,15 +27,15 @@ class Int1D extends Int1DFix implements Numeric1D<int> {
   @override
   void add(int a) {
     _data = new Int32List.fromList(_data.toList()..add(a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   @override
   void insert(int index, int a) {
     _data = new Int32List.fromList(_data.toList()..insert(index, a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   Int1D operator +(/* num | Iterable<num> */ other) => addition(other);

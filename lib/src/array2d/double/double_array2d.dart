@@ -255,8 +255,7 @@ class Double2D extends Object
   @override
   void insert(int index, Iterable<double> row) {
     if (index > numRows) throw new RangeError.range(index, 0, numRows);
-    if (row.length != numCols)
-      throw new ArgumentError.value(row, 'row', 'Size mismatch!');
+    if (row.length != numCols) throw new ArgumentError.value(row, 'row');
     _data.insert(index, new Double1D(row));
   }
 

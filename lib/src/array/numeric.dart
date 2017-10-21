@@ -16,6 +16,8 @@ abstract class Numeric1D<E extends num> implements Array<E>, Numeric1DFix<E> {
 /// A mutable 1 dimensional fixed sized array of numbers
 abstract class Numeric1DFix<E extends num>
     implements ArrayFix<E>, Numeric1DView<E> {
+  void clip({E min, E max});
+
   Numeric1DFix<E> operator +(/* E | Iterable<E> */ other);
 
   Numeric1DFix<E> addition(/* E | Iterable<E> */ other, {bool self: false});
@@ -40,6 +42,8 @@ abstract class Numeric1DFix<E extends num>
 /// A read-only 1 dimensional array of numbers
 abstract class Numeric1DView<E extends num> implements ArrayView<E> {
   E get ptp;
+
+  Extent<E> get extent;
 
   double get mean;
 

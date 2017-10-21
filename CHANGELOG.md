@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.11
+
+- bool 1d and 2d arrays
+- isAllClose for double 1d and 2D arrays
+
 ## 0.0.10
 
 - view and fixed bug fixes

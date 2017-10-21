@@ -460,4 +460,26 @@ abstract class Double2DMixin {
     }
     return ret;
   }
+
+  bool isAllClose(Numeric2D v, {double absTol: 1e-8}) {
+    if (v.shape != shape) return false;
+    for (int i = 0; i < numRows; i++) {
+      if (_data[i].isAllClose(v[i])) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseVector(Iterable<num> v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if (!_data[i].isAllClose(v, absTol: absTol)) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseScalar(num v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if (!_data[i].isAllCloseScalar(v, absTol: absTol)) return false;
+    }
+    return true;
+  }
 }

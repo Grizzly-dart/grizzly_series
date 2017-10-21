@@ -39,7 +39,11 @@ class Double1DView extends Object
     return new Double1DView.make(list);
   }
 
-  Double1D makeFrom(Iterable<double> newData) => new Double1D(newData);
+  Double1DView makeView(Iterable<double> newData) => new Double1DView(newData);
+
+  Double1DFix makeFix(Iterable<double> newData) => new Double1DFix(newData);
+
+  Double1D makeArray(Iterable<double> newData) => new Double1D(newData);
 
   Iterator<double> get iterator => _data.iterator;
 
@@ -454,8 +458,8 @@ class Double1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Double1D head([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(0, count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(0, count));
   }
 
   /// Returns a new  [Double1D] containing last [count] elements of this array
@@ -463,15 +467,15 @@ class Double1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Double1D tail([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(length - count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(length - count));
   }
 
   /// Returns a new  [Array] containing random [count] elements of this array
   ///
   /// If the length of the array is shorter than [count], all elements are
   /// returned
-  Double1D sample([int count = 10]) => makeFrom(_sample<double>(_data, count));
+  Double1D sample([int count = 10]) => makeArray(_sample<double>(_data, count));
 
   Double2D to2D() => new Double2D.make([new Double1D(_data)]);
 
@@ -566,5 +570,20 @@ class Double1DView extends Object
   Double1D corrcoefMatrix(Numeric2DView y) {
     if (y.numRows != length) throw new Exception('Size mismatch!');
     return covMatrix(y) / (y.std * std);
+  }
+
+  bool isAllClose(Iterable<num> v, {double absTol: 1e-8}) {
+    if (length != v.length) return false;
+    for (int i = 0; i < length; i++) {
+      if ((_data[i] - v.elementAt(i)).abs() > absTol) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseScalar(num v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if ((_data[i] - v).abs() > absTol) return false;
+    }
+    return true;
   }
 }

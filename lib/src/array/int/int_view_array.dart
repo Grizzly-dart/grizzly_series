@@ -26,7 +26,11 @@ class Int1DView extends Object
     }
   }
 
-  Int1D makeFrom(Iterable<int> newData) => new Int1D(newData);
+  Int1DView makeView(Iterable<int> newData) => new Int1DView(newData);
+
+  Int1DFix makeFix(Iterable<int> newData) => new Int1DFix(newData);
+
+  Int1D makeArray(Iterable<int> newData) => new Int1D(newData);
 
   Iterator<int> get iterator => _data.iterator;
 
@@ -449,8 +453,8 @@ class Int1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Int1D head([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(0, count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(0, count));
   }
 
   /// Returns a new  [Int1D] containing last [count] elements of this array
@@ -458,15 +462,15 @@ class Int1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Int1D tail([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(length - count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(length - count));
   }
 
   /// Returns a new  [Array] containing random [count] elements of this array
   ///
   /// If the length of the array is shorter than [count], all elements are
   /// returned
-  Int1D sample([int count = 10]) => makeFrom(_sample<int>(_data, count));
+  Int1D sample([int count = 10]) => makeArray(_sample<int>(_data, count));
 
   Int2D to2D() => new Int2D.make([new Int1D(_data)]);
 
