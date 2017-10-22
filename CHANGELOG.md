@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.13
+
+- String 1d and 2d arrays
+
 ## 0.0.12
 
 - allTrue, allFalse, anyTrue, anyFalse methods on bool arrays

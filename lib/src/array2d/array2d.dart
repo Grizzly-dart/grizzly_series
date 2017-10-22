@@ -21,6 +21,11 @@ part 'bool/bool_fix_array2d.dart';
 part 'bool/bool_axis.dart';
 part 'bool/bool_view_array2d.dart';
 
+part 'string/string_array2d.dart';
+part 'string/string_fix_array2d.dart';
+part 'string/string_axis.dart';
+part 'string/string_view_array2d.dart';
+
 part 'index.dart';
 part 'double_array2d.dart';
 part 'numeric.dart';

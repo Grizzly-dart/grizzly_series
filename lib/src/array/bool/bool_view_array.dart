@@ -198,37 +198,37 @@ class Bool1DView extends Object
   }
 
   bool get allTrue {
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final bool val = _data[i];
-      if(val == null) continue;
-      if(!val) return false;
+      if (val == null) continue;
+      if (!val) return false;
     }
     return true;
   }
 
   bool get allFalse {
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final bool val = _data[i];
-      if(val == null) continue;
-      if(val) return false;
+      if (val == null) continue;
+      if (val) return false;
     }
     return true;
   }
 
   bool get anyTrue {
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final bool val = _data[i];
-      if(val == null) continue;
-      if(val) return true;
+      if (val == null) continue;
+      if (val) return true;
     }
     return false;
   }
 
   bool get anyFalse {
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       final bool val = _data[i];
-      if(val == null) continue;
-      if(!val) return true;
+      if (val == null) continue;
+      if (!val) return true;
     }
     return false;
   }

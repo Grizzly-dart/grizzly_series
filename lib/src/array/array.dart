@@ -19,6 +19,10 @@ part 'bool/bool_array.dart';
 part 'bool/bool_fix_array.dart';
 part 'bool/bool_view_array.dart';
 
+part 'string/string_array.dart';
+part 'string/string_fix_array.dart';
+part 'string/string_view_array.dart';
+
 part 'index.dart';
 part 'numeric.dart';
 part 'sample.dart';

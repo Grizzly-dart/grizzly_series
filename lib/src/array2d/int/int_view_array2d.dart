@@ -135,7 +135,6 @@ abstract class Int2DBase {
   }
 
   Index2D get argMin {
-    if (numRows == 0) return null;
     Index2D ret;
     int min;
     for (int i = 0; i < numRows; i++) {
@@ -152,7 +151,6 @@ abstract class Int2DBase {
   }
 
   Index2D get argMax {
-    if (numRows == 0) return null;
     Index2D ret;
     int max;
     for (int i = 0; i < numRows; i++) {
