@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.12
+
+- allTrue, allFalse, anyTrue, anyFalse methods on bool arrays
+
 ## 0.0.11
 
 - bool 1d and 2d arrays

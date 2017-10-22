@@ -245,4 +245,32 @@ abstract class Bool2DMixin implements Array2DView<bool> {
     }
     return ret;
   }
+
+  bool get allTrue {
+    for(int i = 0; i < length; i++) {
+      if(!_data[i].allTrue) return false;
+    }
+    return true;
+  }
+
+  bool get allFalse {
+    for(int i = 0; i < length; i++) {
+      if(!_data[i].allFalse) return false;
+    }
+    return true;
+  }
+
+  bool get anyTrue {
+    for(int i = 0; i < length; i++) {
+      if(_data[i].anyTrue) return true;
+    }
+    return false;
+  }
+
+  bool get anyFalse {
+    for(int i = 0; i < length; i++) {
+      if(_data[i].anyFalse) return true;
+    }
+    return false;
+  }
 }

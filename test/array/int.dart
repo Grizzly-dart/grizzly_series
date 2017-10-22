@@ -23,7 +23,7 @@ void main() {
       ]);
       expect(s1.transpose, [
         [1],
-        [5]
+        [5],
       ]);
       expect(s1.to2D().shape, idx2D(1, 2));
       expect(s1.transpose.shape, idx2D(2, 1));
