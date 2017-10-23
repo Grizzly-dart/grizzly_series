@@ -10,6 +10,9 @@ class String1DFix extends String1DView implements ArrayFix<String> {
 
   String1DFix.single(String data) : super.single(data);
 
+  String1DFix.shapedLike(Iterable d, {String data: ''})
+      : super.sized(d.length, data: data);
+
   String1DFix.gen(int length, String maker(int index))
       : super.gen(length, maker);
 

@@ -8,6 +8,9 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
   Double1D.sized(int length, {double data: 0.0})
       : super.sized(length, data: data);
 
+  Double1D.shapedLike(Iterable d, {double data: 0.0})
+      : super.sized(d.length, data: data);
+
   Double1D.single(double data) : super.single(data);
 
   factory Double1D.fromNum(Iterable<num> iterable) {

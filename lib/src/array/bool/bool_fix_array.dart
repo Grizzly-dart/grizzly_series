@@ -10,6 +10,9 @@ class Bool1DFix extends Bool1DView implements ArrayFix<bool> {
 
   Bool1DFix.single(bool data) : super.single(data);
 
+  Bool1DFix.shapedLike(Iterable d, {bool data: false})
+      : super.sized(d.length, data: data);
+
   Bool1DFix.gen(int length, bool maker(int index)) : super.gen(length, maker);
 
   operator []=(int i, bool val) {

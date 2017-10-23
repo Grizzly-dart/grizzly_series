@@ -8,6 +8,9 @@ class Bool1D extends Bool1DFix implements Array<bool> {
   Bool1D.sized(int length, {bool data: false})
       : super.sized(length, data: data);
 
+  Bool1D.shapedLike(Iterable d, {bool data: false})
+      : super.sized(d.length, data: data);
+
   Bool1D.single(bool data) : super.single(data);
 
   Bool1D.gen(int length, bool maker(int index)) : super.gen(length, maker);

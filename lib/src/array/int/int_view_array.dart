@@ -15,6 +15,9 @@ class Int1DView extends Object
     }
   }
 
+  factory Int1DView.shapedLike(Iterable d, {int data: 0}) =>
+      new Int1DView.sized(d.length, data: data);
+
   Int1DView.single(int data) : _data = new Int32List(1) {
     _data[0] = data;
   }

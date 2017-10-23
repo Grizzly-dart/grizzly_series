@@ -10,6 +10,9 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
 
   Double1DFix.single(double data) : super.single(data);
 
+  Double1DFix.shapedLike(Iterable d, {double data: 0.0})
+      : super.sized(d.length, data: data);
+
   factory Double1DFix.fromNum(Iterable<num> iterable) {
     final list = new Float64List(iterable.length);
     final Iterator<num> ite = iterable.iterator;

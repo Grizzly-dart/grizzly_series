@@ -17,6 +17,9 @@ class Double1DView extends Object
     }
   }
 
+  factory Double1DView.shapedLike(Iterable d, {double data: 0.0}) =>
+      new Double1DView.sized(d.length, data: data);
+
   Double1DView.single(double data) : _data = new Float64List(1) {
     _data[0] = data;
   }

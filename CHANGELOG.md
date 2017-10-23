@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.14
+
+- Convenient constructors on arrays
+
 ## 0.0.13
 
 - String 1d and 2d arrays

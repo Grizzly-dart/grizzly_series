@@ -16,6 +16,9 @@ class String1DView extends Object
     }
   }
 
+  factory String1DView.shapedLike(Iterable d, {String data: ''}) =>
+      new String1DView.sized(d.length, data: data);
+
   String1DView.single(String data) : _data = new List<String>(1) {
     _data[0] = data;
   }

@@ -8,6 +8,9 @@ class String1D extends String1DFix implements Array<String> {
   String1D.sized(int length, {String data: ''})
       : super.sized(length, data: data);
 
+  String1D.shapedLike(Iterable d, {String data: ''})
+      : super.sized(d.length, data: data);
+
   String1D.single(String data) : super.single(data);
 
   String1D.gen(int length, String maker(int index)) : super.gen(length, maker);
