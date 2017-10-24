@@ -55,6 +55,8 @@ abstract class Numeric2DView<E extends num> implements Array2DView<E> {
   Double2D get covMatrix;
 
   Double2D get corrcoefMatrix;
+
+  Numeric1D<E> dot(Numeric1D other);
 }
 
 abstract class Numeric2DAxis<E extends num>

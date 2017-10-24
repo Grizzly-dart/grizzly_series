@@ -52,7 +52,7 @@ void main() {
         [4, 2],
         [1, 2]
       ]);
-      expect(a.dot(b), [
+      expect(a * b, [
         [4, 2],
         [1, 2]
       ]);
@@ -68,7 +68,7 @@ void main() {
         [4, 2],
         [2, 2]
       ]);
-      expect(a.dot(b), [
+      expect(a * b, [
         [12, 10],
         [18, 14],
         [24, 18],

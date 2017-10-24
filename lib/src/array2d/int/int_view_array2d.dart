@@ -354,15 +354,13 @@ abstract class Int2DBase {
     return sum;
   }
 
-  Int2D dot(Numeric2D other) {
-    if (numCols != other.numRows)
+  Int1D dot(Numeric1D<num> other) {
+    if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
-    final Int2D ret = new Int2D.sized(numRows, other.numCols);
-    for (int r = 0; r < ret.numRows; r++) {
-      for (int c = 0; c < ret.numCols; c++) {
-        ret[r][c] = _data[r].dot(other.col[c]);
-      }
+    final ret = new Int1D.sized(numRows);
+    for (int r = 0; r < numRows; r++) {
+      ret[r] = _data[r].dot(other).toInt();
     }
     return ret;
   }

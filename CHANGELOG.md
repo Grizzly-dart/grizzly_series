@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.16
+
+- Fixed dot for Array2D
+
 ## 0.0.15
 
 - `assign` method on arrays

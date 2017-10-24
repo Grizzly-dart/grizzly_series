@@ -377,7 +377,15 @@ class Int2D extends Object
       }
       return ret;
     } else if (other is Numeric2D) {
-      return dot(other);
+      if (numCols != other.numRows)
+        throw new ArgumentError.value(other, 'other', 'Invalid shape!');
+      final ret = new Int2D.sized(numRows, other.numCols);
+      for (int r = 0; r < ret.numRows; r++) {
+        for (int c = 0; c < ret.numCols; c++) {
+          ret[r][c] = _data[r].dot(other.col[c]);
+        }
+      }
+      return ret;
     }
 
     throw new ArgumentError.value(other, 'other', 'Unsupported type!');
