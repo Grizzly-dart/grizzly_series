@@ -229,6 +229,18 @@ class String2DFix extends Object
     }
   }
 
+  @override
+  void assign(Array2DView<String> other) {
+    if (other.shape != shape)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
+        _data[r][c] = other[r][c];
+      }
+    }
+  }
+
   String2DView _view;
 
   String2DView get view => _view ??= new String2DView.make(_data);

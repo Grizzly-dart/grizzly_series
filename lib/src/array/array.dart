@@ -88,6 +88,10 @@ abstract class ArrayFix<E> implements ArrayView<E> {
 
   // TODO [Index] based indexing
 
+  void set(E v);
+
+  void assign(Iterable<E> other);
+
   ArrayFix<E> get fixed;
 }
 

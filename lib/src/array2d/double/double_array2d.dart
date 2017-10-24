@@ -247,6 +247,18 @@ class Double2D extends Object
   }
 
   @override
+  void assign(Array2DView<double> other) {
+    if (other.shape != shape)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
+        _data[r][c] = other[r][c];
+      }
+    }
+  }
+
+  @override
   void add(Iterable<double> row) => this[numRows] = row;
 
   @override

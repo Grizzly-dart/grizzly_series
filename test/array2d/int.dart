@@ -74,5 +74,21 @@ void main() {
         [24, 18],
       ]);
     });
+
+    test('assign', () {
+      final a = int2D([
+        [1, 4],
+        [2, 5],
+        [3, 6],
+      ]);
+      final b = new Int2D.shapedLike(a);
+      expect(b, [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ]);
+      b.assign(a);
+      expect(b, a);
+    });
   });
 }

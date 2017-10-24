@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.15
+
+- `assign` method on arrays
+
 ## 0.0.14
 
 - Convenient constructors on arrays

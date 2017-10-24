@@ -33,6 +33,8 @@ part 'numeric.dart';
 Double2D array2D(Iterable<Iterable<num>> matrix) =>
     new Double2D.fromNum(matrix);
 
+Int2D int2D(Iterable<Iterable<int>> matrix) => new Int2D(matrix);
+
 abstract class Array2D<E> implements Iterable<Array<E>>, Array2DFix<E> {
   ArrayFix<E> operator [](int i);
 
@@ -68,6 +70,8 @@ abstract class Array2DFix<E> implements Iterable<ArrayFix<E>>, Array2DView<E> {
   Axis2DFix<E> get col;
 
   void set(E v);
+
+  void assign(Array2DView<E> other);
 
   Array2DView<E> get view;
 

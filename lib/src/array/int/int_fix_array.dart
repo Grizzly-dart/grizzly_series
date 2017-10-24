@@ -22,6 +22,20 @@ class Int1DFix extends Int1DView implements Numeric1DFix<int> {
     _data[i] = val;
   }
 
+  /// Sets all elements in the array to given value [v]
+  void set(int v) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = v;
+    }
+  }
+
+  void assign(Iterable<int> other) {
+    if (other.length != length)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int i = 0; i < length; i++) _data[i] = other.elementAt(i);
+  }
+
   @override
   void clip({int min, int max}) {
     if (min != null && max != null) {

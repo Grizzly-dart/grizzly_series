@@ -24,6 +24,20 @@ class String1DFix extends String1DView implements ArrayFix<String> {
     _data[i] = val;
   }
 
+  /// Sets all elements in the array to given value [v]
+  void set(String v) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = v;
+    }
+  }
+
+  void assign(Iterable<String> other) {
+    if (other.length != length)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int i = 0; i < length; i++) _data[i] = other.elementAt(i);
+  }
+
   String1DView _view;
   String1DView get view => _view ??= new String1DView.make(_data);
 

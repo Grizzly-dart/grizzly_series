@@ -30,7 +30,7 @@ class Int2D extends Object
             shape.row, (_) => new Int1D.sized(shape.column, data: data));
 
   factory Int2D.shapedLike(Array2DView like, {int data: 0}) =>
-      new Int2D.sized(like.numCols, like.numRows, data: data);
+      new Int2D.sized(like.numRows, like.numCols, data: data);
 
   Int2D.repeatRow(Iterable<int> row, [int numRows = 1])
       : _data = new List<Int1D>(numRows) {
@@ -218,6 +218,18 @@ class Int2D extends Object
     for (int r = 0; r < numRows; r++) {
       for (int c = 0; c < numCols; c++) {
         _data[r][c] = v;
+      }
+    }
+  }
+
+  @override
+  void assign(Array2DView<int> other) {
+    if (other.shape != shape)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
+        _data[r][c] = other[r][c];
       }
     }
   }

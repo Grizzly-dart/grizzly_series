@@ -2,7 +2,7 @@ part of grizzly.series.array2d;
 
 class Int2DView extends Object
     with IterableMixin<ArrayView<int>>, Int2DBase
-    implements Numeric2DView<int> {
+    implements Numeric2DView<int>, Array2DView<int> {
   final List<Int1DView> _data;
 
   Int2DView(Iterable<Iterable<int>> data) : _data = <Int1D>[] {
@@ -30,7 +30,7 @@ class Int2DView extends Object
             shape.row, (_) => new Int1D.sized(shape.column, data: data));
 
   factory Int2DView.shapedLike(Array2DView like, {int data: 0}) =>
-      new Int2DView.sized(like.numCols, like.numRows, data: data);
+      new Int2DView.sized(like.numRows, like.numCols, data: data);
 
   Int2DView.repeatRow(Iterable<int> row, [int numRows = 1])
       : _data = new List<Int1D>(numRows) {

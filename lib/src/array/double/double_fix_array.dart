@@ -35,6 +35,20 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
     _data[i] = val;
   }
 
+  /// Sets all elements in the array to given value [v]
+  void set(double v) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = v;
+    }
+  }
+
+  void assign(Iterable<double> other) {
+    if (other.length != length)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int i = 0; i < length; i++) _data[i] = other.elementAt(i);
+  }
+
   @override
   void clip({double min, double max}) {
     if (min != null && max != null) {

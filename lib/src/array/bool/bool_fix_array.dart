@@ -23,6 +23,20 @@ class Bool1DFix extends Bool1DView implements ArrayFix<bool> {
     _data[i] = val;
   }
 
+  /// Sets all elements in the array to given value [v]
+  void set(bool v) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = v;
+    }
+  }
+
+  void assign(Iterable<bool> other) {
+    if (other.length != length)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int i = 0; i < length; i++) _data[i] = other.elementAt(i);
+  }
+
   Bool1DView _view;
   Bool1DView get view => _view ??= new Bool1DView.make(_data);
 
