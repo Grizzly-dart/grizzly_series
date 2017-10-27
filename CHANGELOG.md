@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.20
+
+- Bug fixes for dot method on Array2D 
+
 ## 0.0.19
 
 - Unary minus operator for arrays

@@ -395,7 +395,7 @@ abstract class Int2DBase {
     return ret;
   }
 
-  Int1D dot(Numeric1D<num> other) {
+  Int1D dot(Iterable<num> other) {
     if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 

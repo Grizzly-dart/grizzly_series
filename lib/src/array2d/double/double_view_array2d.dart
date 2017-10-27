@@ -555,7 +555,7 @@ abstract class Double2DMixin {
     return ret;
   }
 
-  Double1D dot(Numeric1D other) {
+  Double1D dot(Iterable<num> other) {
     if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
