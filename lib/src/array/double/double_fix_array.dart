@@ -10,6 +10,9 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
 
   Double1DFix.single(double data) : super.single(data);
 
+  Double1DFix.shapedLike(Iterable d, {double data: 0.0})
+      : super.sized(d.length, data: data);
+
   factory Double1DFix.fromNum(Iterable<num> iterable) {
     final list = new Float64List(iterable.length);
     final Iterator<num> ite = iterable.iterator;
@@ -30,6 +33,20 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
     }
 
     _data[i] = val;
+  }
+
+  /// Sets all elements in the array to given value [v]
+  void set(double v) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = v;
+    }
+  }
+
+  void assign(Iterable<double> other) {
+    if (other.length != length)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int i = 0; i < length; i++) _data[i] = other.elementAt(i);
   }
 
   @override
@@ -253,6 +270,27 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
       return this;
     }
     return super.sqrt();
+  }
+
+  Double1DFix get logSelf {
+    for (int i = 0; i < length; i++) _data[i] = math.log(_data[i]);
+    return this;
+  }
+
+  Double1DFix get log10Self {
+    for (int i = 0; i < length; i++) _data[i] = math.log(_data[i]) / math.LN10;
+    return this;
+  }
+
+  Double1D expSelf(num x) {
+    for (int i = 0; i < length; i++) _data[i] = math.exp(_data[i]);
+    return this;
+  }
+
+  Double1DFix logNSelf(double n) {
+    for (int i = 0; i < length; i++)
+      _data[i] = math.log(_data[i]) / math.log(n);
+    return this;
   }
 
   Double1DFix floorToDouble({bool self: false}) {

@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.0.19
+
+- Unary minus operator for arrays
+
+## 0.0.18
+
+- exp for arrays
+
+## 0.0.17
+
+- log, log10, logN for arrays
+
+## 0.0.16
+
+- Fixed dot for Array2D
+
+## 0.0.15
+
+- `assign` method on arrays
+
+## 0.0.14
+
+- Convenient constructors on arrays
+
+## 0.0.13
+
+- String 1d and 2d arrays
+
+## 0.0.12
+
+- allTrue, allFalse, anyTrue, anyFalse methods on bool arrays
+
+## 0.0.11
+
+- bool 1d and 2d arrays
+- isAllClose for double 1d and 2D arrays
+
 ## 0.0.10
 
 - view and fixed bug fixes

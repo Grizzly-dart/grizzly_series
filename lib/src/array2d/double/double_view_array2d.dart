@@ -22,6 +22,174 @@ class Double2DView extends Object
 
   Double2DView.make(this._data);
 
+  Double2DView.sized(int numRows, int numCols, {double data: 0.0})
+      : _data = new List<Double1D>.generate(
+            numRows, (_) => new Double1D.sized(numCols, data: data));
+
+  Double2DView.shaped(Index2D shape, {double data: 0.0})
+      : _data = new List<Double1D>.generate(
+            shape.row, (_) => new Double1D.sized(shape.column, data: data));
+
+  factory Double2DView.shapedLike(Array2DView like, {double data: 0.0}) =>
+      new Double2DView.sized(like.numRows, like.numCols, data: data);
+
+  factory Double2DView.diagonal(Iterable<double> diagonal) {
+    final ret = new Double2DFix.sized(diagonal.length, diagonal.length);
+    for (int i = 0; i < diagonal.length; i++) {
+      ret[i][i] = diagonal.elementAt(i);
+    }
+    return ret.view;
+  }
+
+  Double2DView.fromNum(Iterable<Iterable<num>> data) : _data = <Double1D>[] {
+    if (data.length != 0) {
+      final int len = data.first.length;
+      for (Iterable<num> item in data) {
+        if (item.length != len) {
+          throw new Exception('All rows must have same number of columns!');
+        }
+      }
+
+      for (Iterable<num> item in data) {
+        _data.add(new Double1D.fromNum(item));
+      }
+    }
+  }
+
+  Double2DView.repeatRow(Iterable<double> row, [int numRows = 1])
+      : _data = new List<Double1D>(numRows) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = new Double1D(row);
+    }
+  }
+
+  Double2DView.repeatColumn(Iterable<double> column, [int numCols = 1])
+      : _data = new List<Double1D>(column.length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = new Double1D.sized(numCols, data: column.elementAt(i));
+    }
+  }
+
+  Double2DView.aRow(Iterable<double> row) : _data = new List<Double1D>(1) {
+    _data[0] = new Double1D(row);
+  }
+
+  Double2DView.aColumn(Iterable<double> column)
+      : _data = new List<Double1D>(column.length) {
+    for (int i = 0; i < length; i++) {
+      _data[i] = new Double1D.single(column.elementAt(i));
+    }
+  }
+
+  /// Create [Int2D] from column major
+  factory Double2DView.columns(Iterable<Iterable<double>> columns) {
+    if (columns.length == 0) {
+      return new Double2DView.sized(0, 0);
+    }
+
+    if (!columns.every((i) => i.length == columns.first.length)) {
+      throw new Exception('Size mismatch!');
+    }
+
+    final ret = new Double2DFix.sized(columns.first.length, columns.length);
+    for (int c = 0; c < ret.numCols; c++) {
+      final Iterator<double> col = columns.elementAt(c).iterator;
+      col.moveNext();
+      for (int r = 0; r < ret.numRows; r++) {
+        ret[r][c] = col.current;
+        col.moveNext();
+      }
+    }
+    return ret;
+  }
+
+  factory Double2DView.genRows(
+      int numRows, Iterable<double> rowMaker(int index)) {
+    final rows = <Double1D>[];
+    int colLen;
+    for (int i = 0; i < numRows; i++) {
+      final v = rowMaker(i);
+      if (v == null) continue;
+      colLen ??= v.length;
+      if (colLen != v.length) throw new Exception('Size mismatch!');
+      rows.add(v);
+    }
+    return new Double2DView.make(rows);
+  }
+
+  factory Double2DView.genColumns(
+      int numCols, Iterable<double> colMaker(int index)) {
+    final List<Iterable<double>> cols = <Iterable<double>>[];
+    int rowLen;
+    for (int i = 0; i < numCols; i++) {
+      final v = colMaker(i);
+      if (v == null) continue;
+      rowLen ??= v.length;
+      if (rowLen != v.length) throw new Exception('Size mismatch!');
+      cols.add(v);
+    }
+    return new Double2DView.columns(cols);
+  }
+
+  factory Double2DView.gen(Index2D shape, double maker(int row, int col)) {
+    final ret = new Double2DFix.shaped(shape);
+    for (int r = 0; r < ret.numRows; r++) {
+      for (int c = 0; c < ret.numCols; c++) {
+        ret[r][c] = maker(r, c);
+      }
+    }
+    return ret.view;
+  }
+
+  static Double2DView buildRows<T>(
+      Iterable<T> iterable, Iterable<double> rowMaker(T v)) {
+    final rows = <Double1D>[];
+    int colLen;
+    for (int i = 0; i < iterable.length; i++) {
+      final v = rowMaker(iterable.elementAt(i));
+      if (v == null) continue;
+      colLen ??= v.length;
+      if (colLen != v.length) throw new Exception('Size mismatch!');
+      rows.add(v);
+    }
+    return new Double2DView.make(rows);
+  }
+
+  static Double2DView buildColumns<T>(
+      Iterable<T> iterable, Iterable<double> colMaker(T v)) {
+    final List<Iterable<double>> cols = <Iterable<double>>[];
+    int rowLen;
+    for (int i = 0; i < iterable.length; i++) {
+      final v = colMaker(iterable.elementAt(i));
+      if (v == null) continue;
+      rowLen ??= v.length;
+      if (rowLen != v.length) throw new Exception('Size mismatch!');
+      cols.add(v);
+    }
+    return new Double2DView.columns(cols);
+  }
+
+  static Double2DView build<T>(Iterable<Iterable<T>> data, double maker(T v)) {
+    if (data.length == 0) {
+      return new Double2DView.sized(0, 0);
+    }
+
+    if (!data.every((i) => i.length == data.first.length)) {
+      throw new Exception('Size mismatch!');
+    }
+
+    final ret = new Double2DFix.sized(data.length, data.first.length);
+    for (int r = 0; r < ret.numRows; r++) {
+      final Iterator<T> row = data.elementAt(r).iterator;
+      row.moveNext();
+      for (int c = 0; c < ret.numCols; c++) {
+        ret[r][c] = maker(row.current);
+        row.moveNext();
+      }
+    }
+    return ret.view;
+  }
+
   Iterator<Numeric1DView<double>> get iterator => _data.iterator;
 
   covariant Double2DColView _col;
@@ -308,7 +476,15 @@ abstract class Double2DMixin {
       }
       return ret;
     } else if (other is Numeric2D) {
-      return dot(other);
+      if (numCols != other.numRows)
+        throw new ArgumentError.value(other, 'other', 'Invalid shape!');
+      final ret = new Double2D.sized(numRows, other.numCols);
+      for (int r = 0; r < ret.numRows; r++) {
+        for (int c = 0; c < ret.numCols; c++) {
+          ret[r][c] = _data[r].dot(other.col[c]);
+        }
+      }
+      return ret;
     }
 
     throw new ArgumentError.value(other, 'other', 'Unsupported type!');
@@ -338,18 +514,55 @@ abstract class Double2DMixin {
     throw new ArgumentError.value(other, 'other', 'Unsupported type!');
   }
 
-  Double2D dot(Numeric2D other) {
-    if (numCols != other.numRows)
+  Double2D operator -() {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < length; r++)
+      for (int c = 0; c < length; c++) ret[r][c] = -_data[r][c];
+    return ret;
+  }
+
+  Double2D get log {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) ret[r][c] = math.log(_data[r][c]);
+    }
+    return ret;
+  }
+
+  Double2D get log10 {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
+        ret[r][c] = math.log(_data[r][c]) / math.LN10;
+    }
+    return ret;
+  }
+
+  Double2D logN(double n) {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
+        ret[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return ret;
+  }
+
+  Double2D get exp {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) ret[r][c] = math.exp(_data[r][c]);
+    }
+    return ret;
+  }
+
+  Double1D dot(Numeric1D other) {
+    if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 
-    final ret = new Double2D.sized(numRows, other.numCols);
-
-    for (int r = 0; r < ret.numRows; r++) {
-      for (int c = 0; c < ret.numCols; c++) {
-        ret[r][c] = _data[r].dot(other.col[c]);
-      }
+    final ret = new Double1D.sized(numRows);
+    for (int r = 0; r < numRows; r++) {
+      ret[r] = _data[r].dot(other);
     }
-
     return ret;
   }
 
@@ -459,5 +672,27 @@ abstract class Double2DMixin {
       ret[c] = col[c].corrcoefMatrix(view);
     }
     return ret;
+  }
+
+  bool isAllClose(Numeric2D v, {double absTol: 1e-8}) {
+    if (v.shape != shape) return false;
+    for (int i = 0; i < numRows; i++) {
+      if (_data[i].isAllClose(v[i])) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseVector(Iterable<num> v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if (!_data[i].isAllClose(v, absTol: absTol)) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseScalar(num v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if (!_data[i].isAllCloseScalar(v, absTol: absTol)) return false;
+    }
+    return true;
   }
 }

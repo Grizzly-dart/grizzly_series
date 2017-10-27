@@ -247,6 +247,18 @@ class Double2D extends Object
   }
 
   @override
+  void assign(Array2DView<double> other) {
+    if (other.shape != shape)
+      throw new ArgumentError.value(other, 'other', 'Size mismatch!');
+
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) {
+        _data[r][c] = other[r][c];
+      }
+    }
+  }
+
+  @override
   void add(Iterable<double> row) => this[numRows] = row;
 
   @override
@@ -255,8 +267,7 @@ class Double2D extends Object
   @override
   void insert(int index, Iterable<double> row) {
     if (index > numRows) throw new RangeError.range(index, 0, numRows);
-    if (row.length != numCols)
-      throw new ArgumentError.value(row, 'row', 'Size mismatch!');
+    if (row.length != numCols) throw new ArgumentError.value(row, 'row');
     _data.insert(index, new Double1D(row));
   }
 
@@ -299,6 +310,36 @@ class Double2D extends Object
       }
       return;
     }
+  }
+
+  Double2D get logSelf {
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) _data[r][c] = math.log(_data[r][c]);
+    }
+    return this;
+  }
+
+  Double2D get log10Self {
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
+        _data[r][c] = math.log(_data[r][c]) / math.LN10;
+    }
+    return this;
+  }
+
+  Double2D logNSelf(double n) {
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
+        _data[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return this;
+  }
+
+  Double2D expSelf() {
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) _data[r][c] = math.exp(_data[r][c]);
+    }
+    return this;
   }
 
   Double2DView _view;

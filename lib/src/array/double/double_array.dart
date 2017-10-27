@@ -8,6 +8,9 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
   Double1D.sized(int length, {double data: 0.0})
       : super.sized(length, data: data);
 
+  Double1D.shapedLike(Iterable d, {double data: 0.0})
+      : super.sized(d.length, data: data);
+
   Double1D.single(double data) : super.single(data);
 
   factory Double1D.fromNum(Iterable<num> iterable) {
@@ -39,15 +42,15 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
   @override
   void add(double a) {
     _data = new Float64List.fromList(_data.toList()..add(a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   @override
   void insert(int index, double a) {
     _data = new Float64List.fromList(_data.toList()..insert(index, a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   @override
@@ -222,6 +225,12 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
   Int1D truncDiv(/* num | Iterable<num> */ other, {bool self: false}) {
     if (!self) return this ~/ other;
     throw new Exception('Operation not supported!');
+  }
+
+  Double1D operator -() {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = -_data[i];
+    return ret;
   }
 
   Double1D floorToDouble({bool self: false}) {

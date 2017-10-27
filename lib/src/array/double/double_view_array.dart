@@ -17,6 +17,9 @@ class Double1DView extends Object
     }
   }
 
+  factory Double1DView.shapedLike(Iterable d, {double data: 0.0}) =>
+      new Double1DView.sized(d.length, data: data);
+
   Double1DView.single(double data) : _data = new Float64List(1) {
     _data[0] = data;
   }
@@ -39,7 +42,11 @@ class Double1DView extends Object
     return new Double1DView.make(list);
   }
 
-  Double1D makeFrom(Iterable<double> newData) => new Double1D(newData);
+  Double1DView makeView(Iterable<double> newData) => new Double1DView(newData);
+
+  Double1DFix makeFix(Iterable<double> newData) => new Double1DFix(newData);
+
+  Double1D makeArray(Iterable<double> newData) => new Double1D(newData);
 
   Iterator<double> get iterator => _data.iterator;
 
@@ -411,9 +418,43 @@ class Double1DView extends Object
 
   Int1DFix truncDiv(/* num | Iterable<num> */ other) => this ~/ other;
 
+  Double1D operator -() {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = -_data[i];
+    return ret;
+  }
+
   Double1DFix sqrt() {
     final ret = new Double1D.sized(length);
     for (int i = 0; i < length; i++) ret[i] = math.sqrt(_data[i]);
+    return ret;
+  }
+
+  @override
+  Double1D get log {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.log(_data[i]);
+    return ret;
+  }
+
+  @override
+  Double1D get log10 {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.log(_data[i]) / math.LN10;
+    return ret;
+  }
+
+  @override
+  Double1D logN(double n) {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.log(_data[i]) / math.log(n);
+    return ret;
+  }
+
+  @override
+  Double1D get exp {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.exp(_data[i]);
     return ret;
   }
 
@@ -454,8 +495,8 @@ class Double1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Double1D head([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(0, count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(0, count));
   }
 
   /// Returns a new  [Double1D] containing last [count] elements of this array
@@ -463,15 +504,15 @@ class Double1DView extends Object
   /// If the length of the array is shorter than [count], all elements are
   /// returned
   Double1D tail([int count = 10]) {
-    if (length <= count) return makeFrom(_data);
-    return makeFrom(_data.sublist(length - count));
+    if (length <= count) return makeArray(_data);
+    return makeArray(_data.sublist(length - count));
   }
 
   /// Returns a new  [Array] containing random [count] elements of this array
   ///
   /// If the length of the array is shorter than [count], all elements are
   /// returned
-  Double1D sample([int count = 10]) => makeFrom(_sample<double>(_data, count));
+  Double1D sample([int count = 10]) => makeArray(_sample<double>(_data, count));
 
   Double2D to2D() => new Double2D.make([new Double1D(_data)]);
 
@@ -566,5 +607,20 @@ class Double1DView extends Object
   Double1D corrcoefMatrix(Numeric2DView y) {
     if (y.numRows != length) throw new Exception('Size mismatch!');
     return covMatrix(y) / (y.std * std);
+  }
+
+  bool isAllClose(Iterable<num> v, {double absTol: 1e-8}) {
+    if (length != v.length) return false;
+    for (int i = 0; i < length; i++) {
+      if ((_data[i] - v.elementAt(i)).abs() > absTol) return false;
+    }
+    return true;
+  }
+
+  bool isAllCloseScalar(num v, {double absTol: 1e-8}) {
+    for (int i = 0; i < length; i++) {
+      if ((_data[i] - v).abs() > absTol) return false;
+    }
+    return true;
   }
 }

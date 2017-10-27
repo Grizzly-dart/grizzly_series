@@ -15,23 +15,30 @@ part 'double/double_array.dart';
 part 'double/double_view_array.dart';
 part 'double/double_fix_array.dart';
 
+part 'bool/bool_array.dart';
+part 'bool/bool_fix_array.dart';
+part 'bool/bool_view_array.dart';
+
+part 'string/string_array.dart';
+part 'string/string_fix_array.dart';
+part 'string/string_view_array.dart';
+
 part 'index.dart';
 part 'numeric.dart';
 part 'sample.dart';
 
 //TODO DateTime
 //TODO String
-//TODO bool
 
 /// Creates a 1-dimensional array of integers from given [data]
 Int1D int1D(/* Iterable<num> | double | int | Index1D */ data) {
-  if(data is Iterable<int>) {
+  if (data is Iterable<int>) {
     return new Int1D(data);
-  } else if(data is double) {
+  } else if (data is double) {
     return new Int1D.single(data.toInt());
-  } else if(data is int) {
+  } else if (data is int) {
     return new Int1D.sized(data);
-  } else if(data is Index1D) {
+  } else if (data is Index1D) {
     return new Int1D.sized(data.x);
   } else {
     throw new ArgumentError.value(data, 'data', 'Invalid value!');
@@ -40,13 +47,13 @@ Int1D int1D(/* Iterable<num> | double | int | Index1D */ data) {
 
 /// Creates a 1-dimensional array of double from given [data]
 Double1D double1D(/* Iterable<num> | double | int | Index1D */ data) {
-  if(data is Iterable<num>) {
+  if (data is Iterable<num>) {
     return new Double1D.fromNum(data);
-  } else if(data is double) {
+  } else if (data is double) {
     return new Double1D.single(data);
-  } else if(data is int) {
+  } else if (data is int) {
     return new Double1D.sized(data);
-  } else if(data is Index1D) {
+  } else if (data is Index1D) {
     return new Double1D.sized(data.x);
   } else {
     throw new ArgumentError.value(data, 'data', 'Invalid value!');
@@ -55,13 +62,13 @@ Double1D double1D(/* Iterable<num> | double | int | Index1D */ data) {
 
 /// Creates a 1-dimensional array of double from given [data]
 Double1D array(/* Iterable<num> | double | int | Index1D */ data) {
-  if(data is Iterable<num>) {
+  if (data is Iterable<num>) {
     return new Double1D.fromNum(data);
-  } else if(data is double) {
+  } else if (data is double) {
     return new Double1D.single(data);
-  } else if(data is int) {
+  } else if (data is int) {
     return new Double1D.sized(data);
-  } else if(data is Index1D) {
+  } else if (data is Index1D) {
     return new Double1D.sized(data.x);
   } else {
     throw new ArgumentError.value(data, 'data', 'Invalid value!');
@@ -81,14 +88,20 @@ abstract class ArrayFix<E> implements ArrayView<E> {
 
   // TODO [Index] based indexing
 
-  void clip({E min, E max});
+  void set(E v);
+
+  void assign(Iterable<E> other);
 
   ArrayFix<E> get fixed;
 }
 
 /// A read-only 1 dimensional array of element [E]
 abstract class ArrayView<E> implements Iterable<E> {
-  Array<E> makeFrom(Iterable<E> newData);
+  ArrayView<E> makeView(Iterable<E> newData);
+
+  ArrayFix<E> makeFix(Iterable<E> newData);
+
+  Array<E> makeArray(Iterable<E> newData);
 
   Index1D get shape;
 
@@ -99,8 +112,6 @@ abstract class ArrayView<E> implements Iterable<E> {
   E get min;
 
   E get max;
-
-  Extent<E> get extent;
 
   int get argMin;
 

@@ -20,6 +20,8 @@ abstract class Numeric2DFix<E extends num>
 
   Numeric2DAxisFix<E> get col;
 
+  void clip({E min, E max});
+
   ArrayFix<E> firstWhere(bool test(ArrayFix<E> element),
       {ArrayFix<E> orElse()});
 
@@ -36,6 +38,8 @@ abstract class Numeric2DView<E extends num> implements Array2DView<E> {
 
   // TODO E get ptp;
 
+  Extent<E> get extent;
+
   double get mean;
 
   E get sum;
@@ -46,7 +50,23 @@ abstract class Numeric2DView<E extends num> implements Array2DView<E> {
 
   double get std;
 
+  Numeric2DView<E> operator -();
+
   Double2D get toDouble;
+
+  Double2D get covMatrix;
+
+  Double2D get corrcoefMatrix;
+
+  Numeric1D<E> dot(Numeric1D other);
+
+  Double2D get log;
+
+  Double2D get log10;
+
+  Double2D logN(double n);
+
+  Double2D get exp;
 }
 
 abstract class Numeric2DAxis<E extends num>

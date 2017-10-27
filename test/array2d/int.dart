@@ -52,7 +52,7 @@ void main() {
         [4, 2],
         [1, 2]
       ]);
-      expect(a.dot(b), [
+      expect(a * b, [
         [4, 2],
         [1, 2]
       ]);
@@ -68,11 +68,27 @@ void main() {
         [4, 2],
         [2, 2]
       ]);
-      expect(a.dot(b), [
+      expect(a * b, [
         [12, 10],
         [18, 14],
         [24, 18],
       ]);
+    });
+
+    test('assign', () {
+      final a = int2D([
+        [1, 4],
+        [2, 5],
+        [3, 6],
+      ]);
+      final b = new Int2D.shapedLike(a);
+      expect(b, [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ]);
+      b.assign(a);
+      expect(b, a);
     });
   });
 }

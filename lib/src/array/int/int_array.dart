@@ -7,6 +7,9 @@ class Int1D extends Int1DFix implements Numeric1D<int> {
 
   Int1D.sized(int length, {int data: 0}) : super.sized(length, data: data);
 
+  Int1D.shapedLike(Iterable d, {int data: 0})
+      : super.sized(d.length, data: data);
+
   Int1D.single(int data) : super.single(data);
 
   Int1D.gen(int length, int maker(int index)) : super.gen(length, maker);
@@ -27,15 +30,15 @@ class Int1D extends Int1DFix implements Numeric1D<int> {
   @override
   void add(int a) {
     _data = new Int32List.fromList(_data.toList()..add(a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   @override
   void insert(int index, int a) {
     _data = new Int32List.fromList(_data.toList()..insert(index, a));
-    if(_view != null) _view._data = _data;
-    if(_fixed != null) _fixed._data = _data;
+    if (_view != null) _view._data = _data;
+    if (_fixed != null) _fixed._data = _data;
   }
 
   Int1D operator +(/* num | Iterable<num> */ other) => addition(other);
