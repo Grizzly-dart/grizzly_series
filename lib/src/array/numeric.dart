@@ -81,6 +81,8 @@ abstract class Numeric1DView<E extends num> implements ArrayView<E> {
 
   Numeric1DFix<int> truncDiv(/* E | Iterable<E> */ other);
 
+  Numeric1DFix<E> operator -();
+
   E dot(Iterable<num> other);
 
   Double1D get log;

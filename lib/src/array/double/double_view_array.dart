@@ -418,6 +418,12 @@ class Double1DView extends Object
 
   Int1DFix truncDiv(/* num | Iterable<num> */ other) => this ~/ other;
 
+  Double1D operator -() {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = -_data[i];
+    return ret;
+  }
+
   Double1DFix sqrt() {
     final ret = new Double1D.sized(length);
     for (int i = 0; i < length; i++) ret[i] = math.sqrt(_data[i]);

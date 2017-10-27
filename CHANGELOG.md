@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.19
+
+- Unary minus operator for arrays
+
 ## 0.0.18
 
 - exp for arrays

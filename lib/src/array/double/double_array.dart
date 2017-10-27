@@ -227,6 +227,12 @@ class Double1D extends Double1DFix implements Numeric1D<double> {
     throw new Exception('Operation not supported!');
   }
 
+  Double1D operator -() {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = -_data[i];
+    return ret;
+  }
+
   Double1D floorToDouble({bool self: false}) {
     if (self) {
       for (int i = 0; i < length; i++) {

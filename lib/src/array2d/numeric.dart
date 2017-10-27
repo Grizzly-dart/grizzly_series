@@ -50,6 +50,8 @@ abstract class Numeric2DView<E extends num> implements Array2DView<E> {
 
   double get std;
 
+  Numeric2DView<E> operator -();
+
   Double2D get toDouble;
 
   Double2D get covMatrix;

@@ -354,6 +354,13 @@ abstract class Int2DBase {
     return sum;
   }
 
+  Int2D operator -() {
+    final ret = new Int2D.sized(numRows, numCols);
+    for (int r = 0; r < length; r++)
+      for (int c = 0; c < length; c++) ret[r][c] = -_data[r][c];
+    return ret;
+  }
+
   Double2D get log {
     final ret = new Double2D.sized(numRows, numCols);
     for (int r = 0; r < numRows; r++) {

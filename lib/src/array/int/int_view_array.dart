@@ -445,6 +445,12 @@ class Int1DView extends Object
     return ret;
   }
 
+  Int1D operator -() {
+    final ret = new Int1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = -_data[i];
+    return ret;
+  }
+
   Double1D sqrt() {
     final ret = new Double1D.sized(length);
     for (int i = 0; i < length; i++) ret[i] = math.sqrt(_data[i]);
