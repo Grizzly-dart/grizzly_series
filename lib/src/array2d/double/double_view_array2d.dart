@@ -514,6 +514,32 @@ abstract class Double2DMixin {
     throw new ArgumentError.value(other, 'other', 'Unsupported type!');
   }
 
+  Double2D get log {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++) ret[r][c] = math.log(_data[r][c]);
+    }
+    return ret;
+  }
+
+  Double2D get log10 {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++)
+        ret[r][c] = math.log(_data[r][c]) / math.LN10;
+    }
+    return ret;
+  }
+
+  Double2D logN(double n) {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++)
+        ret[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return ret;
+  }
+
   Double1D dot(Numeric1D other) {
     if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');

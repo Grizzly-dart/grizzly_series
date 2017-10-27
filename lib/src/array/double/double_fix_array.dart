@@ -272,6 +272,22 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
     return super.sqrt();
   }
 
+  Double1DFix get logSelf {
+    for (int i = 0; i < length; i++) _data[i] = math.log(_data[i]);
+    return this;
+  }
+
+  Double1DFix get log10Self {
+    for (int i = 0; i < length; i++) _data[i] = math.log(_data[i]) / math.LN10;
+    return this;
+  }
+
+  Double1DFix logNSelf(double n) {
+    for (int i = 0; i < length; i++)
+      _data[i] = math.log(_data[i]) / math.log(n);
+    return this;
+  }
+
   Double1DFix floorToDouble({bool self: false}) {
     if (self) {
       for (int i = 0; i < length; i++) {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.17
+
+- log, log10, logN for arrays
+
 ## 0.0.16
 
 - Fixed dot for Array2D

@@ -292,6 +292,29 @@ class Double2DFix extends Object
     }
   }
 
+  Double2DFix get logSelf {
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++) _data[r][c] = math.log(_data[r][c]);
+    }
+    return this;
+  }
+
+  Double2DFix get log10Self {
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++)
+        _data[r][c] = math.log(_data[r][c]) / math.LN10;
+    }
+    return this;
+  }
+
+  Double2DFix logNSelf(double n) {
+    for (int r = 0; r < length; r++) {
+      for (int c = 0; c < length; c++)
+        _data[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return this;
+  }
+
   Double2DView _view;
 
   Double2DView get view => _view ??= new Double2DView.make(_data);
