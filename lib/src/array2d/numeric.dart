@@ -63,6 +63,8 @@ abstract class Numeric2DView<E extends num> implements Array2DView<E> {
   Double2D get log10;
 
   Double2D logN(double n);
+
+  Double2D get exp;
 }
 
 abstract class Numeric2DAxis<E extends num>

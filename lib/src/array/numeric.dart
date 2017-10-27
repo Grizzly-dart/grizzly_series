@@ -89,6 +89,8 @@ abstract class Numeric1DView<E extends num> implements ArrayView<E> {
 
   Double1D logN(double n);
 
+  Double1D get exp;
+
   Double1D get toDouble;
 
   double cov(Numeric1DView y);

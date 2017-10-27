@@ -282,6 +282,11 @@ class Double1DFix extends Double1DView implements Numeric1DFix<double> {
     return this;
   }
 
+  Double1D expSelf(num x) {
+    for (int i = 0; i < length; i++) _data[i] = math.exp(_data[i]);
+    return this;
+  }
+
   Double1DFix logNSelf(double n) {
     for (int i = 0; i < length; i++)
       _data[i] = math.log(_data[i]) / math.log(n);

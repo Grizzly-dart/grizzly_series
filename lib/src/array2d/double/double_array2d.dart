@@ -313,24 +313,31 @@ class Double2D extends Object
   }
 
   Double2D get logSelf {
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++) _data[r][c] = math.log(_data[r][c]);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) _data[r][c] = math.log(_data[r][c]);
     }
     return this;
   }
 
   Double2D get log10Self {
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++)
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
         _data[r][c] = math.log(_data[r][c]) / math.LN10;
     }
     return this;
   }
 
   Double2D logNSelf(double n) {
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++)
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
         _data[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return this;
+  }
+
+  Double2D expSelf() {
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) _data[r][c] = math.exp(_data[r][c]);
     }
     return this;
   }

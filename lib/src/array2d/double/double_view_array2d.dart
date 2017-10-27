@@ -516,16 +516,16 @@ abstract class Double2DMixin {
 
   Double2D get log {
     final ret = new Double2D.sized(numRows, numCols);
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++) ret[r][c] = math.log(_data[r][c]);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) ret[r][c] = math.log(_data[r][c]);
     }
     return ret;
   }
 
   Double2D get log10 {
     final ret = new Double2D.sized(numRows, numCols);
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++)
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
         ret[r][c] = math.log(_data[r][c]) / math.LN10;
     }
     return ret;
@@ -533,9 +533,17 @@ abstract class Double2DMixin {
 
   Double2D logN(double n) {
     final ret = new Double2D.sized(numRows, numCols);
-    for (int r = 0; r < length; r++) {
-      for (int c = 0; c < length; c++)
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++)
         ret[r][c] = math.log(_data[r][c]) / math.log(n);
+    }
+    return ret;
+  }
+
+  Double2D get exp {
+    final ret = new Double2D.sized(numRows, numCols);
+    for (int r = 0; r < numRows; r++) {
+      for (int c = 0; c < numCols; c++) ret[r][c] = math.exp(_data[r][c]);
     }
     return ret;
   }

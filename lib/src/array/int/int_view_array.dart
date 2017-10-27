@@ -472,6 +472,13 @@ class Int1DView extends Object
     return ret;
   }
 
+  @override
+  Double1D get exp {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.exp(_data[i]);
+    return ret;
+  }
+
   /// Returns a new  [Int1D] containing first [count] elements of this array
   ///
   /// If the length of the array is shorter than [count], all elements are

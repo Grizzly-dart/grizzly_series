@@ -33,5 +33,11 @@ void main() {
       final s1 = int1D([1, 5]);
       // TODO
     });
+
+    test('exp', () {
+      final x = int1D([-1, 2, 3, 4]);
+      final y = (x.exp + 1).log;
+      print(y);
+    });
   });
 }

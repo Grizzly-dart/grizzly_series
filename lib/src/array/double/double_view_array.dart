@@ -445,6 +445,13 @@ class Double1DView extends Object
     return ret;
   }
 
+  @override
+  Double1D get exp {
+    final ret = new Double1D.sized(length);
+    for (int i = 0; i < length; i++) ret[i] = math.exp(_data[i]);
+    return ret;
+  }
+
   Double1DFix floorToDouble() {
     final ret = new Double1D.sized(length);
     for (int i = 0; i < length; i++) {
