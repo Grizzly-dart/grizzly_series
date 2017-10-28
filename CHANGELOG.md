@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.22
+
+- Bug fix: `aRow` constructor for 2D arrays
+- Renamed genColumns, aColumn and buildColumns to be concise
+
 ## 0.0.21
 
 - `double2D` to create 2D double arrays

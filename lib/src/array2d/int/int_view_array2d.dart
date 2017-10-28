@@ -80,19 +80,19 @@ class Int2DView extends Object
   }
 
   factory Int2DView.genRows(int numRows, Iterable<int> rowMaker(int index)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DView>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DView(v));
     }
     return new Int2DView.make(rows);
   }
 
-  factory Int2DView.genColumns(int numCols, Iterable<int> colMaker(int index)) {
+  factory Int2DView.genCols(int numCols, Iterable<int> colMaker(int index)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -117,19 +117,19 @@ class Int2DView extends Object
 
   static Int2DView buildRows<T>(
       Iterable<T> iterable, Iterable<int> rowMaker(T v)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DView>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DView(v));
     }
     return new Int2DView.make(rows);
   }
 
-  static Int2DView buildColumns<T>(
+  static Int2DView buildCols<T>(
       Iterable<T> iterable, Iterable<int> colMaker(T v)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;

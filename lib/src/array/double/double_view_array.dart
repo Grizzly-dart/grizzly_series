@@ -520,7 +520,7 @@ class Double1DView extends Object
 
   Double2D repeat({int repeat: 1, bool transpose: false}) {
     if (!transpose) {
-      return new Double2D.repeatColumn(_data, repeat + 1);
+      return new Double2D.repeatCol(_data, repeat + 1);
     } else {
       return new Double2D.repeatRow(_data, repeat + 1);
     }

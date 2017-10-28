@@ -48,7 +48,7 @@ class String2DFix extends Object
     }
   }
 
-  String2DFix.repeatColumn(Iterable<String> column, [int numCols = 1])
+  String2DFix.repeatCol(Iterable<String> column, [int numCols = 1])
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.sized(numCols, data: column.elementAt(i));
@@ -59,7 +59,7 @@ class String2DFix extends Object
     _data[0] = new String1D(row);
   }
 
-  String2DFix.aColumn(Iterable<String> column)
+  String2DFix.aCol(Iterable<String> column)
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.single(column.elementAt(i));
@@ -90,19 +90,19 @@ class String2DFix extends Object
 
   factory String2DFix.genRows(
       int numRows, Iterable<String> rowMaker(int index)) {
-    final rows = <String1D>[];
+    final rows = <String1DFix>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1DFix(v));
     }
     return new String2DFix.make(rows);
   }
 
-  factory String2DFix.genColumns(
+  factory String2DFix.genCols(
       int numCols, Iterable<String> colMaker(int index)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;
@@ -128,19 +128,19 @@ class String2DFix extends Object
 
   static String2DFix buildRows<T>(
       Iterable<T> iterable, Iterable<String> rowMaker(T v)) {
-    final rows = <String1D>[];
+    final rows = <String1DFix>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1DFix(v));
     }
     return new String2DFix.make(rows);
   }
 
-  static String2DFix buildColumns<T>(
+  static String2DFix buildCols<T>(
       Iterable<T> iterable, Iterable<String> colMaker(T v)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;

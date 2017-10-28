@@ -48,7 +48,7 @@ class Bool2DFix extends Object
     }
   }
 
-  Bool2DFix.repeatColumn(Iterable<bool> column, [int numCols = 1])
+  Bool2DFix.repeatCol(Iterable<bool> column, [int numCols = 1])
       : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.sized(numCols, data: column.elementAt(i));
@@ -59,7 +59,7 @@ class Bool2DFix extends Object
     _data[0] = new Bool1D(row);
   }
 
-  Bool2DFix.aColumn(Iterable<bool> column)
+  Bool2DFix.aCol(Iterable<bool> column)
       : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.single(column.elementAt(i));
@@ -89,20 +89,19 @@ class Bool2DFix extends Object
   }
 
   factory Bool2DFix.genRows(int numRows, Iterable<bool> rowMaker(int index)) {
-    final rows = <Bool1D>[];
+    final rows = <Bool1DFix>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1DFix(v));
     }
     return new Bool2DFix.make(rows);
   }
 
-  factory Bool2DFix.genColumns(
-      int numCols, Iterable<bool> colMaker(int index)) {
+  factory Bool2DFix.genCols(int numCols, Iterable<bool> colMaker(int index)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -127,19 +126,19 @@ class Bool2DFix extends Object
 
   static Bool2DFix buildRows<T>(
       Iterable<T> iterable, Iterable<bool> rowMaker(T v)) {
-    final rows = <Bool1D>[];
+    final rows = <Bool1DFix>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1DFix(v));
     }
     return new Bool2DFix.make(rows);
   }
 
-  static Bool2DFix buildColumns<T>(
+  static Bool2DFix buildCols<T>(
       Iterable<T> iterable, Iterable<bool> colMaker(T v)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;

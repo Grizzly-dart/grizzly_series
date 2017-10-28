@@ -127,7 +127,7 @@ class String1DView extends Object
 
   String2D repeat({int repeat: 1, bool transpose: false}) {
     if (!transpose) {
-      return new String2D.repeatColumn(_data, repeat + 1);
+      return new String2D.repeatCol(_data, repeat + 1);
     } else {
       return new String2D.repeatRow(_data, repeat + 1);
     }
