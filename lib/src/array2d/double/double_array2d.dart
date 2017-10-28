@@ -28,7 +28,7 @@ class Double2D extends Object
 
   Double2D.shaped(Index2D shape, {double data: 0.0})
       : _data = new List<Double1D>.generate(
-            shape.row, (_) => new Double1D.sized(shape.column, data: data));
+            shape.row, (_) => new Double1D.sized(shape.col, data: data));
 
   factory Double2D.shapedLike(Array2DView like, {double data: 0.0}) =>
       new Double2D.sized(like.numRows, like.numCols, data: data);
@@ -74,7 +74,7 @@ class Double2D extends Object
     _data[0] = new Double1D(row);
   }
 
-  Double2D.aColumn(Iterable<double> column)
+  Double2D.aCol(Iterable<double> column)
       : _data = new List<Double1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Double1D.single(column.elementAt(i));

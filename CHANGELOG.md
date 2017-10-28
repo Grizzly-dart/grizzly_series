@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.21
+
+- `double2D` to create 2D double arrays
+- Flexible `int2D` and `array2D`
+
 ## 0.0.20
 
 - Bug fixes for dot method on Array2D 

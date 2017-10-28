@@ -27,7 +27,7 @@ class Int2DView extends Object
 
   Int2DView.shaped(Index2D shape, {int data: 0})
       : _data = new List<Int1D>.generate(
-            shape.row, (_) => new Int1D.sized(shape.column, data: data));
+            shape.row, (_) => new Int1D.sized(shape.col, data: data));
 
   factory Int2DView.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2DView.sized(like.numRows, like.numCols, data: data);
@@ -229,7 +229,7 @@ abstract class Int2DBase {
     final list = <Int1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new Int2D.make(list);

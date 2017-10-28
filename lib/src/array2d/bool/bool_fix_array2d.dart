@@ -28,7 +28,7 @@ class Bool2DFix extends Object
 
   Bool2DFix.shaped(Index2D shape, {bool data: false})
       : _data = new List<Bool1D>.generate(
-            shape.row, (_) => new Bool1D.sized(shape.column, data: data));
+            shape.row, (_) => new Bool1D.sized(shape.col, data: data));
 
   factory Bool2DFix.shapedLike(Array2DView like, {bool data: false}) =>
       new Bool2DFix.sized(like.numRows, like.numCols, data: data);

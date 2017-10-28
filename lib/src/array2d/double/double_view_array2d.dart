@@ -28,7 +28,7 @@ class Double2DView extends Object
 
   Double2DView.shaped(Index2D shape, {double data: 0.0})
       : _data = new List<Double1D>.generate(
-            shape.row, (_) => new Double1D.sized(shape.column, data: data));
+            shape.row, (_) => new Double1D.sized(shape.col, data: data));
 
   factory Double2DView.shapedLike(Array2DView like, {double data: 0.0}) =>
       new Double2DView.sized(like.numRows, like.numCols, data: data);
@@ -256,7 +256,7 @@ abstract class Double2DMixin {
     final list = <Double1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new Double2D.make(list);

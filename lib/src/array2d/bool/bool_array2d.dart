@@ -28,7 +28,7 @@ class Bool2D extends Object
 
   Bool2D.shaped(Index2D shape, {bool data: false})
       : _data = new List<Bool1D>.generate(
-            shape.row, (_) => new Bool1D.sized(shape.column, data: data));
+            shape.row, (_) => new Bool1D.sized(shape.col, data: data));
 
   factory Bool2D.shapedLike(Array2DView like, {bool data: false}) =>
       new Bool2D.sized(like.numRows, like.numCols, data: data);

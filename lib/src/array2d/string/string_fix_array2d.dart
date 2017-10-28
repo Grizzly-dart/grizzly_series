@@ -28,7 +28,7 @@ class String2DFix extends Object
 
   String2DFix.shaped(Index2D shape, {String data: ''})
       : _data = new List<String1D>.generate(
-            shape.row, (_) => new String1D.sized(shape.column, data: data));
+            shape.row, (_) => new String1D.sized(shape.col, data: data));
 
   factory String2DFix.shapedLike(Array2DView like, {String data: ''}) =>
       new String2DFix.sized(like.numRows, like.numCols, data: data);

@@ -28,7 +28,7 @@ class String2DView extends Object
 
   String2DView.shaped(Index2D shape, {String data: ''})
       : _data = new List<String1D>.generate(
-            shape.row, (_) => new String1D.sized(shape.column, data: data));
+            shape.row, (_) => new String1D.sized(shape.col, data: data));
 
   factory String2DView.shapedLike(Array2DView like, {String data: ''}) =>
       new String2DView.sized(like.numRows, like.numCols, data: data);
@@ -241,7 +241,7 @@ abstract class String2DMixin implements Array2DView<String> {
     final list = <String1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new String2D.make(list);

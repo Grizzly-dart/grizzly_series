@@ -30,10 +30,58 @@ part 'index.dart';
 part 'double_array2d.dart';
 part 'numeric.dart';
 
-Double2D array2D(Iterable<Iterable<num>> matrix) =>
-    new Double2D.fromNum(matrix);
+Double2D array2D(
+    /* Iterable<Iterable<num>> | Iterable<double> | Index2D */ data,
+    {bool transpose: false}) {
+  if (data is Iterable<Iterable<num>>) {
+    if (!transpose) {
+      return new Double2D.fromNum(data);
+    } else {
+      return new Double2D.columns(data);
+    }
+  } else if (data is Iterable<double>) {
+    if (!transpose) {
+      return new Double2D.aRow(data);
+    } else {
+      return new Double2D.aCol(data);
+    }
+  } else if (data is Index2D) {
+    if (!transpose) {
+      return new Double2D.shaped(data);
+    } else {
+      return new Double2D.shaped(data.transpose);
+    }
+  } else {
+    throw new ArgumentError.value(data, 'data', 'Invalid value!');
+  }
+}
 
-Int2D int2D(Iterable<Iterable<int>> matrix) => new Int2D(matrix);
+Double2D double2D(Iterable<Iterable<num>> matrix) => array2D(matrix);
+
+Int2D int2D(/* Iterable<Iterable<int>> | Iterable<int> | Index2D */ data,
+    {bool transpose: false}) {
+  if (data is Iterable<Iterable<int>>) {
+    if (!transpose) {
+      return new Int2D(data);
+    } else {
+      return new Int2D.columns(data);
+    }
+  } else if (data is Iterable<int>) {
+    if (!transpose) {
+      return new Int2D.aRow(data);
+    } else {
+      return new Int2D.aCol(data);
+    }
+  } else if (data is Index2D) {
+    if (!transpose) {
+      return new Int2D.shaped(data);
+    } else {
+      return new Int2D.shaped(data.transpose);
+    }
+  } else {
+    throw new ArgumentError.value(data, 'data', 'Invalid value!');
+  }
+}
 
 abstract class Array2D<E> implements Iterable<Array<E>>, Array2DFix<E> {
   ArrayFix<E> operator [](int i);

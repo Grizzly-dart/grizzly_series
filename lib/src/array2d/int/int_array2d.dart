@@ -27,7 +27,7 @@ class Int2D extends Object
 
   Int2D.shaped(Index2D shape, {int data: 0})
       : _data = new List<Int1D>.generate(
-            shape.row, (_) => new Int1D.sized(shape.column, data: data));
+            shape.row, (_) => new Int1D.sized(shape.col, data: data));
 
   factory Int2D.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2D.sized(like.numRows, like.numCols, data: data);

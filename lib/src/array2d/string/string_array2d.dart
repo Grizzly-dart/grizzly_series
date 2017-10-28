@@ -28,7 +28,7 @@ class String2D extends Object
 
   String2D.shaped(Index2D shape, {String data: ''})
       : _data = new List<String1D>.generate(
-            shape.row, (_) => new String1D.sized(shape.column, data: data));
+            shape.row, (_) => new String1D.sized(shape.col, data: data));
 
   factory String2D.shapedLike(Array2DView like, {String data: ''}) =>
       new String2D.sized(like.numRows, like.numCols, data: data);

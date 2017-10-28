@@ -28,7 +28,7 @@ class Bool2DView extends Object
 
   Bool2DView.shaped(Index2D shape, {bool data: false})
       : _data = new List<Bool1D>.generate(
-            shape.row, (_) => new Bool1D.sized(shape.column, data: data));
+            shape.row, (_) => new Bool1D.sized(shape.col, data: data));
 
   factory Bool2DView.shapedLike(Array2DView like, {bool data: false}) =>
       new Bool2DView.sized(like.numRows, like.numCols, data: data);
@@ -239,7 +239,7 @@ abstract class Bool2DMixin implements Array2DView<bool> {
     final list = <Bool1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new Bool2D.make(list);

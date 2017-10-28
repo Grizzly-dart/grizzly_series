@@ -28,7 +28,7 @@ class Double2DFix extends Object
 
   Double2DFix.shaped(Index2D shape, {double data: 0.0})
       : _data = new List<Double1D>.generate(
-            shape.row, (_) => new Double1D.sized(shape.column, data: data));
+            shape.row, (_) => new Double1D.sized(shape.col, data: data));
 
   factory Double2DFix.shapedLike(Array2DView like, {double data: 0.0}) =>
       new Double2DFix.sized(like.numRows, like.numCols, data: data);
