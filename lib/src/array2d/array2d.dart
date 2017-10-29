@@ -2,7 +2,6 @@ library grizzly.series.array2d;
 
 import 'dart:math' as math;
 import 'dart:collection';
-import 'package:meta/meta.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
@@ -26,7 +25,6 @@ part 'string/string_fix_array2d.dart';
 part 'string/string_axis.dart';
 part 'string/string_view_array2d.dart';
 
-part 'index.dart';
 part 'double_array2d.dart';
 part 'numeric.dart';
 
