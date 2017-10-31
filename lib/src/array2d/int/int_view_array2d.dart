@@ -27,7 +27,7 @@ class Int2DView extends Object
 
   Int2DView.shaped(Index2D shape, {int data: 0})
       : _data = new List<Int1D>.generate(
-            shape.row, (_) => new Int1D.sized(shape.column, data: data));
+            shape.row, (_) => new Int1D.sized(shape.col, data: data));
 
   factory Int2DView.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2DView.sized(like.numRows, like.numCols, data: data);
@@ -80,19 +80,19 @@ class Int2DView extends Object
   }
 
   factory Int2DView.genRows(int numRows, Iterable<int> rowMaker(int index)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DView>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DView(v));
     }
     return new Int2DView.make(rows);
   }
 
-  factory Int2DView.genColumns(int numCols, Iterable<int> colMaker(int index)) {
+  factory Int2DView.genCols(int numCols, Iterable<int> colMaker(int index)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -117,19 +117,19 @@ class Int2DView extends Object
 
   static Int2DView buildRows<T>(
       Iterable<T> iterable, Iterable<int> rowMaker(T v)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DView>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DView(v));
     }
     return new Int2DView.make(rows);
   }
 
-  static Int2DView buildColumns<T>(
+  static Int2DView buildCols<T>(
       Iterable<T> iterable, Iterable<int> colMaker(T v)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
@@ -229,7 +229,7 @@ abstract class Int2DBase {
     final list = <Int1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new Int2D.make(list);
@@ -395,7 +395,7 @@ abstract class Int2DBase {
     return ret;
   }
 
-  Int1D dot(Numeric1D<num> other) {
+  Int1D dot(Iterable<num> other) {
     if (numCols != other.length)
       throw new ArgumentError.value(other, 'other', 'Invalid shape!');
 

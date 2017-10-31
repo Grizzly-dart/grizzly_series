@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.23
+
+- Stripped `Pair`, `IntPair`, `Extent`, `Index`, `Index1D`, `Index2D` into its own package `grizzly_primitives`
+
+## 0.0.22
+
+- Bug fix: `aRow` constructor for 2D arrays
+- Renamed genColumns, aColumn and buildColumns to be concise
+
+## 0.0.21
+
+- `double2D` to create 2D double arrays
+- Flexible `int2D` and `array2D`
+
+## 0.0.20
+
+- Bug fixes for dot method on Array2D 
+
 ## 0.0.19
 
 - Unary minus operator for arrays

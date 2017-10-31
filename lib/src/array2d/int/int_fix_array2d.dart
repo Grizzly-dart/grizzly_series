@@ -27,7 +27,7 @@ class Int2DFix extends Object
 
   Int2DFix.shaped(Index2D shape, {int data: 0})
       : _data = new List<Int1D>.generate(
-            shape.row, (_) => new Int1D.sized(shape.column, data: data));
+            shape.row, (_) => new Int1D.sized(shape.col, data: data));
 
   factory Int2DFix.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2DFix.sized(like.numRows, like.numCols, data: data);
@@ -79,19 +79,19 @@ class Int2DFix extends Object
   }
 
   factory Int2DFix.genRows(int numRows, Iterable<int> rowMaker(int index)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DFix>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DFix(v));
     }
     return new Int2DFix.make(rows);
   }
 
-  factory Int2DFix.genColumns(int numCols, Iterable<int> colMaker(int index)) {
+  factory Int2DFix.genCols(int numCols, Iterable<int> colMaker(int index)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -116,19 +116,19 @@ class Int2DFix extends Object
 
   static Int2DFix buildRows<T>(
       Iterable<T> iterable, Iterable<int> rowMaker(T v)) {
-    final rows = <Int1D>[];
+    final rows = <Int1DFix>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1DFix(v));
     }
     return new Int2DFix.make(rows);
   }
 
-  static Int2DFix buildColumns<T>(
+  static Int2DFix buildCols<T>(
       Iterable<T> iterable, Iterable<int> colMaker(T v)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;

@@ -28,7 +28,7 @@ class Bool2DView extends Object
 
   Bool2DView.shaped(Index2D shape, {bool data: false})
       : _data = new List<Bool1D>.generate(
-            shape.row, (_) => new Bool1D.sized(shape.column, data: data));
+            shape.row, (_) => new Bool1D.sized(shape.col, data: data));
 
   factory Bool2DView.shapedLike(Array2DView like, {bool data: false}) =>
       new Bool2DView.sized(like.numRows, like.numCols, data: data);
@@ -48,7 +48,7 @@ class Bool2DView extends Object
     }
   }
 
-  Bool2DView.repeatColumn(Iterable<bool> column, [int numCols = 1])
+  Bool2DView.repeatCol(Iterable<bool> column, [int numCols = 1])
       : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.sized(numCols, data: column.elementAt(i));
@@ -59,7 +59,7 @@ class Bool2DView extends Object
     _data[0] = new Bool1D(row);
   }
 
-  Bool2DView.aColumn(Iterable<bool> column)
+  Bool2DView.aCol(Iterable<bool> column)
       : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.single(column.elementAt(i));
@@ -89,20 +89,19 @@ class Bool2DView extends Object
   }
 
   factory Bool2DView.genRows(int numRows, Iterable<bool> rowMaker(int index)) {
-    final rows = <Bool1D>[];
+    final rows = <Bool1DView>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1DView(v));
     }
     return new Bool2DView.make(rows);
   }
 
-  factory Bool2DView.genColumns(
-      int numCols, Iterable<bool> colMaker(int index)) {
+  factory Bool2DView.genCols(int numCols, Iterable<bool> colMaker(int index)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -127,19 +126,19 @@ class Bool2DView extends Object
 
   static Bool2DView buildRows<T>(
       Iterable<T> iterable, Iterable<bool> rowMaker(T v)) {
-    final rows = <Bool1D>[];
+    final rows = <Bool1DView>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1DView(v));
     }
     return new Bool2DView.make(rows);
   }
 
-  static Bool2DView buildColumns<T>(
+  static Bool2DView buildCols<T>(
       Iterable<T> iterable, Iterable<bool> colMaker(T v)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;
@@ -239,7 +238,7 @@ abstract class Bool2DMixin implements Array2DView<bool> {
     final list = <Bool1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new Bool2D.make(list);

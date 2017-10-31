@@ -144,7 +144,7 @@ class Bool1DView extends Object
 
   Bool2D repeat({int repeat: 1, bool transpose: false}) {
     if (!transpose) {
-      return new Bool2D.repeatColumn(_data, repeat + 1);
+      return new Bool2D.repeatCol(_data, repeat + 1);
     } else {
       return new Bool2D.repeatRow(_data, repeat + 1);
     }

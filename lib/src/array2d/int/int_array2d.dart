@@ -27,7 +27,7 @@ class Int2D extends Object
 
   Int2D.shaped(Index2D shape, {int data: 0})
       : _data = new List<Int1D>.generate(
-            shape.row, (_) => new Int1D.sized(shape.column, data: data));
+            shape.row, (_) => new Int1D.sized(shape.col, data: data));
 
   factory Int2D.shapedLike(Array2DView like, {int data: 0}) =>
       new Int2D.sized(like.numRows, like.numCols, data: data);
@@ -86,12 +86,12 @@ class Int2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1D(v));
     }
     return new Int2D.make(rows);
   }
 
-  factory Int2D.genColumns(int numCols, Iterable<int> colMaker(int index)) {
+  factory Int2D.genCols(int numCols, Iterable<int> colMaker(int index)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -122,13 +122,12 @@ class Int2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Int1D(v));
     }
     return new Int2D.make(rows);
   }
 
-  static Int2D buildColumns<T>(
-      Iterable<T> iterable, Iterable<int> colMaker(T v)) {
+  static Int2D buildCols<T>(Iterable<T> iterable, Iterable<int> colMaker(T v)) {
     final List<Iterable<int>> cols = <Iterable<int>>[];
     int rowLen;
     for (int i = 0; i < iterable.length; i++) {

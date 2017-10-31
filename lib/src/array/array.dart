@@ -3,7 +3,6 @@ library grizzly.series.array;
 import 'dart:math' as math;
 import 'dart:collection';
 import 'dart:typed_data';
-import 'package:meta/meta.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 
@@ -23,7 +22,6 @@ part 'string/string_array.dart';
 part 'string/string_fix_array.dart';
 part 'string/string_view_array.dart';
 
-part 'index.dart';
 part 'numeric.dart';
 part 'sample.dart';
 

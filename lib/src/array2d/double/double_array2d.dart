@@ -28,7 +28,7 @@ class Double2D extends Object
 
   Double2D.shaped(Index2D shape, {double data: 0.0})
       : _data = new List<Double1D>.generate(
-            shape.row, (_) => new Double1D.sized(shape.column, data: data));
+            shape.row, (_) => new Double1D.sized(shape.col, data: data));
 
   factory Double2D.shapedLike(Array2DView like, {double data: 0.0}) =>
       new Double2D.sized(like.numRows, like.numCols, data: data);
@@ -63,7 +63,7 @@ class Double2D extends Object
     }
   }
 
-  Double2D.repeatColumn(Iterable<double> column, [int numCols = 1])
+  Double2D.repeatCol(Iterable<double> column, [int numCols = 1])
       : _data = new List<Double1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Double1D.sized(numCols, data: column.elementAt(i));
@@ -74,7 +74,7 @@ class Double2D extends Object
     _data[0] = new Double1D(row);
   }
 
-  Double2D.aColumn(Iterable<double> column)
+  Double2D.aCol(Iterable<double> column)
       : _data = new List<Double1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Double1D.single(column.elementAt(i));
@@ -111,13 +111,12 @@ class Double2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Double1D(v));
     }
     return new Double2D.make(rows);
   }
 
-  factory Double2D.genColumns(
-      int numCols, Iterable<double> colMaker(int index)) {
+  factory Double2D.genCols(int numCols, Iterable<double> colMaker(int index)) {
     final List<Iterable<double>> cols = <Iterable<double>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -149,12 +148,12 @@ class Double2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Double1D(v));
     }
     return new Double2D.make(rows);
   }
 
-  static Double2D buildColumns<T>(
+  static Double2D buildCols<T>(
       Iterable<T> iterable, Iterable<double> colMaker(T v)) {
     final List<Iterable<double>> cols = <Iterable<double>>[];
     int rowLen;

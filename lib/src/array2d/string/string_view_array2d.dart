@@ -28,7 +28,7 @@ class String2DView extends Object
 
   String2DView.shaped(Index2D shape, {String data: ''})
       : _data = new List<String1D>.generate(
-            shape.row, (_) => new String1D.sized(shape.column, data: data));
+            shape.row, (_) => new String1D.sized(shape.col, data: data));
 
   factory String2DView.shapedLike(Array2DView like, {String data: ''}) =>
       new String2DView.sized(like.numRows, like.numCols, data: data);
@@ -48,7 +48,7 @@ class String2DView extends Object
     }
   }
 
-  String2DView.repeatColumn(Iterable<String> column, [int numCols = 1])
+  String2DView.repeatCol(Iterable<String> column, [int numCols = 1])
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.sized(numCols, data: column.elementAt(i));
@@ -59,7 +59,7 @@ class String2DView extends Object
     _data[0] = new String1D(row);
   }
 
-  String2DView.aColumn(Iterable<String> column)
+  String2DView.aCol(Iterable<String> column)
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.single(column.elementAt(i));
@@ -90,19 +90,19 @@ class String2DView extends Object
 
   factory String2DView.genRows(
       int numRows, Iterable<String> rowMaker(int index)) {
-    final rows = <String1D>[];
+    final rows = <String1DView>[];
     int colLen;
     for (int i = 0; i < numRows; i++) {
       final v = rowMaker(i);
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1DView(v));
     }
     return new String2DView.make(rows);
   }
 
-  factory String2DView.genColumns(
+  factory String2DView.genCols(
       int numCols, Iterable<String> colMaker(int index)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;
@@ -128,19 +128,19 @@ class String2DView extends Object
 
   static String2DView buildRows<T>(
       Iterable<T> iterable, Iterable<String> rowMaker(T v)) {
-    final rows = <String1D>[];
+    final rows = <String1DView>[];
     int colLen;
     for (int i = 0; i < iterable.length; i++) {
       final v = rowMaker(iterable.elementAt(i));
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1DView(v));
     }
     return new String2DView.make(rows);
   }
 
-  static String2DView buildColumns<T>(
+  static String2DView buildCols<T>(
       Iterable<T> iterable, Iterable<String> colMaker(T v)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;
@@ -241,7 +241,7 @@ abstract class String2DMixin implements Array2DView<String> {
     final list = <String1D>[];
 
     for (int c = start.row; c < end.row; c++) {
-      list.add(_data[c].slice(start.column, end.column));
+      list.add(_data[c].slice(start.col, end.col));
     }
 
     return new String2D.make(list);

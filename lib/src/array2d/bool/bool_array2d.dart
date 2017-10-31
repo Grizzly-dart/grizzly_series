@@ -28,7 +28,7 @@ class Bool2D extends Object
 
   Bool2D.shaped(Index2D shape, {bool data: false})
       : _data = new List<Bool1D>.generate(
-            shape.row, (_) => new Bool1D.sized(shape.column, data: data));
+            shape.row, (_) => new Bool1D.sized(shape.col, data: data));
 
   factory Bool2D.shapedLike(Array2DView like, {bool data: false}) =>
       new Bool2D.sized(like.numRows, like.numCols, data: data);
@@ -48,7 +48,7 @@ class Bool2D extends Object
     }
   }
 
-  Bool2D.repeatColumn(Iterable<bool> column, [int numCols = 1])
+  Bool2D.repeatCol(Iterable<bool> column, [int numCols = 1])
       : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.sized(numCols, data: column.elementAt(i));
@@ -59,8 +59,7 @@ class Bool2D extends Object
     _data[0] = new Bool1D(row);
   }
 
-  Bool2D.aColumn(Iterable<bool> column)
-      : _data = new List<Bool1D>(column.length) {
+  Bool2D.aCol(Iterable<bool> column) : _data = new List<Bool1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new Bool1D.single(column.elementAt(i));
     }
@@ -96,12 +95,12 @@ class Bool2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1D(v));
     }
     return new Bool2D.make(rows);
   }
 
-  factory Bool2D.genColumns(int numCols, Iterable<bool> colMaker(int index)) {
+  factory Bool2D.genCols(int numCols, Iterable<bool> colMaker(int index)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -133,12 +132,12 @@ class Bool2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new Bool1D(v));
     }
     return new Bool2D.make(rows);
   }
 
-  static Bool2D buildColumns<T>(
+  static Bool2D buildCols<T>(
       Iterable<T> iterable, Iterable<bool> colMaker(T v)) {
     final List<Iterable<bool>> cols = <Iterable<bool>>[];
     int rowLen;

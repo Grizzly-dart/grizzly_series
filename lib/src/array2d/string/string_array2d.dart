@@ -28,7 +28,7 @@ class String2D extends Object
 
   String2D.shaped(Index2D shape, {String data: ''})
       : _data = new List<String1D>.generate(
-            shape.row, (_) => new String1D.sized(shape.column, data: data));
+            shape.row, (_) => new String1D.sized(shape.col, data: data));
 
   factory String2D.shapedLike(Array2DView like, {String data: ''}) =>
       new String2D.sized(like.numRows, like.numCols, data: data);
@@ -48,7 +48,7 @@ class String2D extends Object
     }
   }
 
-  String2D.repeatColumn(Iterable<String> column, [int numCols = 1])
+  String2D.repeatCol(Iterable<String> column, [int numCols = 1])
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.sized(numCols, data: column.elementAt(i));
@@ -59,7 +59,7 @@ class String2D extends Object
     _data[0] = new String1D(row);
   }
 
-  String2D.aColumn(Iterable<String> column)
+  String2D.aCol(Iterable<String> column)
       : _data = new List<String1D>(column.length) {
     for (int i = 0; i < length; i++) {
       _data[i] = new String1D.single(column.elementAt(i));
@@ -96,13 +96,12 @@ class String2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1D(v));
     }
     return new String2D.make(rows);
   }
 
-  factory String2D.genColumns(
-      int numCols, Iterable<String> colMaker(int index)) {
+  factory String2D.genCols(int numCols, Iterable<String> colMaker(int index)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;
     for (int i = 0; i < numCols; i++) {
@@ -134,12 +133,12 @@ class String2D extends Object
       if (v == null) continue;
       colLen ??= v.length;
       if (colLen != v.length) throw new Exception('Size mismatch!');
-      rows.add(v);
+      rows.add(new String1D(v));
     }
     return new String2D.make(rows);
   }
 
-  static String2D buildColumns<T>(
+  static String2D buildCols<T>(
       Iterable<T> iterable, Iterable<String> colMaker(T v)) {
     final List<Iterable<String>> cols = <Iterable<String>>[];
     int rowLen;
