@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 class IntSeries<IT> extends Object
-    with SeriesBase<IT, int>, NumericSeries<IT, int>
+    with SeriesMixin<IT, int>, NumericSeries<IT, int>
     implements Series<IT, int> {
   final List<IT> _labels;
 
@@ -34,7 +34,7 @@ class IntSeries<IT> extends Object
 
   factory IntSeries(Iterable<int> data, {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToPosMapper(madeIndices);
+    final mapper = labelsToMapper(madeIndices);
 
     return new IntSeries._(data.toList(), madeIndices, name, mapper);
   }
@@ -784,10 +784,6 @@ class IntSeries<IT> extends Object
     return new DoubleSeries<IT>(_data.map((int v) => v.toDouble()).toList(),
         name: name, labels: _labels.toList());
   }
-}
-
-abstract class SeriesView<IT, VT> implements Series<IT, VT> {
-  Series<IT, VT> toSeries();
 }
 
 class IntSeriesView<IT> extends IntSeries<IT>

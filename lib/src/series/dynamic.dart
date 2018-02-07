@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 class DynamicSeries<IT> extends Object
-    with SeriesBase<IT, dynamic>
+    with SeriesMixin<IT, dynamic>
     implements Series<IT, dynamic> {
   final List<IT> _labels;
 
@@ -35,7 +35,7 @@ class DynamicSeries<IT> extends Object
   factory DynamicSeries(Iterable<dynamic> data,
       {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToPosMapper(madeIndices);
+    final mapper = labelsToMapper(madeIndices);
 
     return new DynamicSeries._(data.toList(), madeIndices, name, mapper);
   }

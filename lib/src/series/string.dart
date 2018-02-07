@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 class StringSeries<IT> extends Object
-    with SeriesBase<IT, String>
+    with SeriesMixin<IT, String>
     implements Series<IT, String> {
   final List<IT> _labels;
 
@@ -34,7 +34,7 @@ class StringSeries<IT> extends Object
 
   factory StringSeries(Iterable<String> data, {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToPosMapper(madeIndices);
+    final mapper = labelsToMapper(madeIndices);
 
     return new StringSeries._(data.toList(), madeIndices, name, mapper);
   }

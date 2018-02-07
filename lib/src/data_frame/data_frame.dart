@@ -5,8 +5,9 @@ import 'dart:collection';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
+import 'package:grizzly_primitives/grizzly_primitives.dart';
 
-class DataFrame<IT, CT> {
+class DataFrame<IT, CT> implements DataFrameBase<IT, CT> {
   final List<CT> _columns;
 
   final List<IT> _labels;
@@ -15,13 +16,13 @@ class DataFrame<IT, CT> {
 
   final SplayTreeMap<IT, List<int>> _mapper;
 
-  DataFramePositioned _pos;
+  FrameByPosition<IT, CT> _byPos;
 
-  DataFramePositioned get pos => _pos;
+  FrameByPosition<IT, CT> get byPos => _byPos;
 
-  DataFrameIndexed _index;
+  FrameByLabel<IT, CT> _byLabel;
 
-  DataFrameIndexed get index => _index;
+  FrameByLabel<IT, CT> get byLabel => _byLabel;
 
   final UnmodifiableListView<CT> columns;
 
@@ -30,8 +31,8 @@ class DataFrame<IT, CT> {
   DataFrame._(this._columns, this._labels, this._data, this._mapper)
       : labels = new UnmodifiableListView(_labels),
         columns = new UnmodifiableListView(_columns) {
-    _pos = new DataFramePositioned<IT, CT>(this);
-    _index = new DataFrameIndexed<IT, CT>(this);
+    _byPos = new FrameByPosition<IT, CT>(this);
+    _byLabel = new FrameByLabel<IT, CT>(this);
   }
 
   factory DataFrame(Map<CT, List> data, {List<IT> labels}) {
@@ -142,7 +143,7 @@ class DataFrame<IT, CT> {
           final List<CT> columns = seriesMap.keys.toList()
             ..addAll(series.map((Series s) => s.name).toList() as List<CT>)
             ..addAll(lists.keys.toList());
-          final SplayTreeMap<IT, List<int>> mapper = labelsToPosMapper(labels);
+          final SplayTreeMap<IT, List<int>> mapper = labelsToMapper(labels);
           return new DataFrame._(columns, labels, seriesAll, mapper);
         }
       }
@@ -170,7 +171,7 @@ class DataFrame<IT, CT> {
     final List<CT> columns = seriesMap.keys.toList()
       ..addAll(series.map((Series s) => s.name) as Iterable<CT>);
 
-    final SplayTreeMap<IT, List<int>> mapper = labelsToPosMapper<IT>(labels);
+    final SplayTreeMap<IT, List<int>> mapper = labelsToMapper<IT>(labels);
 
     return new DataFrame._(columns, labels, d, mapper);
   }
@@ -216,7 +217,7 @@ class DataFrame<IT, CT> {
     if (position >= _labels.length)
       throw new RangeError.range(position, 0, _labels.length);
 
-    final List d = _data.map((Series l) => l.pos[position]).toList();
+    final List d = _data.map((Series l) => l.byPos[position]).toList();
 
     return new DynamicSeries<CT>(d,
         labels: _columns.toList(), name: _labels[position]);
@@ -240,7 +241,7 @@ class DataFrame<IT, CT> {
 
     final int pos = _mapper[label].first;
 
-    final List d = _data.map((Series l) => l.pos[pos]).toList();
+    final List d = _data.map((Series l) => l.byPos[pos]).toList();
 
     return new DynamicSeries<CT>(d, labels: _columns.toList(), name: label);
   }
@@ -251,7 +252,7 @@ class DataFrame<IT, CT> {
     }
 
     return _mapper[label].map((int pos) {
-      final List d = _data.map((Series l) => l.pos[pos]).toList();
+      final List d = _data.map((Series l) => l.byPos[pos]).toList();
       return new DynamicSeries<CT>(d, labels: _columns.toList(), name: label);
     }).toList();
   }
@@ -371,7 +372,7 @@ class DataFrame<IT, CT> {
       sb.write(_labels[i]);
       sb.write('\t');
       for (Series s in _data) {
-        sb.write(s.pos[i]);
+        sb.write(s.byPos[i]);
         sb.write('\t');
       }
       sb.writeln();
@@ -379,34 +380,4 @@ class DataFrame<IT, CT> {
 
     return sb.toString();
   }
-}
-
-class DataFramePositioned<IT, CT> {
-  final DataFrame<IT, CT> frame;
-
-  DataFramePositioned(this.frame);
-
-  DynamicSeries<CT> operator [](int position) => frame.getByPos(position);
-
-  operator []=(int position, List value) => frame.setByPos(position, value);
-
-  DynamicSeries<CT> get(int position) => frame.getByPos(position);
-
-  void set(int position, List value) => frame.setByPos(position, value);
-}
-
-class DataFrameIndexed<IT, CT> {
-  final DataFrame<IT, CT> frame;
-
-  DataFrameIndexed(this.frame);
-
-  DynamicSeries<CT> operator [](IT index) => frame.getByLabel(index);
-
-  operator []=(IT index, List value) => frame.setByLabel(index, value);
-
-  DynamicSeries<CT> get(IT index) => frame.getByLabel(index);
-
-  void set(IT index, List value) => frame.setByLabel(index, value);
-
-  List<DynamicSeries<CT>> getMulti(IT index) => frame.getByLabelMulti(index);
 }

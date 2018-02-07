@@ -20,16 +20,13 @@ List<IT> makeLabels<IT>(int dataLength, List<IT> indices, Type itType) {
   return madeIndices;
 }
 
-SplayTreeMap<IT, List<int>> labelsToPosMapper<IT>(List<IT> indices) {
-  final mapper = new SplayTreeMap<IT, List<int>>();
+SplayTreeMap<LT, int> labelsToMapper<LT>(List<LT> labels) {
+  final mapper = new SplayTreeMap<LT, int>();
 
-  for (int i = 0; i < indices.length; i++) {
-    final IT index = indices[i];
-    if (mapper.containsKey(index)) {
-      mapper[index].add(i);
-    } else {
-      mapper[index] = new List<int>()..add(i);
-    }
+  for (int i = 0; i < labels.length; i++) {
+    final LT label = labels[i];
+    if(mapper.containsKey(label)) throw new Exception('Duplicate label found!');
+    mapper[label] = i;
   }
 
   return mapper;

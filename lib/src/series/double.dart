@@ -1,7 +1,7 @@
 part of grizzly.series;
 
 class DoubleSeries<IT> extends Object
-    with SeriesBase<IT, double>, NumericSeries<IT, double>
+    with SeriesMixin<IT, double>, NumericSeries<IT, double>
     implements Series<IT, double> {
   final List<IT> _labels;
 
@@ -34,7 +34,7 @@ class DoubleSeries<IT> extends Object
 
   factory DoubleSeries(Iterable<double> data, {dynamic name, List<IT> labels}) {
     final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToPosMapper(madeIndices);
+    final mapper = labelsToMapper(madeIndices);
 
     return new DoubleSeries._(
         new Float64List.fromList(data), madeIndices, name, mapper);
