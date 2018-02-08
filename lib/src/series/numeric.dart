@@ -14,54 +14,6 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     }
   }
 
-  VT max({bool skipNan: true}) {
-    VT ret;
-    bool seenNan = false;
-
-    for (VT v in _data) {
-      if (v == null) continue;
-      if (v == double.NAN) {
-        if (skipNan) {
-          seenNan = true;
-          continue;
-        } else {
-          return double.NAN as VT;
-        }
-      }
-      if (ret == null)
-        ret = v;
-      else if (ret < v) ret = v;
-    }
-
-    if (ret == null && seenNan) return double.NAN as VT;
-
-    return ret;
-  }
-
-  VT min({bool skipNan: true}) {
-    VT ret;
-    bool seenNan = false;
-
-    for (VT v in _data) {
-      if (v == null) continue;
-      if (v == double.NAN) {
-        if (skipNan) {
-          seenNan = true;
-          continue;
-        } else {
-          return double.NAN as VT;
-        }
-      }
-      if (ret == null)
-        ret = v;
-      else if (ret > v) ret = v;
-    }
-
-    if (ret == null && seenNan) return double.NAN as VT;
-
-    return ret;
-  }
-
   VT sum({bool skipNull: true});
 
   BoolSeries<IT> _relOp(NumericSeries<IT, num> other, bool func(num a, num b),

@@ -1,9 +1,70 @@
 part of grizzly.series;
 
+class DoubleSeries<LT> extends Object
+    with
+        SeriesMixin<LT, double>,
+        SeriesViewMixin<LT, double>,
+        DoubleSeriesViewMixin<LT>
+    implements NumericSeries<LT, double> {
+  final List<LT> _labels;
+
+  final Double1D _data;
+
+  final SplayTreeMap<LT, int> _mapper;
+
+  dynamic name;
+
+  SeriesByPosition<LT, double> _pos;
+
+  DoubleSeriesView<LT> _view;
+
+  DoubleSeries._(this._labels, this._data, this.name, this._mapper);
+
+  DoubleSeries._build(this._labels, this._data, this.name)
+      : _mapper = labelsToMapper(_labels);
+
+  factory DoubleSeries(/* Iterable<int> | IterView<int> */ data,
+      {dynamic name, Iterable<LT> labels}) {
+    Double1D d;
+    if (data is Iterable<double>) {
+      d = new Double1D(data);
+    } else if (data is IterView<double>) {
+      d = new Double1D.copy(data);
+    } else {
+      throw new UnsupportedError('Type not supported!');
+    }
+
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new DoubleSeries._build(madeLabels, d, name);
+  }
+
+  factory DoubleSeries.fromMap(Map<LT, double> map, {dynamic name}) {
+    final labels = new List<LT>()..length = map.length;
+    final data = new Double1D.sized(map.length);
+    final mapper = new SplayTreeMap<LT, int>();
+
+    for (int i = 0; i < map.length; i++) {
+      LT label = map.keys.elementAt(i);
+      labels[i] = label;
+      data[i] = map[label];
+      mapper[label] = i;
+    }
+    return new DoubleSeries._(labels, data, name, mapper);
+  }
+
+  factory DoubleSeries.copy(SeriesView<LT, String> series) {}
+
+  Iterable<LT> get labels => _labels;
+
+  Numeric1DView<double> get data => _data.view;
+
+  SeriesByPosition<LT, double> get byPos =>
+      _pos ??= new SeriesByPosition<LT, double>(this);
+
+  DoubleSeriesView<LT> toView() =>
+      _view ??= new DoubleSeriesView<LT>._(_labels, _data, () => name, _mapper);
+
 /*
-class DoubleSeries<IT> extends Object
-    with SeriesMixin<IT, double>, NumericSeries<IT, double>
-    implements Series<IT, double> {
   final List<IT> _labels;
 
   final Float64List _data;
@@ -704,87 +765,9 @@ class DoubleSeries<IT> extends Object
 
     return ret;
   }
-
-  DoubleSeries<IT> log({double fillValue = 1.0, bool self: true}) {
-    if (self) {
-      for (int i = 0; i < length; i++) {
-        if (_data[i] == null && fillValue != null) {
-          _data[i] = math.log(fillValue);
-        } else {
-          _data[i] = math.log(_data[i]);
-        }
-      }
-      return this;
-    } else {
-      throw new UnimplementedError();
-    }
   }
-
-  DoubleSeries<IT> logN(num n, {double fillValue = 1.0, bool self: true}) {
-    if (self) {
-      for (int i = 0; i < length; i++) {
-        if (_data[i] == null && fillValue != null) {
-          _data[i] = math.log(fillValue) / math.log(n);
-        } else {
-          _data[i] = math.log(_data[i]) / math.log(n);
-        }
-      }
-      return this;
-    } else {
-      throw new UnimplementedError();
-    }
-  }
-
-  DoubleSeries<IT> log10({double fillValue = 1.0, bool self: true}) {
-    if (self) {
-      for (int i = 0; i < length; i++) {
-        if (_data[i] == null && fillValue != null) {
-          _data[i] = math.log(fillValue) / math.LN10;
-        } else {
-          _data[i] = math.log(_data[i]) / math.LN10;
-        }
-      }
-      return this;
-    } else {
-      throw new UnimplementedError();
-    }
-  }
-
-  IntSeries<IT> toInt() {
-    return new IntSeries<IT>(_data.map((double v) => v.toInt()).toList(),
-        name: name, labels: _labels.toList());
-  }
+  */
 }
 
-class DoubleSeriesView<IT> extends DoubleSeries<IT>
-    implements SeriesView<IT, double> {
-  DoubleSeriesView(DoubleSeries<IT> series)
-      : super._(series._data, series._labels, null, series._mapper) {
-    _nameGetter = () => series.name;
-  }
-
-  Function _nameGetter;
-
-  dynamic get name => _nameGetter();
-
-  set name(dynamic value) {
-    throw new Exception('Cannot change name of SeriesView!');
-  }
-
-  @override
-  operator []=(IT index, double value) {
-    if (!_mapper.containsKey(index)) {
-      throw new Exception('Cannot add new elements to SeriesView!');
-    }
-
-    _mapper[index].forEach((int position) {
-      _data[position] = value;
-    });
-  }
-
-  DoubleSeries<IT> toSeries() =>
-      new DoubleSeries(_data, name: name, labels: _labels);
-
-  DoubleSeriesView<IT> toView() => this;
-}
+/*
 */

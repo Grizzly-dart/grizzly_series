@@ -176,6 +176,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     _mapper.addAll(mapper);
   }
 
+  /*
   SplayTreeMap<LT, List<int>> cloneMapper() {
     final ret = new SplayTreeMap<LT, List<int>>();
 
@@ -185,6 +186,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
     return ret;
   }
+  */
 
   @override
   void mask(IterView<bool> mask) {

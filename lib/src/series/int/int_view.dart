@@ -57,27 +57,3 @@ class IntSeriesView<LT> extends Object
   SeriesViewByPosition<LT, int> get byPos =>
       _pos ??= new SeriesViewByPosition<LT, int>(this);
 }
-
-abstract class IntSeriesViewMixin<LT> implements SeriesView<LT, int> {
-  IntSeries<LT> toSeries() =>
-      new IntSeries(data, name: name, labels: labels);
-
-  IntSeriesView<IIT> makeView<IIT>(
-      /* Iterable<int> | IterView<int> */ data,
-      {dynamic name,
-        List<IIT> labels}) =>
-      new IntSeriesView(data, name: name, labels: labels);
-
-  IntSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-      {dynamic name, List<IIT> labels}) =>
-      new IntSeries<IIT>(data, name: name, labels: labels);
-
-  @override
-  Int1D makeVTArraySized(int size) => new Int1D.sized(size);
-
-  @override
-  Int1D makeVTArray(Iterable<int> data) => new Int1D(data);
-
-  @override
-  int compareVT(int a, int b) => a.compareTo(b);
-}

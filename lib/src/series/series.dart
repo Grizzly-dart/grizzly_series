@@ -1,7 +1,5 @@
 library grizzly.series;
 
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:collection';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
@@ -15,10 +13,15 @@ part 'base/series_view_mixin.dart';
 part 'bool/bool.dart';
 part 'bool/bool_view.dart';
 
-part 'double.dart';
-part 'dynamic.dart';
 part 'int/int_series.dart';
 part 'int/int_view.dart';
+part 'int/int_view_mixin.dart';
+
+part 'double/double_series.dart';
+part 'double/double_view.dart';
+part 'double/double_view_mixin.dart';
+
+part 'dynamic.dart';
 part 'numeric.dart';
 part 'string/string_view.dart';
 part 'string/string_series.dart';

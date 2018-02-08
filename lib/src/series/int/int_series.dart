@@ -1,77 +1,67 @@
 part of grizzly.series;
 
-class IntSeries<IT> extends Object
-    with SeriesMixin<IT, int>, NumericSeries<IT, int>
-    implements Series<IT, int> {
-  /*
-  final List<IT> _labels;
+class IntSeries<LT> extends Object
+    with SeriesMixin<LT, int>, SeriesViewMixin<LT, int>, IntSeriesViewMixin<LT>
+    implements NumericSeries<LT, int> {
+  final List<LT> _labels;
 
-  final List<int> _data;
+  final Int1D _data;
 
-  final SplayTreeMap<IT, List<int>> _mapper;
+  final SplayTreeMap<LT, int> _mapper;
 
   dynamic name;
 
-  final UnmodifiableListView<IT> labels;
+  SeriesByPosition<LT, int> _pos;
 
-  final UnmodifiableListView<int> data;
+  IntSeriesView<LT> _view;
 
-  SeriesPositioned<IT, int> _pos;
+  IntSeries._(this._labels, this._data, this.name, this._mapper);
 
-  SeriesPositioned<IT, int> get pos => _pos;
+  IntSeries._build(this._labels, this._data, this.name)
+      : _mapper = labelsToMapper(_labels);
 
-  IntSeriesView<IT> _view;
-
-  IntSeriesView<IT> toView() {
-    if (_view == null) _view = new IntSeriesView<IT>(this);
-    return _view;
-  }
-
-  IntSeries._(this._data, this._labels, this.name, this._mapper)
-      : labels = new UnmodifiableListView(_labels),
-        data = new UnmodifiableListView(_data) {
-    _pos = new SeriesPositioned<IT, int>(this);
-  }
-
-  factory IntSeries(Iterable<int> data, {dynamic name, List<IT> labels}) {
-    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToMapper(madeIndices);
-
-    return new IntSeries._(data.toList(), madeIndices, name, mapper);
-  }
-
-  factory IntSeries.fromMap(Map<IT, List<int>> map, {dynamic name}) {
-    final List<IT> indices = [];
-    final data = new List<int>();
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (IT index in map.keys) {
-      mapper[index] = <int>[];
-      for (num val in map[index]) {
-        indices.add(index);
-        data.add(val);
-        mapper[index].add(data.length - 1);
-      }
+  factory IntSeries(/* Iterable<int> | IterView<int> */ data,
+      {dynamic name, Iterable<LT> labels}) {
+    Int1D d;
+    if (data is Iterable<int>) {
+      d = new Int1D(data);
+    } else if (data is IterView<int>) {
+      d = new Int1D.copy(data);
+    } else {
+      throw new UnsupportedError('Type not supported!');
     }
 
-    return new IntSeries._(data, indices, name, mapper);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new IntSeries._build(madeLabels, d, name);
   }
 
-  IntSeries<IIT> makeNew<IIT>(Iterable<int> data,
-      {dynamic name, List<IIT> labels}) {
-    return new IntSeries<IIT>(data, name: name, labels: labels);
-  }
+  factory IntSeries.fromMap(Map<LT, int> map, {dynamic name}) {
+    final labels = new List<LT>()..length = map.length;
+    final data = new Int1D.sized(map.length);
+    final mapper = new SplayTreeMap<LT, int>();
 
-  int sum({bool skipNull: true}) {
-    int ret = 0;
-    for (int i = 0; i < _data.length; i++) {
-      if (data[i] != null)
-        ret += data[i];
-      else if (!skipNull) return null;
+    for (int i = 0; i < map.length; i++) {
+      LT label = map.keys.elementAt(i);
+      labels[i] = label;
+      data[i] = map[label];
+      mapper[label] = i;
     }
-    return ret;
+    return new IntSeries._(labels, data, name, mapper);
   }
 
+  factory IntSeries.copy(SeriesView<LT, String> series) {}
+
+  Iterable<LT> get labels => _labels;
+
+  Numeric1DView<int> get data => _data.view;
+
+  SeriesByPosition<LT, int> get byPos =>
+      _pos ??= new SeriesByPosition<LT, int>(this);
+
+  IntSeriesView<LT> toView() =>
+      _view ??= new IntSeriesView<LT>._(_labels, _data, () => name, _mapper);
+
+/*
   void _selfAdd(IntSeries<IT> a, {int mfv, int ofv, bool strict: true}) {
     for (IT index in _mapper.keys) {
       if (a._mapper.containsKey(index)) {
@@ -764,26 +754,6 @@ class IntSeries<IT> extends Object
     }
 
     return ret;
-  }
-
-  DoubleSeries<IT> log({int fillValue = 1, bool self: false}) {
-    if (self) throw new UnsupportedError('Log results are double!');
-    return toDouble().log(fillValue: fillValue.toDouble(), self: true);
-  }
-
-  DoubleSeries<IT> logN(num n, {int fillValue = 1, bool self: false}) {
-    if (self) throw new UnsupportedError('Log results are double!');
-    return toDouble().logN(n, fillValue: fillValue.toDouble(), self: true);
-  }
-
-  DoubleSeries<IT> log10({int fillValue = 1, bool self: false}) {
-    if (self) throw new UnsupportedError('Log results are double!');
-    return toDouble().log10(fillValue: fillValue.toDouble(), self: true);
-  }
-
-  DoubleSeries<IT> toDouble() {
-    return new DoubleSeries<IT>(_data.map((int v) => v.toDouble()).toList(),
-        name: name, labels: _labels.toList());
   }
   */
 }

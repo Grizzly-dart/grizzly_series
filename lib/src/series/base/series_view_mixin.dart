@@ -87,12 +87,12 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       bool descending: false,
       bool dropNull: false,
       dynamic name}) {
-    final groups = new Map<VT, List<int>>();
+    final groups = new Map<VT, int>();
 
     for (int i = 0; i < length; i++) {
       final VT v = data[i];
-      if (!groups.containsKey(v)) groups[v] = <int>[0];
-      groups[v][0]++;
+      if (!groups.containsKey(v)) groups[v] = 0;
+      groups[v]++;
     }
 
     // Drop null
