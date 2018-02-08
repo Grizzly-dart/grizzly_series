@@ -21,9 +21,7 @@ class StringSeries<LT> extends Object
   StringSeries._(this._labels, this._data, this.name, this._mapper);
 
   StringSeries._build(this._labels, this._data, this.name)
-      : _mapper = labelsToMapper(_labels) {
-    ;
-  }
+      : _mapper = labelsToMapper(_labels);
 
   factory StringSeries(/* Iterable<String> | IterView<String> */ data,
       {dynamic name, Iterable<LT> labels}) {
@@ -63,10 +61,10 @@ class StringSeries<LT> extends Object
   SeriesByPosition<LT, String> get byPos =>
       _pos ??= new SeriesByPosition<LT, String>(this);
 
-  @override
-  int compareVT(String a, String b) => a.compareTo(b);
+  StringSeriesView<LT> toView() =>
+      _view ??= new StringSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
-  /* TODO
+/* TODO
   IntSeries<LT> toInt({int radix, int fillVal}) {
     return new IntSeries<LT>(
         _data
@@ -84,7 +82,4 @@ class StringSeries<LT> extends Object
         labels: _labels.toList());
   }
   */
-
-  StringSeriesView<LT> toView() =>
-      _view ??= new StringSeriesView<LT>._(_labels, _data, () => name, _mapper);
 }

@@ -1,77 +1,70 @@
 part of grizzly.series;
 
-/*
 class BoolSeries<LT> extends Object
-    with SeriesMixin<LT, bool>, SeriesViewMixin<LT, bool>
+    with
+        SeriesViewMixin<LT, bool>,
+        SeriesMixin<LT, bool>,
+        BoolSeriesViewMixin<LT>
     implements Series<LT, bool> {
   final List<LT> _labels;
 
-  final List<bool> _data;
+  final Bool1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
   dynamic name;
 
-  final UnmodifiableListView<LT> labels;
-
-  final UnmodifiableListView<bool> data;
-
   SeriesByPosition<LT, bool> _pos;
-
-  SeriesByPosition<LT, bool> get byPos => _pos;
 
   BoolSeriesView<LT> _view;
 
-  BoolSeriesView<LT> get toView {
-    if (_view == null) _view = new BoolSeriesView<LT>.from(this);
-    return _view;
-  }
+  BoolSeries._(this._labels, this._data, this.name, this._mapper);
 
-  BoolSeries._(this._data, this._labels, this.name, this._mapper)
-      : labels = new UnmodifiableListView(_labels),
-        data = new UnmodifiableListView(_data) {
-    _pos = new SeriesByPosition<LT, bool>(this);
-  }
+  BoolSeries._build(this._labels, this._data, this.name)
+      : _mapper = labelsToMapper(_labels);
 
-  factory BoolSeries(Iterable<bool> data, {dynamic name, List<LT> labels}) {
-    final List<LT> madeIndices = makeLabels<LT>(data.length, labels, LT);
-    final mapper = labelsToMapper(madeIndices);
+  factory BoolSeries(/* Iterable<String> | IterView<String> */ data,
+      {dynamic name, Iterable<LT> labels}) {
+    Bool1D d;
+    if (data is Iterable<bool>) {
+      d = new Bool1D(data);
+    } else if (data is IterView<bool>) {
+      d = new Bool1D.copy(data);
+    } else {
+      throw new UnsupportedError('Type not supported!');
+    }
 
-    return new BoolSeries._(data.toList(), madeIndices, name, mapper);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new BoolSeries._build(madeLabels, d, name);
   }
 
   factory BoolSeries.fromMap(Map<LT, bool> map, {dynamic name}) {
-    final List<LT> labels = [];
-    final List<bool> data = [];
+    final labels = new List<LT>()..length = map.length;
+    final data = new Bool1D.sized(map.length);
     final mapper = new SplayTreeMap<LT, int>();
 
-    for (LT label in map.keys) {
-      labels.add(label);
-      data.add(map[label]);
-      mapper[label] = data.length - 1;
+    for (int i = 0; i < map.length; i++) {
+      LT label = map.keys.elementAt(i);
+      labels[i] = label;
+      data[i] = map[label];
+      mapper[label] = i;
     }
-
-    return new BoolSeries._(data.toList(), labels, name, mapper);
+    return new BoolSeries._(labels, data, name, mapper);
   }
 
-  bool get max {
-    for (bool v in _data) {
-      if (v == null) continue;
-      if (v) return true;
-    }
+  factory BoolSeries.copy(SeriesView<LT, bool> series) {}
 
-    return false;
-  }
+  Iterable<LT> get labels => _labels;
 
-  bool get min {
-    for (bool v in _data) {
-      if (v == null) continue;
-      if (!v) return false;
-    }
+  BoolArrayView get data => _data.view;
 
-    return true;
-  }
+  SeriesByPosition<LT, bool> get byPos =>
+      _pos ??= new SeriesByPosition<LT, bool>(this);
 
+  BoolSeriesView<LT> toView() =>
+      _view ??= new BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);
+
+/* TODO
   IntSeries<LT> toInt({int radix, int fillVal}) {
     return new IntSeries<LT>(_data.map((bool v) => v ? 1 : 0).toList(),
         name: name, labels: _labels.toList());
@@ -81,16 +74,5 @@ class BoolSeries<LT> extends Object
     return new DoubleSeries<LT>(_data.map((bool v) => v ? 1.0 : 0.0).toList(),
         name: name, labels: _labels.toList());
   }
-
-  BoolSeries<LT> get toSeries =>
-      new BoolSeries(_data, name: name, labels: _labels);
-
-  BoolSeriesView<ILT> makeView<ILT>(Iterable<bool> data,
-          {dynamic name, List<ILT> labels}) =>
-      new BoolSeriesView<ILT>(data, name: name, labels: labels);
-
-  BoolSeries<IIT> make<IIT>(Iterable<bool> data,
-          {dynamic name, List<IIT> labels}) =>
-      new BoolSeries<IIT>(data, name: name, labels: labels);
+  */
 }
-*/

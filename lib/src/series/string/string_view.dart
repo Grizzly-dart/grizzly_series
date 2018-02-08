@@ -3,7 +3,7 @@ part of grizzly.series;
 class StringSeriesView<LT> extends Object
     with SeriesViewMixin<LT, String>, StringSeriesViewMixin<LT>
     implements SeriesView<LT, String> {
-  dynamic _name;
+  final _name;
 
   final Iterable<LT> labels;
 
