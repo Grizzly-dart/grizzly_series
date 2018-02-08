@@ -55,6 +55,30 @@ class StringSeriesView<LT> extends Object
 
   SeriesViewByPosition<LT, String> get byPos =>
       _pos ??= new SeriesViewByPosition<LT, String>(this);
+}
+
+abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
+  StringSeries<LT> toSeries() =>
+      new StringSeries(data, name: name, labels: labels);
+
+  StringSeriesView<IIT> makeView<IIT>(
+          /* Iterable<String> | IterView<String> */ data,
+          {dynamic name,
+          List<IIT> labels}) =>
+      new StringSeriesView(data, name: name, labels: labels);
+
+  StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
+          {dynamic name, List<IIT> labels}) =>
+      new StringSeries<IIT>(data, name: name, labels: labels);
+
+  @override
+  String1D makeVTArraySized(int size) => new String1D.sized(size);
+
+  @override
+  String1D makeVTArray(Iterable<String> data) => new String1D(data);
+
+  @override
+  int compareVT(String a, String b) => a.compareTo(b);
 
   String max() {
     String ret;
@@ -81,28 +105,4 @@ class StringSeriesView<LT> extends Object
 
     return ret;
   }
-}
-
-abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
-  StringSeries<LT> toSeries() =>
-      new StringSeries(data, name: name, labels: labels);
-
-  StringSeriesView<IIT> makeView<IIT>(
-          /* Iterable<String> | IterView<String> */ data,
-          {dynamic name,
-          List<IIT> labels}) =>
-      new StringSeriesView(data, name: name, labels: labels);
-
-  StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-          {dynamic name, List<IIT> labels}) =>
-      new StringSeries<IIT>(data, name: name, labels: labels);
-
-  @override
-  String1D makeVTArraySized(int size) => new String1D.sized(size);
-
-  @override
-  String1D makeVTArray(Iterable<String> data) => new String1D(data);
-
-  @override
-  int compareVT(String a, String b) => a.compareTo(b);
 }

@@ -17,7 +17,8 @@ part 'bool/bool_view.dart';
 
 part 'double.dart';
 part 'dynamic.dart';
-part 'int.dart';
+part 'int/int_series.dart';
+part 'int/int_view.dart';
 part 'numeric.dart';
 part 'string/string_view.dart';
 part 'string/string_series.dart';
