@@ -6,6 +6,8 @@ import 'dart:collection';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
+import 'package:collection/collection.dart';
+import 'package:grizzly_array/grizzly_array.dart';
 
 part 'base/series_mixin.dart';
 part 'base/series_view_mixin.dart';
@@ -17,5 +19,6 @@ part 'double.dart';
 part 'dynamic.dart';
 part 'int.dart';
 part 'numeric.dart';
-part 'string.dart';
+part 'string/string_view.dart';
+part 'string/string_series.dart';
 

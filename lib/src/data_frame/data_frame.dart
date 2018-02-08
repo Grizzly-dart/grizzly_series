@@ -35,11 +35,12 @@ class DataFrame<IT, CT> implements DataFrameBase<IT, CT> {
     _byLabel = new FrameByLabel<IT, CT>(this);
   }
 
-  factory DataFrame(Map<CT, List> data, {List<IT> labels}) {
+  factory DataFrame(Map<CT, /* Iter<VT> | Iterable<VT> */ dynamic> data,
+      {List<IT> labels}) {
     int len;
 
     if (data.length > 0) {
-      for (List v in data.values) {
+      for (final v in data.values) {
         if (v == null) continue;
 
         final int l = v.length;

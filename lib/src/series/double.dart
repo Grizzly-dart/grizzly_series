@@ -1,5 +1,6 @@
 part of grizzly.series;
 
+/*
 class DoubleSeries<IT> extends Object
     with SeriesMixin<IT, double>, NumericSeries<IT, double>
     implements Series<IT, double> {
@@ -786,3 +787,4 @@ class DoubleSeriesView<IT> extends DoubleSeries<IT>
 
   DoubleSeriesView<IT> toView() => this;
 }
+*/

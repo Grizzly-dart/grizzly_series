@@ -1,33 +1,27 @@
 part of grizzly.series;
 
 abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
-  List<LT> get _labels;
-
-  List<VT> get _data;
-
   SplayTreeMap<LT, int> get _mapper;
 
-  int get length => _data.length;
+  int get length => data.length;
 
-  bool containsIndex(LT label) => _mapper.containsKey(label);
+  bool containsLabel(LT label) => _mapper.containsKey(label);
 
   VT operator [](LT label) {
-    if (!_mapper.containsKey(label)) {
-      throw new Exception("Index named $label not found!");
-    }
-    return _data[_mapper[label]];
+    if (!_mapper.containsKey(label)) throw new LabelNotFound(label);
+    return data[_mapper[label]];
   }
 
   VT get(LT label) => this[label];
 
   VT getByPos(int position) {
     if (position >= length) throw new RangeError.range(position, 0, length);
-    return _data[position];
+    return data[position];
   }
 
   LT labelAt(int position) {
     if (position >= length) throw new RangeError.range(position, 0, length);
-    return _labels[position];
+    return labels.elementAt(position);
   }
 
   @override
@@ -37,7 +31,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
 
   Pair<LT, VT> pairByPos(int position) {
     if (position >= length) throw new RangeError.range(position, 0, length);
-    return pair<LT, VT>(_labels[position], _data[position]);
+    return pair<LT, VT>(labels.elementAt(position), data[position]);
   }
 
   Iterable<Pair<LT, VT>> get enumerate =>
@@ -63,7 +57,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     final LinkedHashMap<VT, int> map = new LinkedHashMap<VT, int>();
     int max = 0;
 
-    for (VT v in _data) {
+    for (VT v in data.asIterable) {
       if (!map.containsKey(v)) map[v] = 0;
       map[v]++;
       if (map[v] > max) max = map[v];
@@ -83,36 +77,34 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   }
 
   StringSeries<LT> toStringSeries() {
-    return new StringSeries<LT>(_data.map((v) => v.toString()).toList(),
-        name: name, labels: _labels.toList());
+    return new StringSeries<LT>(data.toStringArray(),
+        name: name, labels: labels);
   }
 
   @override
   IntSeries<VT> valueCounts(
       {bool sortByValue: false,
-      bool ascending: false,
+      bool descending: false,
       bool dropNull: false,
       dynamic name}) {
     final groups = new Map<VT, List<int>>();
 
     for (int i = 0; i < length; i++) {
-      final VT v = _data[i];
+      final VT v = data[i];
       if (!groups.containsKey(v)) groups[v] = <int>[0];
       groups[v][0]++;
     }
 
     // Drop null
-    if (dropNull) {
-      groups.remove(null);
-    }
+    if (dropNull) groups.remove(null);
 
     final ret = new IntSeries<VT>.fromMap(groups, name: name ?? this.name);
 
     // Sort
     if (sortByValue) {
-      ret.sortByIndex(ascending: ascending, inplace: true);
+      ret.sortByLabel(descending: descending);
     } else {
-      ret.sortByValue(ascending: ascending, inplace: true);
+      ret.sortByValue(descending: descending);
     }
 
     return ret;
@@ -121,4 +113,18 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   DataFrame<LT, dynamic> toDataFrame<CT>({CT column}) {
     return new DataFrame<LT, CT>({column ?? name: data}, labels: labels);
   }
+
+  bool labelsMatch(
+      final /* IterView<LT> | Series<LT, dynamic> | Iterable<LT> */ labels) {
+    if (labels is IterView<LT>) {
+      return _iterEquality.equals(this.labels, labels.asIterable);
+    } else if (labels is Series<LT, dynamic>) {
+      return _iterEquality.equals(this.labels, labels.labels);
+    } else if (labels is Iterable<LT>) {
+      return _iterEquality.equals(this.labels, labels);
+    }
+    throw new UnsupportedError('Type not supported!');
+  }
 }
+
+const IterableEquality _iterEquality = const IterableEquality();

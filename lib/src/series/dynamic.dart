@@ -1,5 +1,6 @@
 part of grizzly.series;
 
+/*
 class DynamicSeries<IT> extends Object
     with SeriesMixin<IT, dynamic>
     implements Series<IT, dynamic> {
@@ -141,3 +142,4 @@ class DynamicSeriesView<IT> extends DynamicSeries<IT>
 
   DynamicSeriesView<IT> toView() => this;
 }
+*/

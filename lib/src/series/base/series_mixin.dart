@@ -3,7 +3,7 @@ part of grizzly.series;
 abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   List<LT> get _labels;
 
-  List<VT> get _data;
+  Array<VT> get _data;
 
   SplayTreeMap<LT, int> get _mapper;
 
@@ -14,7 +14,6 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       _mapper[label] = _data.length - 1;
       return;
     }
-
     _data[_mapper[label]] = value;
   }
 
@@ -103,37 +102,24 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  void assign(SeriesView<LT, VT> other) {
-    // Check
-    for (LT key in _mapper.keys) {
-      if (!other.containsIndex(key)) continue;
-
-      final int sourcePos = _mapper[key];
-      final int destPos = other._mapper[key];
-
-      if (sourcePos.length != destPos.length) {
-        if (destPos.length != 1) {
-          throw new Exception('Mismatch of value lengths by label!');
-        }
+  void assign(SeriesView<LT, VT> other, {bool addNew: true}) {
+    for (LT label in other.labels) {
+      if (containsLabel(label)) {
+        final int sourcePos = _mapper[label];
+        _data[sourcePos] = other[label];
+      } else {
+        if (addNew) set(label, other[label]);
       }
     }
+  }
 
-    // Assign
-    for (LT key in _mapper.keys) {
-      if (!other.containsIndex(key)) continue;
-
-      final List<int> sourcePos = _mapper[key];
-      final List<int> destPos = other._mapper[key];
-
-      if (sourcePos.length == destPos.length) {
-        for (int i = 0; i < sourcePos.length; i++) {
-          _data[sourcePos[i]] = other.data[destPos[i]];
-        }
+  void assignMap(Map<LT, VT> other, {bool addNew: true}) {
+    for (LT label in other.keys) {
+      if (containsLabel(label)) {
+        final int sourcePos = _mapper[label];
+        _data[sourcePos] = other[label];
       } else {
-        final VT destData = other.data[destPos.first];
-        for (int pos in sourcePos) {
-          _data[pos] = destData;
-        }
+        if (addNew) set(label, other[label]);
       }
     }
   }
@@ -144,98 +130,50 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  Series<LT, VT> sortByValue(
-      {bool ascending: true, bool inplace: false, name}) {
-    if (length == 0) {
-      if (inplace)
-        return this;
-      else
-        return make([], labels: [], name: name ?? this.name);
-    }
-
-    final items = <SeriesValueSortItem<LT, VT>>[];
-
+  void sortByValue({bool descending: false}) {
+    final items = new List<Pair<LT, VT>>(length);
     for (int i = 0; i < length; i++) {
-      items.add(new SeriesValueSortItem(_labels[i], _data[i]));
+      items[i] = new Pair<LT, VT>(labels.elementAt(i), data[i]);
     }
 
-    if (ascending) {
-      items.sort(SeriesValueSortItem.compare);
+    if (!descending) {
+      items.sort(
+          (Pair<LT, VT> a, Pair<LT, VT> b) => compareVT(a.value, b.value));
     } else {
-      items.sort((a, b) => SeriesValueSortItem.compare(b, a));
+      items.sort(
+          (Pair<LT, VT> a, Pair<LT, VT> b) => compareVT(b.value, a.value));
     }
 
-    if (inplace) {
-      final idx = <LT>[];
-      final List<VT> d = <VT>[];
-      final mapper = new SplayTreeMap<LT, List<int>>();
-
-      for (SeriesValueSortItem i in items) {
-        idx.add(i.label);
-        d.add(i.value);
-        if (!mapper.containsKey(i.label)) mapper[i.label] = <int>[];
-        mapper[i.label].add(idx.length - 1);
-      }
-
-      _labels.replaceRange(0, _labels.length, idx);
-      _labels.replaceRange(0, _labels.length, idx);
-      _data.replaceRange(0, _data.length, d);
-      _mapper.clear();
-      _mapper.addAll(mapper);
-
-      return this;
-    } else {
-      final idx = <LT>[];
-      final List<VT> d = <VT>[];
-
-      for (SeriesValueSortItem i in items) {
-        idx.add(i.label);
-        d.add(i.value);
-      }
-
-      return make(d, name: name ?? this.name, labels: idx);
+    for (int i = 0; i < items.length; i++) {
+      Pair<LT, VT> item = items[i];
+      _labels[i] = item.key;
+      _data[i] = item.value;
+      _mapper[item.key] = i;
     }
   }
 
-  Series<LT, VT> sortByIndex(
-      {bool ascending: true, bool inplace: false, name}) {
-    List<LT> idxSorted = _mapper.keys.toList();
-
-    sortList(idxSorted, ascending);
-
-    if (inplace) {
-      final idx = <LT>[];
-      final List<VT> d = <VT>[];
-      final mapper = new SplayTreeMap<LT, List<int>>();
-
-      for (LT i in idxSorted) {
-        mapper[i] = <int>[];
-        for (int pos in _mapper[i]) {
-          idx.add(i);
-          d.add(_data[pos]);
-          mapper[i].add(idx.length - 1);
-        }
-      }
-
-      _labels.replaceRange(0, _labels.length, idx);
-      _data.replaceRange(0, _data.length, d);
-      _mapper.clear();
-      _mapper.addAll(mapper);
-
-      return this;
-    } else {
-      final idx = <LT>[];
-      final List<VT> d = <VT>[];
-
-      for (LT i in idxSorted) {
-        for (int pos in _mapper[i]) {
-          idx.add(i);
-          d.add(_data[pos]);
-        }
-      }
-
-      return make(d, name: name ?? this.name, labels: idx);
+  void sortByLabel({bool descending: false}) {
+    List<LT> labelsSorted = _mapper.keys.toList();
+    if (descending) {
+      labelsSorted = labelsSorted.reversed.toList();
     }
+
+    final labs = new List<LT>(length);
+    final d = makeVTArraySized(length);
+    final mapper = new SplayTreeMap<LT, int>();
+
+    for (int c = 0; c < length; c++) {
+      LT lab = labelsSorted[c];
+
+      labs[c] = lab;
+      d[c] = this[lab];
+      mapper[lab] = c;
+    }
+
+    _labels.replaceRange(0, _labels.length, labs);
+    _data.assign(d);
+    _mapper.clear();
+    _mapper.addAll(mapper);
   }
 
   SplayTreeMap<LT, List<int>> cloneMapper() {
@@ -246,6 +184,19 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
 
     return ret;
+  }
+
+  @override
+  void mask(IterView<bool> mask) {
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
+
+    final pos = <int>[];
+    for (int i = 0; i < length; i++) {
+      if (!mask[i]) pos.add(i);
+    }
+    removeMany(pos);
   }
 
   String toString() {

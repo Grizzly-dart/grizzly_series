@@ -1,5 +1,6 @@
 part of grizzly.series;
 
+/*
 class BoolSeries<LT> extends Object
     with SeriesMixin<LT, bool>, SeriesViewMixin<LT, bool>
     implements Series<LT, bool> {
@@ -92,3 +93,4 @@ class BoolSeries<LT> extends Object
           {dynamic name, List<IIT> labels}) =>
       new BoolSeries<IIT>(data, name: name, labels: labels);
 }
+*/

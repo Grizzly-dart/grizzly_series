@@ -1,5 +1,6 @@
 part of grizzly.series;
 
+/* TODO
 abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   List<IT> get _labels;
 
@@ -207,6 +208,7 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   }
   */
 }
+*/
 
 /* TODO
 abstract class NumericSeriesGroupBy<IT, VT extends num> {

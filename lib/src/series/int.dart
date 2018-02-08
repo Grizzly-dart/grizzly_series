@@ -3,6 +3,7 @@ part of grizzly.series;
 class IntSeries<IT> extends Object
     with SeriesMixin<IT, int>, NumericSeries<IT, int>
     implements Series<IT, int> {
+  /*
   final List<IT> _labels;
 
   final List<int> _data;
@@ -784,8 +785,10 @@ class IntSeries<IT> extends Object
     return new DoubleSeries<IT>(_data.map((int v) => v.toDouble()).toList(),
         name: name, labels: _labels.toList());
   }
+  */
 }
 
+/*
 class IntSeriesView<IT> extends IntSeries<IT>
     with SeriesViewBase<IT, int>
     implements SeriesView<IT, int> {
@@ -854,3 +857,4 @@ abstract class SeriesViewBase<IT, VT> implements SeriesView<IT, VT> {
     return sortByIndex(ascending: ascending, name: name);
   }
 }
+*/
