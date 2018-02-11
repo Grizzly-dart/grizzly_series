@@ -3,7 +3,6 @@ part of grizzly.series;
 class IntSeriesView<LT> extends Object
     with SeriesViewMixin<LT, int>, IntSeriesViewMixin<LT>
     implements NumericSeriesView<LT, int> {
-
   final _name;
 
   final Iterable<LT> labels;

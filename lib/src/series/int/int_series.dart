@@ -35,7 +35,9 @@ class IntSeries<LT> extends Object
     return new IntSeries._build(madeLabels, d, name);
   }
 
-  factory IntSeries.fromMap(Map<LT, int> map, {dynamic name}) {
+  factory IntSeries.fromMap(Map<LT, int> map,
+      {dynamic name, Iterable<LT> labels}) {
+    // TODO take labels into account
     final labels = new List<LT>()..length = map.length;
     final data = new Int1D.sized(map.length);
     final mapper = new SplayTreeMap<LT, int>();
@@ -49,7 +51,10 @@ class IntSeries<LT> extends Object
     return new IntSeries._(labels, data, name, mapper);
   }
 
-  factory IntSeries.copy(SeriesView<LT, String> series) {}
+  factory IntSeries.copy(SeriesView<LT, int> series,
+      {name, Iterable<LT> labels}) {
+    // TODO
+  }
 
   Iterable<LT> get labels => _labels;
 

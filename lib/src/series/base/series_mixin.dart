@@ -102,13 +102,23 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  void assign(SeriesView<LT, VT> other, {bool addNew: true}) {
-    for (LT label in other.labels) {
-      if (containsLabel(label)) {
-        final int sourcePos = _mapper[label];
-        _data[sourcePos] = other[label];
-      } else {
-        if (addNew) set(label, other[label]);
+  void assign(/* Series<LT, VT> | IterView<VT> */ other, {bool addNew: true}) {
+    if (other is Series<LT, VT>) {
+      for (LT label in other.labels) {
+        if (containsLabel(label)) {
+          final int sourcePos = _mapper[label];
+          _data[sourcePos] = other[label];
+        } else {
+          if (addNew) set(label, other[label]);
+        }
+      }
+      return;
+    } else if (other is IterView<VT>) {
+      if (length != other.length)
+        throw lengthMismatch(
+            expected: length, found: other.length, subject: 'other');
+      for (int i = 0; i < length; i++) {
+        _data[i] = other[i];
       }
     }
   }

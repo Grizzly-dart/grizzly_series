@@ -1,16 +1,18 @@
 part of grizzly.series;
 
-abstract class DoubleSeriesViewMixin<LT> implements NumericSeriesView<LT, double> {
-  DoubleSeries<LT> toSeries() => new DoubleSeries(data, name: name, labels: labels);
+abstract class DoubleSeriesViewMixin<LT>
+    implements NumericSeriesView<LT, double> {
+  DoubleSeries<LT> toSeries() =>
+      new DoubleSeries(data, name: name, labels: labels);
 
   DoubleSeriesView<IIT> makeView<IIT>(
-      /* Iterable<int> | IterView<int> */ data,
-      {dynamic name,
-        List<IIT> labels}) =>
+          /* Iterable<int> | IterView<int> */ data,
+          {dynamic name,
+          List<IIT> labels}) =>
       new DoubleSeriesView(data, name: name, labels: labels);
 
   DoubleSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-      {dynamic name, List<IIT> labels}) =>
+          {dynamic name, List<IIT> labels}) =>
       new DoubleSeries<IIT>(data, name: name, labels: labels);
 
   @override

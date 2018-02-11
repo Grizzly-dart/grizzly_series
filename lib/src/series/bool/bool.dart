@@ -38,7 +38,9 @@ class BoolSeries<LT> extends Object
     return new BoolSeries._build(madeLabels, d, name);
   }
 
-  factory BoolSeries.fromMap(Map<LT, bool> map, {dynamic name}) {
+  factory BoolSeries.fromMap(Map<LT, bool> map,
+      {dynamic name, Iterable<LT> labels}) {
+    // TODO take labels into account
     final labels = new List<LT>()..length = map.length;
     final data = new Bool1D.sized(map.length);
     final mapper = new SplayTreeMap<LT, int>();
@@ -52,7 +54,10 @@ class BoolSeries<LT> extends Object
     return new BoolSeries._(labels, data, name, mapper);
   }
 
-  factory BoolSeries.copy(SeriesView<LT, bool> series) {}
+  factory BoolSeries.copy(SeriesView<LT, bool> series,
+      {name, Iterable<LT> labels}) {
+    // TODO
+  }
 
   Iterable<LT> get labels => _labels;
 
