@@ -1,26 +1,27 @@
 part of grizzly.series;
 
-class BoolSeries<LT> extends Object
+class BoolSeriesFix<LT> extends Object
     with
         SeriesViewMixin<LT, bool>,
         SeriesFixMixin<LT, bool>,
-        SeriesMixin<LT, bool>,
         BoolSeriesViewMixin<LT>
-    implements Series<LT, bool> {
+    implements SeriesFix<LT, bool> {
   final List<LT> _labels;
 
   final Bool1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  BoolSeries._(this._labels, this._data, this.name, this._mapper);
+  BoolSeriesView<LT> _view;
 
-  BoolSeries._build(this._labels, this._data, this.name)
+  BoolSeriesFix._(this._labels, this._data, this._name, this._mapper);
+
+  BoolSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory BoolSeries(/* Iterable<bool> | IterView<bool> */ data,
+  factory BoolSeriesFix(/* Iterable<bool> | IterView<bool> */ data,
       {dynamic name, Iterable<LT> labels}) {
     Bool1D d;
     if (data is Iterable<bool>) {
@@ -32,10 +33,10 @@ class BoolSeries<LT> extends Object
     }
 
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new BoolSeries._build(madeLabels, d, name);
+    return new BoolSeriesFix._build(madeLabels, d, name);
   }
 
-  factory BoolSeries.fromMap(Map<LT, bool> map,
+  factory BoolSeriesFix.fromMap(Map<LT, bool> map,
       {dynamic name, Iterable<LT> labels}) {
     // TODO take labels into account
     final labels = new List<LT>()..length = map.length;
@@ -48,10 +49,10 @@ class BoolSeries<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new BoolSeries._(labels, data, name, mapper);
+    return new BoolSeriesFix._(labels, data, name, mapper);
   }
 
-  factory BoolSeries.copy(SeriesView<LT, bool> series,
+  factory BoolSeriesFix.copy(SeriesView<LT, bool> series,
       {name, Iterable<LT> labels}) {
     // TODO
   }
@@ -60,15 +61,13 @@ class BoolSeries<LT> extends Object
 
   BoolArrayView get data => _data.view;
 
-  BoolSeriesView<LT> _view;
-
   BoolSeriesView<LT> get view =>
       _view ??= new BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
-  BoolSeriesFix<LT> _fixed;
+  @override
+  SeriesFix<LT, bool> get fixed => this;
 
-  BoolSeriesFix<LT> get fixed =>
-      _fixed ??= new BoolSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+  String get name => _name is Function ? _name() : _name;
 
 /* TODO
   IntSeries<LT> toInt({int radix, int fillVal}) {

@@ -7,8 +7,10 @@ import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
 
-class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
-  final List<CT> _columns;
+import 'package:text_table/text_table.dart';
+
+class DataFrame<LT> implements DataFrameBase<LT> {
+  final List<String> _columns;
 
   final List<LT> _labels;
 
@@ -19,7 +21,9 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
   DataFrame._(this._columns, this._labels, this._data, this._mapper);
 
   factory DataFrame(
-      Map<CT, /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
+      Map<
+              String,
+              /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
           data,
       {List<LT> labels}) {
     if (data.length == 0) {
@@ -75,26 +79,26 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
 
   Index2D get shape => new Index2D(numRows, numCols);
 
-  Iterable<CT> get columns => _columns;
+  Iterable<String> get columns => _columns;
 
   Iterable<LT> get labels => _labels;
 
-  SeriesFix<LT, dynamic> operator [](CT column) {
+  SeriesFix<LT, dynamic> operator [](String column) {
     final int colPos = _columns.indexOf(column);
     if (colPos == -1) throw new Exception("Column named $column not found!");
-    return _data[colPos].fix;
+    return _data[colPos].fixed;
   }
 
-  operator []=(CT column, /* SeriesView<LT, dynamic> | IterView */ value) =>
+  operator []=(String column, /* SeriesView<LT, dynamic> | IterView */ value) =>
       set(column, value);
 
-  Series<LT, VT> get<VT>(CT column) {
+  SeriesFix<LT, VT> get<VT>(String column) {
     final int colPos = _columns.indexOf(column);
     if (colPos == -1) throw new Exception("Column named $column not found!");
-    return _data[colPos].toView();
+    return _data[colPos].fixed;
   }
 
-  void set<VT>(CT column, /* SeriesView<LT, VT> | IterView<VT> */ value) {
+  void set<VT>(String column, /* SeriesView<LT, VT> | IterView<VT> */ value) {
     // TODO check if exists
     int columnPos = _columns.indexOf(column);
     if (columnPos == -1) {
@@ -104,49 +108,76 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
     _data[columnPos].assign(value);
   }
 
-  DynamicSeriesViewBase<CT> getByPos(int position) {
+  DynamicSeriesViewBase<String> getByPos(int position) {
     if (position >= _labels.length)
       throw new RangeError.range(position, 0, _labels.length);
     // TODO return proxy series
+    final d = <dynamic>[];
+    for (int i = 0; i < numCols; i++) {
+      d.add(_data[i].getByPos(position));
+    }
+    return new DynamicSeriesView(d, labels: columns, name: position.toString());
   }
 
-  void setByPos(int position, /* SeriesView<CT, dynamic> | IterView */ value) {
+  void setByPos(
+      int position,
+      /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> */ value) {
     if (position >= _labels.length)
       throw new RangeError.range(position, 0, _labels.length);
 
-    if (value.length != _columns.length)
-      throw new Exception('Value does not match number of columns!');
+    if (value is IterView) {
+      if (value.length != _columns.length)
+        throw new Exception('Value does not match number of columns!');
 
-    for (int i = 0; i < _columns.length; i++) {
-      _data[i].setByPos(position, value[i]);
+      for (int i = 0; i < _columns.length; i++) {
+        _data[i].setByPos(position, value[i]);
+      }
+    } else if (value is SeriesView<String, dynamic>) {
+      for (int i = 0; i < _columns.length; i++) {
+        var lab = _columns[i];
+        if (value.containsLabel(lab))
+          _data[i].setByPos(position, value.get(lab));
+        else
+          _data[i].setByPos(position, null);
+      }
+    } else if (value is Map<String, dynamic>) {
+      for (int i = 0; i < _columns.length; i++) {
+        var lab = _columns[i];
+        if (value.containsKey(lab))
+          _data[i].setByPos(position, value[lab]);
+        else
+          _data[i].setByPos(position, null);
+      }
+    } else {
+      throw new UnsupportedError('Type not supported!');
     }
   }
 
-  DynamicSeriesViewBase<CT> getByLabel(LT label) {
-    if (!_mapper.containsKey(label))
-      throw new Exception("Index named $label not found!");
+  DynamicSeriesViewBase<String> getByLabel(LT label) {
+    if (!_mapper.containsKey(label)) throw labelNotFound(label);
     return getByPos(_mapper[label]);
   }
 
-  void setByLabel(LT label, /* SeriesView<CT, dynamic> | IterView */ value) {
-    if (!_mapper.containsKey(label))
-      throw new Exception("Index named $label not found!");
+  void setByLabel(
+      LT label,
+      /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> */ value) {
+    if (!_mapper.containsKey(label)) throw labelNotFound(label);
     setByPos(_mapper[label], value);
   }
 
-  Pair<LT, DynamicSeriesFixBase<CT>> pairByPos(int position) {
+  Pair<LT, DynamicSeriesFixBase<String>> pairByPos(int position) {
     if (position >= numRows) throw new RangeError.range(position, 0, numRows);
-    return pair<LT, DynamicSeriesFixBase<CT>>(
+    return pair<LT, DynamicSeriesFixBase<String>>(
         _labels[position], getByPos(position));
   }
 
-  Pair<LT, DynamicSeriesViewBase<CT>> pairByLabel(LT label) =>
-      pair<LT, DynamicSeriesViewBase<CT>>(label, getByLabel(label));
+  Pair<LT, DynamicSeriesViewBase<String>> pairByLabel(LT label) =>
+      pair<LT, DynamicSeriesViewBase<String>>(label, getByLabel(label));
 
-  Iterable<Pair<LT, DynamicSeriesViewBase<CT>>> get enumerate =>
+  Iterable<Pair<LT, DynamicSeriesViewBase<String>>> get enumerate =>
       Ranger.indices(numRows).map(pairByPos);
 
-  Iterable<Pair<LT, DynamicSeriesViewBase<CT>>> enumerateSliced(int start,
+  Iterable<Pair<LT, DynamicSeriesViewBase<String>>> enumerateSliced(int start,
       [int end]) {
     if (end == null)
       end = numRows - 1;
@@ -164,28 +195,16 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
   }
 
   String toString() {
-    final sb = new StringBuffer();
-
-    //TODO format table
-    for (CT col in _columns) sb.write('$col\t');
-    sb.writeln();
-
+    final Table tab = table(columns.toList()..insert(0, ''));
     for (int i = 0; i < numRows; i++) {
-      sb.write(_labels[i]);
-      sb.write('\t');
-      for (Series s in _data) {
-        sb.write(s.byPos[i]);
-        sb.write('\t');
-      }
-      sb.writeln();
+      tab.row(getByPos(i).data.toList()..insert(0, labels.elementAt(i)));
     }
-
-    return sb.toString();
+    return tab.toString();
   }
 }
 
 /*
-  void addColumnFromList<VVT>(CT column, List<VVT> value,
+  void addColumnFromList<VVT>(String column, List<VVT> value,
       {SeriesMaker<LT, VVT> maker}) {
     if (value.length != _labels.length)
       throw new Exception('Value does not match length!');
@@ -212,8 +231,8 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
     _data[colPos] = series;
   }
 
-  DynamicSeries<CT> max({dynamic name, bool numericOnly: false}) {
-    final ret = new DynamicSeries<CT>([], name: name, labels: []);
+  DynamicSeries<String> max({dynamic name, bool numericOnly: false}) {
+    final ret = new DynamicSeries<String>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
       ret[_columns[i]] = _data[i].max();
@@ -222,8 +241,8 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
     return ret;
   }
 
-  DynamicSeries<CT> min({dynamic name, bool numericOnly: false}) {
-    final ret = new DynamicSeries<CT>([], name: name, labels: []);
+  DynamicSeries<String> min({dynamic name, bool numericOnly: false}) {
+    final ret = new DynamicSeries<String>([], name: name, labels: []);
 
     for (int i = 0; i < _columns.length; i++) {
       ret[_columns[i]] = _data[i].min();
@@ -233,8 +252,8 @@ class DataFrame<LT, CT> implements DataFrameBase<LT, CT> {
   }
 
   // TODO test
-  DataFrame<int, CT> mode() {
-    final ret = new DataFrame<int, CT>({});
+  DataFrame<int, String> mode() {
+    final ret = new DataFrame<int, String>({});
 
     for (int i = 0; i < _columns.length; i++) {
       ret[_columns[i]] = _data[i].mode();

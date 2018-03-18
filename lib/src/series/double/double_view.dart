@@ -47,12 +47,7 @@ class DoubleSeriesView<LT> extends Object
 
   factory DoubleSeriesView.copy(SeriesView<LT, String> series) {}
 
-  dynamic get name => _name is Function ? _name() : _name;
+  String get name => _name is Function ? _name() : _name;
 
-  DoubleSeriesView<LT> toView() => this;
-
-  SeriesViewByPosition<LT, double> _pos;
-
-  SeriesViewByPosition<LT, double> get byPos =>
-      _pos ??= new SeriesViewByPosition<LT, double>(this);
+  DoubleSeriesView<LT> get view => this;
 }

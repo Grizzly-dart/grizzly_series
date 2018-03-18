@@ -76,7 +76,7 @@ main() {
   print(ret.mode());
   */
 
-  final df = new DataFrame<String, String>({});
+  final df = new DataFrame<String>({});
   df['x'] = new DoubleSeries<String>(new List.generate(1000, (i) => log(i)),
       labels: new List.generate(1000, (i) => i.toString()));
   print(df);

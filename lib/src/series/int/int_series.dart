@@ -1,7 +1,11 @@
 part of grizzly.series;
 
 class IntSeries<LT> extends Object
-    with SeriesMixin<LT, int>, SeriesViewMixin<LT, int>, IntSeriesViewMixin<LT>
+    with
+        SeriesViewMixin<LT, int>,
+        SeriesFixMixin<LT, int>,
+        SeriesMixin<LT, int>,
+        IntSeriesViewMixin<LT>
     implements NumericSeries<LT, int> {
   final List<LT> _labels;
 
@@ -9,11 +13,7 @@ class IntSeries<LT> extends Object
 
   final SplayTreeMap<LT, int> _mapper;
 
-  dynamic name;
-
-  SeriesByPosition<LT, int> _pos;
-
-  IntSeriesView<LT> _view;
+  String name;
 
   IntSeries._(this._labels, this._data, this.name, this._mapper);
 
@@ -60,11 +60,16 @@ class IntSeries<LT> extends Object
 
   Numeric1DView<int> get data => _data.view;
 
-  SeriesByPosition<LT, int> get byPos =>
-      _pos ??= new SeriesByPosition<LT, int>(this);
+  IntSeriesView<LT> _view;
 
-  IntSeriesView<LT> toView() =>
+  IntSeriesView<LT> get view =>
       _view ??= new IntSeriesView<LT>._(_labels, _data, () => name, _mapper);
+
+  IntSeriesFix<LT> _fixed;
+
+  IntSeriesFix<LT> get fixed =>
+      _fixed ??= new IntSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+}
 
 /*
   void _selfAdd(IntSeries<IT> a, {int mfv, int ofv, bool strict: true}) {
@@ -761,4 +766,3 @@ class IntSeries<LT> extends Object
     return ret;
   }
   */
-}

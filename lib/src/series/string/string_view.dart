@@ -47,19 +47,14 @@ class StringSeriesView<LT> extends Object
 
   factory StringSeriesView.copy(SeriesView<LT, String> series) {}
 
-  dynamic get name => _name is Function ? _name() : _name;
+  String get name => _name is Function ? _name() : _name;
 
-  StringSeriesView<LT> toView() => this;
-
-  SeriesViewByPosition<LT, String> _pos;
-
-  SeriesViewByPosition<LT, String> get byPos =>
-      _pos ??= new SeriesViewByPosition<LT, String>(this);
+  StringSeriesView<LT> get view => this;
 }
 
 abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   StringSeries<LT> toSeries() =>
-      new StringSeries(data, name: name, labels: labels);
+      new StringSeries<LT>(data, name: name, labels: labels);
 
   StringSeriesView<IIT> makeView<IIT>(
           /* Iterable<String> | IterView<String> */ data,

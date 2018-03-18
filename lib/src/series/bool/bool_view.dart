@@ -47,15 +47,10 @@ class BoolSeriesView<LT> extends Object
 
   factory BoolSeriesView.copy(SeriesView<LT, bool> series) {}
 
-  dynamic get name => _name is Function ? _name() : _name;
+  String get name => _name is Function ? _name() : _name;
 
   @override
-  BoolSeriesView<LT> toView() => this;
-
-  SeriesViewByPosition<LT, bool> _pos;
-
-  SeriesViewByPosition<LT, bool> get byPos =>
-      _pos ??= new SeriesViewByPosition<LT, bool>(this);
+  BoolSeriesView<LT> get view => this;
 }
 
 abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {

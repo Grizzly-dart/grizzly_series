@@ -47,12 +47,7 @@ class IntSeriesView<LT> extends Object
 
   factory IntSeriesView.copy(SeriesView<LT, String> series) {}
 
-  dynamic get name => _name is Function ? _name() : _name;
+  String get name => _name is Function ? _name() : _name.toString();
 
-  IntSeriesView<LT> toView() => this;
-
-  SeriesViewByPosition<LT, int> _pos;
-
-  SeriesViewByPosition<LT, int> get byPos =>
-      _pos ??= new SeriesViewByPosition<LT, int>(this);
+  IntSeriesView<LT> get view => this;
 }

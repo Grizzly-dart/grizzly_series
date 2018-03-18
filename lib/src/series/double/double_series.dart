@@ -2,8 +2,9 @@ part of grizzly.series;
 
 class DoubleSeries<LT> extends Object
     with
-        SeriesMixin<LT, double>,
         SeriesViewMixin<LT, double>,
+        SeriesFixMixin<LT, double>,
+        SeriesMixin<LT, double>,
         DoubleSeriesViewMixin<LT>
     implements NumericSeries<LT, double> {
   final List<LT> _labels;
@@ -12,11 +13,7 @@ class DoubleSeries<LT> extends Object
 
   final SplayTreeMap<LT, int> _mapper;
 
-  dynamic name;
-
-  SeriesByPosition<LT, double> _pos;
-
-  DoubleSeriesView<LT> _view;
+  String name;
 
   DoubleSeries._(this._labels, this._data, this.name, this._mapper);
 
@@ -63,104 +60,18 @@ class DoubleSeries<LT> extends Object
 
   Numeric1DView<double> get data => _data.view;
 
-  SeriesByPosition<LT, double> get byPos =>
-      _pos ??= new SeriesByPosition<LT, double>(this);
+  DoubleSeriesView<LT> _view;
 
-  DoubleSeriesView<LT> toView() =>
+  DoubleSeriesView<LT> get view =>
       _view ??= new DoubleSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
+  DoubleSeriesFix<LT> _fixed;
+
+  DoubleSeriesFix<LT> get fixed =>
+      _fixed ??= new DoubleSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+}
+
 /*
-  final List<IT> _labels;
-
-  final Float64List _data;
-
-  final SplayTreeMap<IT, List<int>> _mapper;
-
-  dynamic name;
-
-  final UnmodifiableListView<IT> labels;
-
-  final UnmodifiableListView<double> data;
-
-  SeriesPositioned<IT, double> _pos;
-
-  SeriesPositioned<IT, double> get pos => _pos;
-
-  DoubleSeriesView<IT> _view;
-
-  DoubleSeriesView<IT> toView() {
-    if (_view == null) _view = new DoubleSeriesView<IT>(this);
-    return _view;
-  }
-
-  DoubleSeries._(this._data, this._labels, this.name, this._mapper)
-      : labels = new UnmodifiableListView(_labels),
-        data = new UnmodifiableListView(_data) {
-    _pos = new SeriesPositioned<IT, double>(this);
-  }
-
-  factory DoubleSeries(Iterable<double> data, {dynamic name, List<IT> labels}) {
-    final List<IT> madeIndices = makeLabels<IT>(data.length, labels, IT);
-    final mapper = labelsToMapper(madeIndices);
-
-    return new DoubleSeries._(
-        new Float64List.fromList(data), madeIndices, name, mapper);
-  }
-
-  factory DoubleSeries.fromMap(Map<IT, List<double>> map, {dynamic name}) {
-    final List<IT> indices = [];
-    final data = new Float64List(0);
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (IT index in map.keys) {
-      mapper[index] = <int>[];
-      for (double val in map[index]) {
-        indices.add(index);
-        data.add(val);
-        mapper[index].add(data.length - 1);
-      }
-    }
-
-    return new DoubleSeries._(data, indices, name, mapper);
-  }
-
-  factory DoubleSeries.fromLabels(
-      Iterable<IT> keys, double value(IT key, int index),
-      {dynamic name}) {
-    final List<IT> indices = keys.toList();
-    final data = new Float64List(keys.length);
-    final mapper = new SplayTreeMap<IT, List<int>>();
-
-    for (int i = 0; i < keys.length; i++) {
-      final index = indices[i];
-      data[i] = value(index, i);
-
-      List<int> maps = mapper[index];
-      if (maps == null) {
-        maps = mapper[index] = <int>[];
-      }
-
-      maps.add(i);
-    }
-
-    return new DoubleSeries._(data, indices, name, mapper);
-  }
-
-  DoubleSeries<IIT> makeNew<IIT>(Iterable<double> data,
-          {dynamic name, List<IIT> labels}) =>
-      new DoubleSeries<IIT>(new Float64List.fromList(data),
-          name: name, labels: labels.toList());
-
-  double sum({bool skipNull: true}) {
-    double ret = 0.0;
-    for (int i = 0; i < _data.length; i++) {
-      if (data[i] != null)
-        ret += data[i];
-      else if (!skipNull) return null;
-    }
-    return ret;
-  }
-
   void _selfAdd(NumericSeries<IT, num> a,
       {double mfv, double ofv, bool strict: true}) {
     for (IT index in _mapper.keys) {
@@ -772,7 +683,3 @@ class DoubleSeries<LT> extends Object
   }
   }
   */
-}
-
-/*
-*/

@@ -8,7 +8,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   bool containsLabel(LT label) => _mapper.containsKey(label);
 
   VT operator [](LT label) {
-    if (!_mapper.containsKey(label)) throw new LabelNotFound(label);
+    if (!_mapper.containsKey(label)) throw labelNotFound(label);
     return data[_mapper[label]];
   }
 
@@ -110,8 +110,8 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return ret;
   }
 
-  DataFrame<LT, dynamic> toDataFrame<CT>({CT column}) {
-    return new DataFrame<LT, CT>({column ?? name: data}, labels: labels);
+  DataFrame<LT> toDataFrame({String column}) {
+    return new DataFrame<LT>({column ?? name: data}, labels: labels);
   }
 
   bool labelsMatch(
@@ -124,6 +124,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       return _iterEquality.equals(this.labels, labels);
     }
     throw new UnsupportedError('Type not supported!');
+  }
+
+  String toString() {
+    final Table tab = table(['', name]);
+    for (int i = 0; i < length; i++) {
+      tab.row([labelAt(i), getByPos(i)]);
+    }
+    return tab.toString();
   }
 }
 

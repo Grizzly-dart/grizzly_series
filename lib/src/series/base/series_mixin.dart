@@ -19,11 +19,6 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
   void set(LT label, VT value) => this[label] = value;
 
-  void setByPos(int position, VT value) {
-    if (position >= length) throw new RangeError.range(position, 0, length);
-    _data[position] = value;
-  }
-
   void append(LT label, VT value) {
     if (_mapper.containsKey(label))
       throw new Exception('Label already exists!');
@@ -112,7 +107,6 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
           if (addNew) set(label, other[label]);
         }
       }
-      return;
     } else if (other is IterView<VT>) {
       if (length != other.length)
         throw lengthMismatch(
@@ -120,6 +114,8 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       for (int i = 0; i < length; i++) {
         _data[i] = other[i];
       }
+    } else {
+      throw new UnsupportedError('Type not supported!');
     }
   }
 
@@ -131,12 +127,6 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       } else {
         if (addNew) set(label, other[label]);
       }
-    }
-  }
-
-  void apply(VT func(VT value)) {
-    for (int i = 0; i < length; i++) {
-      _data[i] = func(_data[i]);
     }
   }
 
