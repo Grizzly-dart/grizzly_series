@@ -52,9 +52,9 @@ class DynamicSeries<LT> extends Object
   }
 
   factory DynamicSeries.copy(SeriesView<LT, bool> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new DynamicSeries<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
@@ -62,13 +62,13 @@ class DynamicSeries<LT> extends Object
 
   DynamicSeriesView<LT> _view;
 
-  DynamicSeriesView<LT> get view =>
-      _view ??= new DynamicSeriesView<LT>._(_labels, _data, () => name, _mapper);
+  DynamicSeriesView<LT> get view => _view ??=
+      new DynamicSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
   DynamicSeriesFix<LT> _fixed;
 
-  DynamicSeriesFix<LT> get fixed =>
-      _fixed ??= new DynamicSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+  DynamicSeriesFix<LT> get fixed => _fixed ??=
+      new DynamicSeriesFix<LT>._(_labels, _data, () => name, _mapper);
 
 /* TODO
   IntSeries<LT> toInt({int radix, int fillVal}) {

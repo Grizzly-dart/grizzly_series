@@ -51,9 +51,9 @@ class StringSeriesFix<LT> extends Object
   }
 
   factory StringSeriesFix.copy(SeriesView<LT, String> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new StringSeriesFix<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

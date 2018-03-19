@@ -53,9 +53,9 @@ class DynamicSeriesFix<LT> extends Object
   }
 
   factory DynamicSeriesFix.copy(SeriesView<LT, dynamic> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new DynamicSeriesFix<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

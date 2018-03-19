@@ -5,6 +5,9 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
 
   int get length => data.length;
 
+  @override
+  List<VT> toList() => data.toList();
+
   bool containsLabel(LT label) => _mapper.containsKey(label);
 
   VT operator [](LT label) {

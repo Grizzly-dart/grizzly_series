@@ -53,9 +53,9 @@ class BoolSeriesFix<LT> extends Object
   }
 
   factory BoolSeriesFix.copy(SeriesView<LT, bool> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new BoolSeriesFix<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

@@ -53,9 +53,9 @@ class DoubleSeriesFix<LT> extends Object
   }
 
   factory DoubleSeriesFix.copy(SeriesView<LT, double> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new DoubleSeriesFix<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

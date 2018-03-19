@@ -48,7 +48,8 @@ class IntSeriesView<LT> extends Object
   }
 
   factory IntSeriesView.copy(SeriesView<LT, String> series) =>
-      new IntSeriesView<LT>(series.data, name: series.name, labels: series.labels);
+      new IntSeriesView<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();
 

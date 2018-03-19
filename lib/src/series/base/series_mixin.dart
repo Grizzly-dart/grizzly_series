@@ -176,18 +176,6 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     _mapper.addAll(mapper);
   }
 
-  /*
-  SplayTreeMap<LT, List<int>> cloneMapper() {
-    final ret = new SplayTreeMap<LT, List<int>>();
-
-    for (LT label in _mapper.keys) {
-      ret[label] = new List<int>.from(_mapper[label]);
-    }
-
-    return ret;
-  }
-  */
-
   @override
   void mask(IterView<bool> mask) {
     if (length != mask.length)
@@ -199,16 +187,5 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       if (!mask[i]) pos.add(i);
     }
     removeMany(pos);
-  }
-
-  String toString() {
-    final sb = new StringBuffer();
-
-    //TODO print as table
-    for (int i = 0; i < labels.length; i++) {
-      sb.writeln('${_labels[i]} ${_data[i]}');
-    }
-
-    return sb.toString();
   }
 }

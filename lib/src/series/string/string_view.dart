@@ -45,7 +45,9 @@ class StringSeriesView<LT> extends Object
     return new StringSeriesView._(labels, data, name, mapper);
   }
 
-  factory StringSeriesView.copy(SeriesView<LT, String> series) {}
+  factory StringSeriesView.copy(SeriesView<LT, String> series) =>
+      new StringSeriesView<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
 
@@ -59,7 +61,7 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   StringSeriesView<IIT> makeView<IIT>(
           /* Iterable<String> | IterView<String> */ data,
           {dynamic name,
-            Iterable<IIT> labels}) =>
+          Iterable<IIT> labels}) =>
       new StringSeriesView(data, name: name, labels: labels);
 
   StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,

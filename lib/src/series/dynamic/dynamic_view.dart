@@ -45,7 +45,9 @@ class DynamicSeriesView<LT> extends Object
     return new DynamicSeriesView._(labels, data, name, mapper);
   }
 
-  factory DynamicSeriesView.copy(SeriesView<LT, bool> series) {}
+  factory DynamicSeriesView.copy(SeriesView<LT, bool> series) =>
+      new DynamicSeriesView<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();
 

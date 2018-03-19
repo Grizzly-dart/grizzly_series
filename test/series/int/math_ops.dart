@@ -14,7 +14,7 @@ void main() {
 
       final IntSeries<int> s3 = s1 + s2;
 
-      expect(s3.data, [2, 4, 6, 8]);
+      expect(s3.toList(), [2, 4, 6, 8]);
       expect(s3.labels, [0, 1, 2, 3]);
     });
 
@@ -24,15 +24,14 @@ void main() {
       final s2 = new IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'three', 'four', 'two']);
 
+      print(s2);
+
       final IntSeries<String> s3 = s1 + s2;
 
       expect(s3['one'], 2);
       expect(s3['two'], 6);
       expect(s3['three'], 5);
       expect(s3['four'], 7);
-
-      //TODO expect(s3.data, [2, 6, 5, 7]);
-      //TODO expect(s3.labels, ['one', 'two', 'three', 'four']);
     });
 
     test('gt', () {

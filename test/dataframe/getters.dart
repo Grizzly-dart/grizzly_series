@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('DataFrame.Getters', () {
-    final df = new DataFrame<String, String>({
+    final df = new DataFrame<String>({
       'age': [20, 22, 35],
       'house': ['Stark', 'Targaryan', 'Lannister']
     }, labels: [

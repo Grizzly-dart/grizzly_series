@@ -52,9 +52,9 @@ class DoubleSeries<LT> extends Object
   }
 
   factory DoubleSeries.copy(SeriesView<LT, double> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new DoubleSeries<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
