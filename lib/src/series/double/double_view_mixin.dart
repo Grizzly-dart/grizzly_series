@@ -8,18 +8,18 @@ abstract class DoubleSeriesViewMixin<LT>
   DoubleSeriesView<IIT> makeView<IIT>(
           /* Iterable<int> | IterView<int> */ data,
           {dynamic name,
-          List<IIT> labels}) =>
+            Iterable<IIT> labels}) =>
       new DoubleSeriesView(data, name: name, labels: labels);
 
   DoubleSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-          {dynamic name, List<IIT> labels}) =>
+          {dynamic name, Iterable<IIT> labels}) =>
       new DoubleSeries<IIT>(data, name: name, labels: labels);
 
   @override
-  Double1D makeVTArraySized(int size) => new Double1D.sized(size);
+  Double1D makeValueArraySized(int size) => new Double1D.sized(size);
 
   @override
-  Double1D makeVTArray(Iterable<double> data) => new Double1D(data);
+  Double1D makeValueArray(Iterable<double> data) => new Double1D(data);
 
   @override
   int compareVT(double a, double b) => a.compareTo(b);
@@ -58,4 +58,14 @@ abstract class DoubleSeriesViewMixin<LT>
 
   IntSeries<LT> get toInt =>
       new IntSeries<LT>(data, name: name, labels: labels.toList());
+
+  @override
+  DoubleSeries<LT> operator *(
+      /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
+    if (other is int) {
+      return new DoubleSeries<LT>(data * other, name: name, labels: labels);
+    }
+    // TODO
+    throw new UnimplementedError();
+  }
 }

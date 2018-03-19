@@ -16,8 +16,10 @@ class IntSeriesView<LT> extends Object
   IntSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory IntSeriesView(/* Iterable<int> | IterView<int> */ data,
-      {name, Iterable<LT> labels}) {
+  factory IntSeriesView(
+      /* Iterable<int> | IterView<int> | ArrayView<int> */ data,
+      {name,
+      Iterable<LT> labels}) {
     Int1D d;
     if (data is Iterable<int>) {
       d = new Int1D(data);
@@ -45,7 +47,8 @@ class IntSeriesView<LT> extends Object
     return new IntSeriesView._(labels, data, name, mapper);
   }
 
-  factory IntSeriesView.copy(SeriesView<LT, String> series) {}
+  factory IntSeriesView.copy(SeriesView<LT, String> series) =>
+      new IntSeriesView<LT>(series.data, name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();
 

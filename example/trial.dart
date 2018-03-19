@@ -9,7 +9,8 @@ main() {
     'num': new IntSeries([0, 1, 2, 3, 4]),
   });
   print(df);
-  // print(df['num']);
+  print(df['num']);
 
-  // df['num*2'] = (df['num'] as ) * 2;
+  df['num*2'] = (df['num'] as IntSeriesView) * 2;
+  print(df);
 }

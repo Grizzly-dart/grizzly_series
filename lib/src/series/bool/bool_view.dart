@@ -59,18 +59,18 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   BoolSeriesView<IIT> makeView<IIT>(
           /* Iterable<bool> | IterView<bool> */ data,
           {dynamic name,
-          List<IIT> labels}) =>
+            Iterable<IIT> labels}) =>
       new BoolSeriesView(data, name: name, labels: labels);
 
   BoolSeries<IIT> make<IIT>(/* Iterable<bool> | IterView<bool> */ data,
-          {dynamic name, List<IIT> labels}) =>
+          {dynamic name, Iterable<IIT> labels}) =>
       new BoolSeries<IIT>(data, name: name, labels: labels);
 
   @override
-  Bool1D makeVTArraySized(int size) => new Bool1D.sized(size);
+  Bool1D makeValueArraySized(int size) => new Bool1D.sized(size);
 
   @override
-  Bool1D makeVTArray(Iterable<bool> data) => new Bool1D(data);
+  Bool1D makeValueArray(Iterable<bool> data) => new Bool1D(data);
 
   @override
   int compareVT(bool a, bool b) => a == b ? 0 : a ? 1 : -1;

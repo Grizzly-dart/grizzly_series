@@ -159,7 +159,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
 
     final labs = new List<LT>(length);
-    final d = makeVTArraySized(length);
+    final d = makeValueArraySized(length);
     final mapper = new SplayTreeMap<LT, int>();
 
     for (int c = 0; c < length; c++) {

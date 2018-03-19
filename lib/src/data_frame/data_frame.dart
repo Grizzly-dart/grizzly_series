@@ -28,10 +28,11 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       {List<LT> labels}) {
     if (data.length == 0) {
       if (labels == null || labels.length == 0) {
-        return new DataFrame._([], [], [], new SplayTreeMap<LT, int>());
+        return new DataFrame._(<String>[], <LT>[], <Series<LT, dynamic>>[],
+            new SplayTreeMap<LT, int>());
       } else {
-        return new DataFrame._(
-            [], labels.toList(), [], new SplayTreeMap<LT, int>());
+        return new DataFrame._(<String>[], labels.toList(),
+            <Series<LT, dynamic>>[], new SplayTreeMap<LT, int>());
       }
     }
 
@@ -68,7 +69,8 @@ class DataFrame<LT> implements DataFrameBase<LT> {
           throw new Exception('Invalid data');
       }
 
-      d[i] = series(cur, name: data.keys.elementAt(i), labels: labs);
+      final s = series(cur, name: data.keys.elementAt(i), labels: labs);
+      d[i] = s;
     }
     return new DataFrame._(data.keys.toList(), labs, d, mapper);
   }
@@ -82,6 +84,11 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   Iterable<String> get columns => _columns;
 
   Iterable<LT> get labels => _labels;
+
+  LT labelAt(int position) {
+    if (position >= numRows) throw new RangeError.range(position, 0, numRows);
+    return labels.elementAt(position);
+  }
 
   SeriesFix<LT, dynamic> operator [](String column) {
     final int colPos = _columns.indexOf(column);
@@ -99,10 +106,25 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   }
 
   void set<VT>(String column, /* SeriesView<LT, VT> | IterView<VT> */ value) {
-    // TODO check if exists
     int columnPos = _columns.indexOf(column);
     if (columnPos == -1) {
-      // TODO append or throw?
+      if (value is IterView<VT>) {
+        if (value.length != numRows) {
+          throw new Exception('Mismatching column lengths!');
+        }
+        final s = series(value, labels: labels);
+        _columns.add(column);
+        _data.add(s);
+      } else if (value is SeriesView<LT, dynamic>) {
+        final Array d = value.makeValueArraySized(numRows);
+        for(int i = 0; i < numRows; i++) {
+          d[i] = value[labelAt(i)];
+        }
+        final s = value.make(d, labels: labels);
+        _columns.add(column);
+        _data.add(s);
+      } else
+        throw new UnimplementedError();
       return;
     }
     _data[columnPos].assign(value);

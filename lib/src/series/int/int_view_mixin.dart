@@ -3,21 +3,21 @@ part of grizzly.series;
 abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
   IntSeries<LT> toSeries() => new IntSeries(data, name: name, labels: labels);
 
-  IntSeriesView<IIT> makeView<IIT>(
+  IntSeriesView<NLT> makeView<NLT>(
           /* Iterable<int> | IterView<int> */ data,
           {dynamic name,
-          List<IIT> labels}) =>
-      new IntSeriesView(data, name: name, labels: labels);
+          Iterable<NLT> labels}) =>
+      new IntSeriesView<NLT>(data, name: name, labels: labels);
 
-  IntSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-          {dynamic name, List<IIT> labels}) =>
-      new IntSeries<IIT>(data, name: name, labels: labels);
-
-  @override
-  Int1D makeVTArraySized(int size) => new Int1D.sized(size);
+  IntSeries<NLT> make<NLT>(/* Iterable<int> | IterView<int> */ data,
+          {dynamic name, Iterable<NLT> labels}) =>
+      new IntSeries<NLT>(data, name: name, labels: labels);
 
   @override
-  Int1D makeVTArray(Iterable<int> data) => new Int1D(data);
+  Int1D makeValueArraySized(int size) => new Int1D.sized(size);
+
+  @override
+  Int1D makeValueArray(Iterable<int> data) => new Int1D(data);
 
   @override
   int compareVT(int a, int b) => a.compareTo(b);
@@ -56,4 +56,14 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   IntSeries<LT> get toInt =>
       new IntSeries<LT>(data, name: name, labels: labels.toList());
+
+  @override
+  IntSeries<LT> operator *(
+      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+    if (other is int) {
+      return new IntSeries<LT>(data * other, name: name, labels: labels);
+    }
+    // TODO
+    throw new UnimplementedError();
+  }
 }

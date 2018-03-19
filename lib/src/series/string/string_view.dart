@@ -59,18 +59,18 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   StringSeriesView<IIT> makeView<IIT>(
           /* Iterable<String> | IterView<String> */ data,
           {dynamic name,
-          List<IIT> labels}) =>
+            Iterable<IIT> labels}) =>
       new StringSeriesView(data, name: name, labels: labels);
 
   StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
-          {dynamic name, List<IIT> labels}) =>
+          {dynamic name, Iterable<IIT> labels}) =>
       new StringSeries<IIT>(data, name: name, labels: labels);
 
   @override
-  String1D makeVTArraySized(int size) => new String1D.sized(size);
+  String1D makeValueArraySized(int size) => new String1D.sized(size);
 
   @override
-  String1D makeVTArray(Iterable<String> data) => new String1D(data);
+  String1D makeValueArray(Iterable<String> data) => new String1D(data);
 
   @override
   int compareVT(String a, String b) => a.compareTo(b);

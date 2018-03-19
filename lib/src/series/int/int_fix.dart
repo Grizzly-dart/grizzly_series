@@ -5,7 +5,7 @@ class IntSeriesFix<LT> extends Object
         SeriesViewMixin<LT, int>,
         SeriesFixMixin<LT, int>,
         IntSeriesViewMixin<LT>
-    implements NumericFixSeries<LT, int> {
+    implements NumericFixSeries<LT, int>, IntSeriesView<LT> {
   final List<LT> _labels;
 
   final Int1D _data;
@@ -51,13 +51,12 @@ class IntSeriesFix<LT> extends Object
   }
 
   factory IntSeriesFix.copy(SeriesView<LT, int> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+      {name, Iterable<LT> labels}) =>
+      new IntSeriesFix(series.data, name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
-  Numeric1DView<int> get data => _data.view;
+  Int1DView get data => _data.view;
 
   IntSeriesView<LT> _view;
 

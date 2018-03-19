@@ -6,18 +6,18 @@ class IntSeries<LT> extends Object
         SeriesFixMixin<LT, int>,
         SeriesMixin<LT, int>,
         IntSeriesViewMixin<LT>
-    implements NumericSeries<LT, int> {
+    implements IntSeriesFix<LT>, NumericSeries<LT, int> {
   final List<LT> _labels;
 
   final Int1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  IntSeries._(this._labels, this._data, this.name, this._mapper);
+  IntSeries._(this._labels, this._data, this._name, this._mapper);
 
-  IntSeries._build(this._labels, this._data, this.name)
+  IntSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
   factory IntSeries(/* Iterable<int> | IterView<int> */ data,
@@ -52,13 +52,12 @@ class IntSeries<LT> extends Object
   }
 
   factory IntSeries.copy(SeriesView<LT, int> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new IntSeries(series.data, name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
-  Numeric1DView<int> get data => _data.view;
+  Int1DView get data => _data.view;
 
   IntSeriesView<LT> _view;
 
@@ -69,6 +68,8 @@ class IntSeries<LT> extends Object
 
   IntSeriesFix<LT> get fixed =>
       _fixed ??= new IntSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  String get name => _name is Function ? _name() : _name.toString();
 }
 
 /*
