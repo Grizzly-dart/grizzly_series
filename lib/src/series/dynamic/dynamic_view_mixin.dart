@@ -24,4 +24,24 @@ abstract class DynamicSeriesViewMixin<LT> implements DynamicSeriesViewBase<LT> {
   int compareVT(dynamic a, dynamic b) {
     throw new UnimplementedError();
   }
+
+  BoolSeriesBase<LT> operator <(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator <=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
 }

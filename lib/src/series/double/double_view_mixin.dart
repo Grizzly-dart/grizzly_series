@@ -62,30 +62,146 @@ abstract class DoubleSeriesViewMixin<LT>
   @override
   DoubleSeries<LT> operator +(
       /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
-    if (other is int) {
+    if (other is double) {
+      return new DoubleSeries<LT>(data + other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<double>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] + other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new DoubleSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
       return new DoubleSeries<LT>(data + other, name: name, labels: labels);
     }
-    // TODO
     throw new UnimplementedError();
   }
 
   @override
   DoubleSeries<LT> operator -(
       /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
-    if (other is int) {
+    if (other is double) {
+      return new DoubleSeries<LT>(data - other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<double>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] - other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new DoubleSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
       return new DoubleSeries<LT>(data - other, name: name, labels: labels);
     }
-    // TODO
     throw new UnimplementedError();
   }
 
   @override
   DoubleSeries<LT> operator *(
       /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
-    if (other is int) {
+    if (other is double) {
+      return new DoubleSeries<LT>(data * other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<double>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] * other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new DoubleSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
       return new DoubleSeries<LT>(data * other, name: name, labels: labels);
     }
-    // TODO
+    throw new UnimplementedError();
+  }
+
+  @override
+  DoubleSeries<LT> operator -() =>
+      new DoubleSeries.copy(this, name: name)..negate();
+
+  @override
+  BoolSeriesBase<LT> operator >=(other) {
+    if (other is double) {
+      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] >= other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
+      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  BoolSeriesBase<LT> operator >(other) {
+    if (other is double) {
+      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] > other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
+      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  BoolSeriesBase<LT> operator <=(other) {
+    if (other is double) {
+      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] <= other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
+      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  BoolSeriesBase<LT> operator <(other) {
+    if (other is double) {
+      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, double>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] < other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<double>) {
+      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+    }
     throw new UnimplementedError();
   }
 }

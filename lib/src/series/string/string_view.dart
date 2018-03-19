@@ -102,4 +102,24 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
 
     return ret;
   }
+
+  BoolSeriesBase<LT> operator <(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator <=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
 }

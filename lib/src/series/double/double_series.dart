@@ -69,6 +69,11 @@ class DoubleSeries<LT> extends Object
 
   DoubleSeriesFix<LT> get fixed =>
       _fixed ??= new DoubleSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  @override
+  void negate() {
+    _data.negate();
+  }
 }
 
 /*

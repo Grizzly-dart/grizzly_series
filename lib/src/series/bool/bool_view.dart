@@ -2,7 +2,7 @@ part of grizzly.series;
 
 class BoolSeriesView<LT> extends Object
     with SeriesViewMixin<LT, bool>, BoolSeriesViewMixin<LT>
-    implements SeriesView<LT, bool> {
+    implements BoolSeriesViewBase<LT> {
   final _name;
 
   final Iterable<LT> labels;
@@ -93,5 +93,25 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
     }
 
     return true;
+  }
+
+  BoolSeriesBase<LT> operator <(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator <=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >=(
+      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+    throw new UnimplementedError();
   }
 }

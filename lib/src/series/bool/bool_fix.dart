@@ -5,7 +5,7 @@ class BoolSeriesFix<LT> extends Object
         SeriesViewMixin<LT, bool>,
         SeriesFixMixin<LT, bool>,
         BoolSeriesViewMixin<LT>
-    implements SeriesFix<LT, bool> {
+    implements BoolSeriesView<LT>, BoolSeriesFixBase<LT> {
   final List<LT> _labels;
 
   final Bool1D _data;

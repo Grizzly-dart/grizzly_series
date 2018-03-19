@@ -5,7 +5,7 @@ class DoubleSeriesFix<LT> extends Object
         SeriesViewMixin<LT, double>,
         SeriesFixMixin<LT, double>,
         DoubleSeriesViewMixin<LT>
-    implements NumericFixSeries<LT, double> {
+    implements NumericSeriesFix<LT, double> {
   final List<LT> _labels;
 
   final Double1D _data;
@@ -67,4 +67,9 @@ class DoubleSeriesFix<LT> extends Object
   DoubleSeriesFix<LT> get fixed => this;
 
   String get name => _name is Function ? _name() : _name;
+
+  @override
+  void negate() {
+    _data.negate();
+  }
 }

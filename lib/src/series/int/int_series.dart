@@ -51,9 +51,9 @@ class IntSeries<LT> extends Object
     return new IntSeries._(labels, data, name, mapper);
   }
 
-  factory IntSeries.copy(SeriesView<LT, int> series,
-          {name, Iterable<LT> labels}) =>
-      new IntSeries(series.data, name: series.name, labels: series.labels);
+  factory IntSeries.copy(SeriesView<LT, int> series, {name}) =>
+      new IntSeries(series.data,
+          name: name ?? series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
@@ -70,6 +70,11 @@ class IntSeries<LT> extends Object
       _fixed ??= new IntSeriesFix<LT>._(_labels, _data, () => name, _mapper);
 
   String get name => _name is Function ? _name() : _name.toString();
+
+  @override
+  void negate() {
+    _data.negate();
+  }
 }
 
 /*

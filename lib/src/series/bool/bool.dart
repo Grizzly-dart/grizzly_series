@@ -6,18 +6,18 @@ class BoolSeries<LT> extends Object
         SeriesFixMixin<LT, bool>,
         SeriesMixin<LT, bool>,
         BoolSeriesViewMixin<LT>
-    implements Series<LT, bool> {
+    implements BoolSeriesFix<LT>, BoolSeriesBase<LT> {
   final List<LT> _labels;
 
   final Bool1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  BoolSeries._(this._labels, this._data, this.name, this._mapper);
+  BoolSeries._(this._labels, this._data, this._name, this._mapper);
 
-  BoolSeries._build(this._labels, this._data, this.name)
+  BoolSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
   factory BoolSeries(/* Iterable<bool> | IterView<bool> */ data,
@@ -68,6 +68,8 @@ class BoolSeries<LT> extends Object
 
   BoolSeriesFix<LT> get fixed =>
       _fixed ??= new BoolSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  String get name => _name is Function ? _name() : _name.toString();
 
 /* TODO
   IntSeries<LT> toInt({int radix, int fillVal}) {
