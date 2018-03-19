@@ -6,11 +6,17 @@ import 'package:grizzly_series/grizzly_series.dart';
 
 main() {
   final df = new DataFrame<int>({
-    'num': new IntSeries([0, 1, 2, 3, 4]),
+    'num': new IntSeries([1, 2, 3, 4, 5]),
   });
   print(df);
   print(df['num']);
 
   df['num*2'] = (df['num'] as IntSeriesView) * 2;
+  print(df);
+
+  df['english'] = ['one', 'two', 'three', 'four', 'five'];
+  print(df);
+
+  df.set<String>('swedish', ['Ett', 'Två', 'Tre', 'Fyra', 'Fem']);
   print(df);
 }

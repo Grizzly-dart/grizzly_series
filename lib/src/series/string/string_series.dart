@@ -52,9 +52,9 @@ class StringSeries<LT> extends Object
   }
 
   factory StringSeries.copy(SeriesView<LT, String> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new StringSeries<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

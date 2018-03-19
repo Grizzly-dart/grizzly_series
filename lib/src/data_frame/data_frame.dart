@@ -21,59 +21,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   DataFrame._(this._columns, this._labels, this._data, this._mapper);
 
   factory DataFrame(
-      Map<
-              String,
-              /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
-          data,
-      {List<LT> labels}) {
-    if (data.length == 0) {
-      if (labels == null || labels.length == 0) {
-        return new DataFrame._(<String>[], <LT>[], <Series<LT, dynamic>>[],
-            new SplayTreeMap<LT, int>());
-      } else {
-        return new DataFrame._(<String>[], labels.toList(),
-            <Series<LT, dynamic>>[], new SplayTreeMap<LT, int>());
-      }
-    }
-
-    int expectedLen = labels?.length ?? data.values.first.length;
-    // Check lengths
-    for (int i = 0; i < data.length; i++) {
-      int curLen = data.values.elementAt(i).length;
-      if (curLen != expectedLen)
-        throw lengthMismatch(
-            expected: expectedLen, found: curLen, subject: 'data');
-    }
-
-    List<LT> labs = labels;
-    labels ??=
-        (data.values.firstWhere((v) => v is SeriesView, orElse: () => null)
-                as SeriesView<LT, dynamic>)
-            ?.labels
-            ?.toList();
-    labels ??= (data.values.firstWhere((v) => v is Map, orElse: () => null)
-            as Map<LT, dynamic>)
-        ?.keys
-        ?.toList();
-    labs = makeLabels<LT>(expectedLen, labs);
-    SplayTreeMap<LT, int> mapper = labelsToMapper<LT>(labs);
-    List<Series<LT, dynamic>> d = new List<Series<LT, dynamic>>()
-      ..length = data.length;
-    for (int i = 0; i < data.length; i++) {
-      final cur = data.values.elementAt(i);
-      if (cur is Map) {
-        if (labs.any((LT lab) => !cur.containsKey(lab)))
-          throw new Exception('Invalid data');
-      } else if (cur is SeriesView) {
-        if (labs.any((LT lab) => !cur.containsLabel(lab)))
-          throw new Exception('Invalid data');
-      }
-
-      final s = series(cur, name: data.keys.elementAt(i), labels: labs);
-      d[i] = s;
-    }
-    return new DataFrame._(data.keys.toList(), labs, d, mapper);
-  }
+          Map<
+                  String,
+                  /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
+              data,
+          {List<LT> labels}) =>
+      _makeDf(data, labels: labels);
 
   int get numCols => _columns.length;
 
@@ -84,6 +37,9 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   Iterable<String> get columns => _columns;
 
   Iterable<LT> get labels => _labels;
+
+  @override
+  int posOf(LT label) => _mapper[label];
 
   LT labelAt(int position) {
     if (position >= numRows) throw new RangeError.range(position, 0, numRows);
@@ -96,7 +52,9 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return _data[colPos].fixed;
   }
 
-  operator []=(String column, /* SeriesView<LT, dynamic> | IterView */ value) =>
+  operator []=(
+          String column,
+          /* SeriesView<LT, dynamic> | IterView | Iterable<VT> */ value) =>
       set(column, value);
 
   SeriesFix<LT, VT> get<VT>(String column) {
@@ -105,19 +63,21 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return _data[colPos].fixed;
   }
 
-  void set<VT>(String column, /* SeriesView<LT, VT> | IterView<VT> */ value) {
+  void set<VT>(
+      String column,
+      /* SeriesView<LT, VT> | IterView<VT> | Iterable<VT> */ value) {
     int columnPos = _columns.indexOf(column);
     if (columnPos == -1) {
-      if (value is IterView<VT>) {
+      if (value is IterView<VT> || value is Iterable<VT>) {
         if (value.length != numRows) {
           throw new Exception('Mismatching column lengths!');
         }
-        final s = series(value, labels: labels);
+        final s = series<LT, VT>(value, labels: labels);
         _columns.add(column);
         _data.add(s);
       } else if (value is SeriesView<LT, dynamic>) {
         final Array d = value.makeValueArraySized(numRows);
-        for(int i = 0; i < numRows; i++) {
+        for (int i = 0; i < numRows; i++) {
           d[i] = value[labelAt(i)];
         }
         final s = value.make(d, labels: labels);
@@ -284,3 +244,59 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return ret;
   }
  */
+
+DataFrame _makeDf<LT>(
+    Map<
+            String,
+            /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
+        data,
+    {List<LT> labels}) {
+  if (data.length == 0) {
+    if (labels == null || labels.length == 0) {
+      return new DataFrame._(<String>[], <LT>[], <Series<LT, dynamic>>[],
+          new SplayTreeMap<LT, int>());
+    } else {
+      return new DataFrame._(<String>[], labels.toList(),
+          <Series<LT, dynamic>>[], new SplayTreeMap<LT, int>());
+    }
+  }
+
+  int expectedLen = labels?.length ?? data.values.first.length;
+  // Check lengths
+  for (int i = 0; i < data.length; i++) {
+    int curLen = data.values.elementAt(i).length;
+    if (curLen != expectedLen)
+      throw lengthMismatch(
+          expected: expectedLen, found: curLen, subject: 'data');
+  }
+
+  List<LT> labs = labels;
+  labels ??= (data.values.firstWhere((v) => v is SeriesView, orElse: () => null)
+          as SeriesView)
+      ?.labels
+      ?.retype<LT>()
+      ?.toList();
+  labels ??= (data.values.firstWhere((v) => v is Map, orElse: () => null)
+          as Map<LT, dynamic>)
+      ?.keys
+      ?.toList();
+  labs = makeLabels<LT>(expectedLen, labs);
+  SplayTreeMap<LT, int> mapper = labelsToMapper<LT>(labs);
+  List<Series<LT, dynamic>> d = new List<Series<LT, dynamic>>()
+    ..length = data.length;
+  for (int i = 0; i < data.length; i++) {
+    final cur = data.values.elementAt(i);
+    if (cur is Map) {
+      if (labs.any((LT lab) => !cur.containsKey(lab)))
+        throw new Exception('Invalid data');
+    } else if (cur is SeriesView) {
+      if (labs.any((LT lab) => !cur.containsLabel(lab)))
+        throw new Exception('Invalid data');
+    }
+
+    final s =
+        series<LT, dynamic>(cur, name: data.keys.elementAt(i), labels: labs);
+    d[i] = s;
+  }
+  return new DataFrame<LT>._(data.keys.toList(), labs, d, mapper);
+}

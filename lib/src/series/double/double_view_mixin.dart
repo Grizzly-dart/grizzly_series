@@ -8,7 +8,7 @@ abstract class DoubleSeriesViewMixin<LT>
   DoubleSeriesView<IIT> makeView<IIT>(
           /* Iterable<int> | IterView<int> */ data,
           {dynamic name,
-            Iterable<IIT> labels}) =>
+          Iterable<IIT> labels}) =>
       new DoubleSeriesView(data, name: name, labels: labels);
 
   DoubleSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
@@ -58,6 +58,26 @@ abstract class DoubleSeriesViewMixin<LT>
 
   IntSeries<LT> get toInt =>
       new IntSeries<LT>(data, name: name, labels: labels.toList());
+
+  @override
+  DoubleSeries<LT> operator +(
+      /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
+    if (other is int) {
+      return new DoubleSeries<LT>(data + other, name: name, labels: labels);
+    }
+    // TODO
+    throw new UnimplementedError();
+  }
+
+  @override
+  DoubleSeries<LT> operator -(
+      /* double | IterView<double> | NumericSeriesView<double> | Numeric1DView<double> */ other) {
+    if (other is int) {
+      return new DoubleSeries<LT>(data - other, name: name, labels: labels);
+    }
+    // TODO
+    throw new UnimplementedError();
+  }
 
   @override
   DoubleSeries<LT> operator *(

@@ -51,7 +51,7 @@ class IntSeriesFix<LT> extends Object
   }
 
   factory IntSeriesFix.copy(SeriesView<LT, int> series,
-      {name, Iterable<LT> labels}) =>
+          {name, Iterable<LT> labels}) =>
       new IntSeriesFix(series.data, name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;

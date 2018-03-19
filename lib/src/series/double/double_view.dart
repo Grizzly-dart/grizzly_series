@@ -45,7 +45,9 @@ class DoubleSeriesView<LT> extends Object
     return new DoubleSeriesView._(labels, data, name, mapper);
   }
 
-  factory DoubleSeriesView.copy(SeriesView<LT, String> series) {}
+  factory DoubleSeriesView.copy(SeriesView<LT, String> series) =>
+      new DoubleSeriesView<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
 

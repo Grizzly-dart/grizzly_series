@@ -45,7 +45,9 @@ class BoolSeriesView<LT> extends Object
     return new BoolSeriesView._(labels, data, name, mapper);
   }
 
-  factory BoolSeriesView.copy(SeriesView<LT, bool> series) {}
+  factory BoolSeriesView.copy(SeriesView<LT, bool> series) =>
+      new BoolSeriesView<LT>(series.data,
+          name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
 
@@ -59,7 +61,7 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   BoolSeriesView<IIT> makeView<IIT>(
           /* Iterable<bool> | IterView<bool> */ data,
           {dynamic name,
-            Iterable<IIT> labels}) =>
+          Iterable<IIT> labels}) =>
       new BoolSeriesView(data, name: name, labels: labels);
 
   BoolSeries<IIT> make<IIT>(/* Iterable<bool> | IterView<bool> */ data,

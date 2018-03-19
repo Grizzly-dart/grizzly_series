@@ -52,9 +52,8 @@ class BoolSeries<LT> extends Object
   }
 
   factory BoolSeries.copy(SeriesView<LT, bool> series,
-      {name, Iterable<LT> labels}) {
-    // TODO
-  }
+          {name, Iterable<LT> labels}) =>
+      new BoolSeries<LT>(series.data, name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 

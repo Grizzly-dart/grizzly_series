@@ -58,12 +58,68 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
       new IntSeries<LT>(data, name: name, labels: labels.toList());
 
   @override
+  IntSeries<LT> operator +(
+      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+    if (other is int) {
+      return new IntSeries<LT>(data + other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, int>) {
+      final list = new List<int>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] + other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new IntSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<int>) {
+      return new IntSeries<LT>(data + other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  IntSeries<LT> operator -(
+      /* int | IterView<int> | NumericSeriesView<LT, int> | Numeric1DView<int> */ other) {
+    if (other is int) {
+      return new IntSeries<LT>(data - other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, int>) {
+      final list = new List<int>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] - other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new IntSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<int>) {
+      return new IntSeries<LT>(data - other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
   IntSeries<LT> operator *(
       /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
     if (other is int) {
       return new IntSeries<LT>(data * other, name: name, labels: labels);
+    } else if (other is NumericSeriesView<LT, int>) {
+      final list = new List<int>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] * other[label];
+        } else {
+          list[i] = data[i];
+        }
+      }
+      return new IntSeries<LT>(list, name: name, labels: labels);
+    } else if (other is IterView<int>) {
+      return new IntSeries<LT>(data * other, name: name, labels: labels);
     }
-    // TODO
     throw new UnimplementedError();
   }
 }
