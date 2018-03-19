@@ -1,127 +1,79 @@
 library grizzly.series;
 
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:collection';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
+import 'package:collection/collection.dart';
+import 'package:grizzly_array/grizzly_array.dart';
 
-part 'base.dart';
-part 'bool.dart';
-part 'double.dart';
-part 'dynamic.dart';
-part 'int.dart';
+import 'package:text_table/text_table.dart';
+
+part 'base/series_fix.dart';
+part 'base/series_mixin.dart';
+part 'base/series_view_mixin.dart';
+
+part 'bool/bool_fix.dart';
+part 'bool/bool.dart';
+part 'bool/bool_view.dart';
+
+part 'int/int_fix.dart';
+part 'int/int_series.dart';
+part 'int/int_view.dart';
+part 'int/int_view_mixin.dart';
+
+part 'double/double_fix.dart';
+part 'double/double_series.dart';
+part 'double/double_view.dart';
+part 'double/double_view_mixin.dart';
+
+part 'string/string_fix.dart';
+part 'string/string_view.dart';
+part 'string/string_series.dart';
+
+part 'dynamic/dynamic.dart';
+part 'dynamic/dynamic_fix.dart';
+part 'dynamic/dynamic_view.dart';
+part 'dynamic/dynamic_view_mixin.dart';
+
 part 'numeric.dart';
-part 'string.dart';
 
-typedef SeriesMaker<IT, VT> = Series<IT, VT> Function(Iterable<VT> data,
-    {dynamic name, Iterable<IT> labels});
-
-abstract class Series<IT, VT> {
-  dynamic name;
-
-  UnmodifiableListView<IT> get labels;
-
-  UnmodifiableListView<VT> get data;
-
-  int get length;
-
-  SeriesPositioned<IT, VT> get pos;
-
-  /// Checks if Series contains the label
-  bool containsIndex(IT label);
-
-  /// Lookup by label
-  VT operator [](IT label);
-
-  operator []=(IT label, VT val);
-
-  /// Lookup by position
-  VT getByPos(int position);
-
-  void setByPos(int position, VT value);
-
-  /// Returns multiple values by label
-  VT getByLabel(IT label);
-
-  void setByLabel(IT label, VT value);
-
-  /// Returns multiple values by label
-  List<VT> getByLabelMulti(IT label);
-
-  /// Returns label at position
-  IT labelAt(int position);
-
-  Pair<IT, VT> pairByLabel(IT label);
-
-  Pair<IT, VT> pairByPos(int pos);
-
-  Iterable<Pair<IT, VT>> enumerate();
-
-  Iterable<Pair<IT, VT>> enumerateSliced(int start, [int end]);
-
-  void append(IT label, VT value);
-
-  /// Remove element at position [pos]
-  ///
-  /// If [inplace] is true, the modifications are done inplace.
-  Series<IT, VT> remove(int pos, {bool inplace: false});
-
-  /// Remove multiple element at positions [positions]
-  ///
-  /// If [inplace] is true, the modifications are done inplace.
-  Series<IT, VT> removeMany(List<int> positions, {bool inplace: false});
-
-  /// Drop elements by label [label]
-  ///
-  /// If [inplace] is true, the modifications are done inplace.
-  Series<IT, VT> drop(IT label, {bool inplace: false});
-
-  void apply(VT func(VT value));
-
-  void assign(Series<IT, VT> other);
-
-  VT max();
-
-  VT min();
-
-  Series<int, VT> mode();
-
-  IntSeries<VT> valueCounts(
-      {bool sortByValue: false, bool ascending: false, bool dropNull: false});
-
-  /* TODO IntSeries<VT> valueCountsNormalized(
-      {bool sortByValue: false, bool ascending: false, bool dropNull: false}); */
-
-  Series<IT, VT> sortByValue({bool ascending: true, bool inplace: false});
-
-  Series<IT, VT> sortByIndex({bool ascending: true, bool inplace: false});
-
-  Series<IIT, VT> makeNew<IIT>(Iterable<VT> data,
-      {dynamic name, List<IIT> labels});
-
-  SeriesView<IT, VT> toView();
-
-  DataFrame<IT, dynamic> toDataFrame<CT>({CT column});
-
-  StringSeries<IT> toStringSeries();
-
-  SplayTreeMap<IT, List<int>> cloneMapper();
-
-  SplayTreeMap<IT, List<int>> get _mapper;
-}
-
-class SeriesPositioned<IT, VT> {
-  final Series<IT, VT> series;
-
-  SeriesPositioned(this.series);
-
-  VT operator [](int position) => series.getByPos(position);
-
-  operator []=(int position, VT value) => series.setByPos(position, value);
-
-  VT get(int position) => series.getByPos(position);
-
-  void set(int position, VT value) => series.setByPos(position, value);
+Series<LT, VT> series<LT, VT>(
+    /* Iterable | IterView | SeriesView<LT, VT> | Map<LT, VT> */ data,
+    {name,
+    Iterable<LT> labels}) {
+  if (data is Iterable<int> || data is IterView<int>) {
+    return new IntSeries(data, name: name, labels: labels) as Series<LT, VT>;
+  } else if (data is Iterable<double> || data is IterView<double>) {
+    return new DoubleSeries(data, name: name, labels: labels) as Series<LT, VT>;
+  } else if (data is Iterable<String> || data is IterView<String>) {
+    return new StringSeries(data, name: name, labels: labels) as Series<LT, VT>;
+  } else if (data is Iterable<bool> || data is IterView<bool>) {
+    return new BoolSeries(data, name: name, labels: labels) as Series<LT, VT>;
+  } else if (data is Map<dynamic, int>) {
+    return new IntSeries.fromMap(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is Map<dynamic, double>) {
+    return new DoubleSeries.fromMap(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is Map<dynamic, String>) {
+    return new StringSeries.fromMap(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is Map<dynamic, bool>) {
+    return new BoolSeries.fromMap(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is SeriesView<dynamic, int>) {
+    return new IntSeries.copy(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is SeriesView<dynamic, double>) {
+    return new DoubleSeries.copy(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is SeriesView<dynamic, String>) {
+    return new StringSeries.copy(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  } else if (data is SeriesView<dynamic, bool>) {
+    return new BoolSeries.copy(data, name: name, labels: labels)
+        as Series<LT, VT>;
+  }
+  // TODO dynamic
 }

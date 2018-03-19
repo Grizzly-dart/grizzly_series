@@ -9,9 +9,13 @@ environment:
   sdk: '>=1.20.1 <2.0.0'
 
 dependencies:
-  grizzly_primitives: ^0.0.1
+  grizzly_array:
+    path: ../grizzly_array
+  grizzly_primitives: #^0.0.7
+    path: ../grizzly_primitives
   grizzly_scales: ^0.0.3-dev
     #path: ../grizzly_scales
+  text_table: "^2.5.1"
 
 dev_dependencies:
   test: ^0.12.0

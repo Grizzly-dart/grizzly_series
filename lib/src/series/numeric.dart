@@ -1,5 +1,6 @@
 part of grizzly.series;
 
+/* TODO
 abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   List<IT> get _labels;
 
@@ -11,54 +12,6 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
     for (int i = 0; i < _data.length; i++) {
       if (_data[i] != null && _data[i] < 0) _data[i] = -_data[i];
     }
-  }
-
-  VT max({bool skipNan: true}) {
-    VT ret;
-    bool seenNan = false;
-
-    for (VT v in _data) {
-      if (v == null) continue;
-      if (v == double.NAN) {
-        if (skipNan) {
-          seenNan = true;
-          continue;
-        } else {
-          return double.NAN as VT;
-        }
-      }
-      if (ret == null)
-        ret = v;
-      else if (ret < v) ret = v;
-    }
-
-    if (ret == null && seenNan) return double.NAN as VT;
-
-    return ret;
-  }
-
-  VT min({bool skipNan: true}) {
-    VT ret;
-    bool seenNan = false;
-
-    for (VT v in _data) {
-      if (v == null) continue;
-      if (v == double.NAN) {
-        if (skipNan) {
-          seenNan = true;
-          continue;
-        } else {
-          return double.NAN as VT;
-        }
-      }
-      if (ret == null)
-        ret = v;
-      else if (ret > v) ret = v;
-    }
-
-    if (ret == null && seenNan) return double.NAN as VT;
-
-    return ret;
   }
 
   VT sum({bool skipNull: true});
@@ -207,6 +160,7 @@ abstract class NumericSeries<IT, VT extends num> implements Series<IT, VT> {
   }
   */
 }
+*/
 
 /* TODO
 abstract class NumericSeriesGroupBy<IT, VT extends num> {

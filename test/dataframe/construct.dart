@@ -14,10 +14,10 @@ void main() {
 
       expect(df.labels, [0, 1, 2, 3]);
 
-      expect(df.pos[0].data, [1, 10]);
-      expect(df.pos[1].data, [2, 20]);
-      expect(df.pos[2].data, [3, 30]);
-      expect(df.pos[3].data, [4, 40]);
+      expect(df.byPos[0].data, [1, 10]);
+      expect(df.byPos[1].data, [2, 20]);
+      expect(df.byPos[2].data, [3, 30]);
+      expect(df.byPos[3].data, [4, 40]);
     });
 
     test('series.withSeriesList', () {
@@ -31,10 +31,10 @@ void main() {
       expect(df.labels, [0, 1, 2, 3]);
       expect(df.columns, ['one', 'two', 'alphabets']);
 
-      expect(df.pos[0].data, [1, 10, 'A']);
-      expect(df.pos[1].data, [2, 20, 'B']);
-      expect(df.pos[2].data, [3, 30, 'C']);
-      expect(df.pos[3].data, [4, 40, 'D']);
+      expect(df.byPos[0].data, [1, 10, 'A']);
+      expect(df.byPos[1].data, [2, 20, 'B']);
+      expect(df.byPos[2].data, [3, 30, 'C']);
+      expect(df.byPos[3].data, [4, 40, 'D']);
     });
 
     test('series.withSeriesListAndList', () {
@@ -51,10 +51,10 @@ void main() {
       expect(df.labels, [0, 1, 2, 3]);
       expect(df.columns, ['one', 'two', 'alphabets', 'three', 'four']);
 
-      expect(df.pos[0].data, [1, 10, 'A', 1000, 'AA']);
-      expect(df.pos[1].data, [2, 20, 'B', 2000, 'BB']);
-      expect(df.pos[2].data, [3, 30, 'C', 3000, 'CC']);
-      expect(df.pos[3].data, [4, 40, 'D', 4000, 'DD']);
+      expect(df.byPos[0].data, [1, 10, 'A', 1000, 'AA']);
+      expect(df.byPos[1].data, [2, 20, 'B', 2000, 'BB']);
+      expect(df.byPos[2].data, [3, 30, 'C', 3000, 'CC']);
+      expect(df.byPos[3].data, [4, 40, 'D', 4000, 'DD']);
     });
 
     test('empty', () {
