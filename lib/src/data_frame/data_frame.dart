@@ -6,6 +6,7 @@ import 'package:grizzly_primitives/grizzly_primitives.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_scales/grizzly_scales.dart';
+import 'package:collection/collection.dart';
 
 import 'package:text_table/text_table.dart';
 
@@ -45,6 +46,9 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     if (position >= numRows) throw new RangeError.range(position, 0, numRows);
     return labels.elementAt(position);
   }
+
+  @override
+  bool containsLabel(LT label) => _mapper.containsKey(label);
 
   SeriesFix<LT, dynamic> operator [](String column) {
     final int colPos = _columns.indexOf(column);
@@ -183,6 +187,163 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     }
     return tab.toString();
   }
+
+  bool labelsMatch(
+      final /* IterView<LT> | Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is IterView<LT>) {
+      return _iterEquality.equals(this.labels, labels.asIterable);
+    } else if (labels is Labeled<LT>) {
+      return _iterEquality.equals(this.labels, labels.labels);
+    } else if (labels is Iterable<LT>) {
+      return _iterEquality.equals(this.labels, labels);
+    }
+    throw new UnsupportedError('Type not supported!');
+  }
+
+  void _updatePosOnRemove(int posLimit) {
+    for (LT label in _mapper.keys) {
+      int pos = _mapper[label];
+      if (pos > posLimit) _mapper[label]--;
+    }
+  }
+
+  /// Remove element at position [pos]
+  void removeByPos(int pos) {
+    if (pos >= numRows) throw new RangeError.range(pos, 0, numRows);
+
+    final LT label = _labels[pos];
+    _mapper.remove(label);
+    _labels.removeAt(pos);
+    _updatePosOnRemove(pos);
+
+    for (Series s in _data) {
+      s.remove(pos);
+    }
+  }
+
+  void removeManyByPos(List<int> positions) {
+    if (positions.length == 0) {
+      return;
+    }
+
+    final positionSet = new Set<int>.from(positions).toList();
+    positionSet.sort((int a, int b) => b.compareTo(a));
+    if (positionSet.first >= numRows)
+      throw new RangeError.range(positionSet.first, 0, numRows);
+
+    for (int pos in positionSet) {
+      final LT label = _labels[pos];
+      _mapper.remove(label);
+      _labels.removeAt(pos);
+      _updatePosOnRemove(pos);
+    }
+
+    for (Series s in _data) {
+      s.removeMany(positionSet.toList());
+    }
+    return;
+  }
+
+  void drop(LT label) {
+    if (!_mapper.containsKey(label)) {
+      return;
+    }
+
+    final int pos = _mapper[label];
+    _labels.removeAt(pos);
+    _mapper.remove(label);
+    _updatePosOnRemove(pos);
+
+    for (Series s in _data) {
+      s.remove(pos);
+    }
+  }
+
+  void dropMany(/* Iterable<LT> | IterView<LT> | Labeled */ labels) {
+    if (labels is IterView<LT>) {
+      labels = (labels as IterView<LT>).asIterable;
+    } else if (labels is Labeled<LT>) {
+      labels = (labels as Labeled<LT>).labels;
+    }
+    for (LT label in labels) {
+      if (!_mapper.containsKey(label)) {
+        continue;
+      }
+
+      final int pos = _mapper[label];
+      _labels.removeAt(pos);
+      _mapper.remove(label);
+      _updatePosOnRemove(pos);
+
+      for (Series s in _data) {
+        s.remove(pos);
+      }
+    }
+  }
+
+  void keep(mask) {
+    if (mask is BoolSeriesViewBase<LT>) {
+      keepIf(mask);
+      return;
+    } else if (mask is Labeled<LT>) {
+      keepOnly(mask);
+      return;
+    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+      keepLabels(mask);
+      return;
+    } else if (mask is DfCond<LT>) {
+      keepWhen(mask);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  void keepOnly(Labeled<LT> mask) {
+    if (numRows != mask.labels.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.labels.length, subject: 'mask');
+
+    final pos = <int>[];
+    for (LT lab in labels) {
+      if (!mask.containsLabel(lab)) pos.add(posOf(lab));
+    }
+    removeManyByPos(pos);
+  }
+
+  void keepLabels(/* Iterable<LT> | IterView<LT> */ mask) {
+    if (mask is IterView<LT>) {
+      mask = mask.asIterable;
+    }
+    if (mask is Iterable<LT>) {
+      if (numRows != mask.length)
+        throw lengthMismatch(
+            expected: numRows, found: mask.length, subject: 'mask');
+
+      keepOnly(new BoolSeriesView.constant(true, labels: mask));
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  void keepIf(BoolSeriesViewBase<LT> mask) {
+    if (numRows != mask.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.length, subject: 'mask');
+
+    final pos = <int>[];
+    for (LT lab in labels) {
+      if (!mask.containsLabel(lab) || !mask[lab]) pos.add(posOf(lab));
+    }
+    removeManyByPos(pos);
+  }
+
+  void keepWhen(DfCond<LT> cond) {
+    final pos = <int>[];
+    for (LT lab in labels) {
+      if (!cond(lab, this)) pos.add(posOf(lab));
+    }
+    removeManyByPos(pos);
+  }
 }
 
 /*
@@ -300,3 +461,5 @@ DataFrame _makeDf<LT>(
   }
   return new DataFrame<LT>._(data.keys.toList(), labs, d, mapper);
 }
+
+const IterableEquality _iterEquality = const IterableEquality();

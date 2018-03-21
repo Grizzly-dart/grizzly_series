@@ -81,10 +81,13 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   /// Drop elements by label [label]
-  void dropMany(List<LT> label) {
-    final labs = new Set<LT>.from(label);
-
-    for (LT label in labs) {
+  void dropMany(/* Iterable<LT> | IterView<LT> | Labeled */ labels) {
+    if (labels is IterView<LT>) {
+      labels = labels.asIterable;
+    } else if(labels is Labeled<LT>) {
+      labels = labels.labels;
+    }
+    for (LT label in labels) {
       if (!_mapper.containsKey(label)) {
         continue;
       }
@@ -97,8 +100,8 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  void assign(/* Series<LT, VT> | IterView<VT> */ other, {bool addNew: true}) {
-    if (other is Series<LT, VT>) {
+  void assign(/* SeriesView<LT, VT> | IterView<VT> */ other, {bool addNew: true}) {
+    if (other is SeriesView<LT, VT>) {
       for (LT label in other.labels) {
         if (containsLabel(label)) {
           final int sourcePos = _mapper[label];
@@ -138,10 +141,10 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
     if (!descending) {
       items.sort(
-          (Pair<LT, VT> a, Pair<LT, VT> b) => compareVT(a.value, b.value));
+          (Pair<LT, VT> a, Pair<LT, VT> b) => compareValue(a.value, b.value));
     } else {
       items.sort(
-          (Pair<LT, VT> a, Pair<LT, VT> b) => compareVT(b.value, a.value));
+          (Pair<LT, VT> a, Pair<LT, VT> b) => compareValue(b.value, a.value));
     }
 
     for (int i = 0; i < items.length; i++) {
@@ -176,16 +179,78 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     _mapper.addAll(mapper);
   }
 
-  @override
-  void mask(IterView<bool> mask) {
+  void keep(mask) {
+    if(mask is BoolSeriesViewBase<LT>) {
+      keepIf(mask);
+      return;
+    } else if(mask is Labeled<LT>) {
+      keepOnly(mask);
+      return;
+    } else if(mask is Iterable<LT> || mask is IterView<LT>) {
+      keepLabels(mask);
+      return;
+    } else if(mask is SeriesCond<LT>) {
+      keepWhen(mask);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  void keepOnly(Labeled<LT> mask) {
+    if (length != mask.labels.length)
+      throw lengthMismatch(
+          expected: length, found: mask.labels.length, subject: 'mask');
+
+    final pos = <int>[];
+    for (LT lab in labels) {
+      if (!mask.containsLabel(lab)) pos.add(posOf(lab));
+    }
+    removeMany(pos);
+  }
+
+  void keepLabels(/* Iterable<LT> | IterView<LT> */ mask) {
+    if (mask is IterView<LT>) {
+      mask = mask.asIterable;
+    }
+    if (mask is Iterable<LT>) {
+      if (length != mask.length)
+        throw lengthMismatch(
+            expected: length, found: mask.length, subject: 'mask');
+
+      keepOnly(new BoolSeriesView.constant(true, labels: mask));
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  void keepIf(BoolSeriesViewBase<LT> mask) {
     if (length != mask.length)
       throw lengthMismatch(
           expected: length, found: mask.length, subject: 'mask');
 
     final pos = <int>[];
-    for (int i = 0; i < length; i++) {
-      if (!mask[i]) pos.add(i);
+    for (LT lab in labels) {
+      if (!mask.containsLabel(lab) || !mask[lab]) pos.add(posOf(lab));
     }
     removeMany(pos);
   }
+
+  void keepWhen(SeriesCond<LT> cond) {
+    final pos = <int>[];
+    for (LT lab in labels) {
+      if (!cond(lab, this)) pos.add(posOf(lab));
+    }
+    removeMany(pos);
+  }
+
+  NumericSeries<LT, int> get asInt => this as NumericSeries<LT, int>;
+
+  NumericSeries<LT, double> get asDouble => this as NumericSeries<LT, double>;
+
+  BoolSeriesBase<LT> get asBool => this as BoolSeriesBase<LT>;
+
+  StringSeriesBase<LT> get asString => this as StringSeriesBase<LT>;
+
+  DynamicSeriesBase<LT> get asDynamic => this as DynamicSeriesBase<LT>;
 }
+

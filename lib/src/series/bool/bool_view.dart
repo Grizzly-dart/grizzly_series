@@ -31,6 +31,13 @@ class BoolSeriesView<LT> extends Object
     return new BoolSeriesView._build(madeLabels, d, name);
   }
 
+  factory BoolSeriesView.constant(bool data,
+          {name, Iterable<LT> labels, int length}) =>
+      new BoolSeriesView(
+          new ConstantIterable<bool>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
+
   factory BoolSeriesView.fromMap(Map<LT, bool> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
     final data = new Bool1D.sized(map.length);
@@ -75,7 +82,7 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   Bool1D makeValueArray(Iterable<bool> data) => new Bool1D(data);
 
   @override
-  int compareVT(bool a, bool b) => a == b ? 0 : a ? 1 : -1;
+  int compareValue(bool a, bool b) => a == b ? 0 : a ? 1 : -1;
 
   bool get max {
     for (bool v in data.asIterable) {
@@ -93,25 +100,5 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
     }
 
     return true;
-  }
-
-  BoolSeriesBase<LT> operator <(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator <=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
   }
 }

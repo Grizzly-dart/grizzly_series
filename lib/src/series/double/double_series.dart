@@ -6,18 +6,18 @@ class DoubleSeries<LT> extends Object
         SeriesFixMixin<LT, double>,
         SeriesMixin<LT, double>,
         DoubleSeriesViewMixin<LT>
-    implements NumericSeries<LT, double> {
+    implements DoubleSeriesFix<LT>, NumericSeries<LT, double> {
   final List<LT> _labels;
 
   final Double1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  DoubleSeries._(this._labels, this._data, this.name, this._mapper);
+  DoubleSeries._(this._labels, this._data, this._name, this._mapper);
 
-  DoubleSeries._build(this._labels, this._data, this.name)
+  DoubleSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
   factory DoubleSeries(/* Iterable<int> | IterView<int> */ data,
@@ -69,6 +69,12 @@ class DoubleSeries<LT> extends Object
 
   DoubleSeriesFix<LT> get fixed =>
       _fixed ??= new DoubleSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  String get name => _name is Function ? _name() : _name;
+
+  Stats<double> _stats;
+
+  Stats<double> get stats => _stats ??= new StatsImpl<double>(data);
 
   @override
   void negate() {

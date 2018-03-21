@@ -31,6 +31,13 @@ class StringSeriesView<LT> extends Object
     return new StringSeriesView._build(madeLabels, d, name);
   }
 
+  factory StringSeriesView.constant(String data,
+      {name, Iterable<LT> labels, int length}) =>
+      new StringSeriesView(
+          new ConstantIterable<String>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
+
   factory StringSeriesView.fromMap(Map<LT, String> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
     final data = new String1D.sized(map.length);
@@ -75,7 +82,7 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   String1D makeValueArray(Iterable<String> data) => new String1D(data);
 
   @override
-  int compareVT(String a, String b) => a.compareTo(b);
+  int compareValue(String a, String b) => a.compareTo(b);
 
   String max() {
     String ret;
@@ -101,25 +108,5 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
     }
 
     return ret;
-  }
-
-  BoolSeriesBase<LT> operator <(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator <=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
   }
 }

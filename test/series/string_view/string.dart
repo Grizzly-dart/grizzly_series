@@ -11,7 +11,7 @@ void main() {
       final s = new StringSeries<String>(['ett', 'två', 'tre'],
           labels: ['one', 'two', 'three']);
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.toList(), ['ett', 'två', 'tre']);
       expect(s.length, 3);
       expect(s.containsLabel('one'), true);
       expect(s.containsLabel('four'), false);
@@ -36,7 +36,7 @@ void main() {
         'three': 'tre',
       });
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.toList(), ['ett', 'två', 'tre']);
       expect(s.length, 3);
       expect(s.containsLabel('one'), true);
       expect(s.containsLabel('four'), false);
@@ -54,7 +54,7 @@ void main() {
       expect(s.labelsMatch(<String>['one', 'two', 'three', 'four']), false);
     });
 
-    test('map', () {
+    test('ops', () {
       final s = new StringSeries<String>.fromMap({
         'one': 'ett',
         'two': 'två',
@@ -62,61 +62,61 @@ void main() {
       });
       s['one'] = '1';
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['1', 'två', 'tre']);
+      expect(s.toList(), ['1', 'två', 'tre']);
       s.set('one', 'ett');
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.toList(), ['ett', 'två', 'tre']);
       s['five'] = 'fem';
       expect(s.labels, ['one', 'two', 'three', 'five']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre', 'fem']);
+      expect(s.toList(), ['ett', 'två', 'tre', 'fem']);
       s.set('ten', 'tie');
       expect(s.labels, ['one', 'two', 'three', 'five', 'ten']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre', 'fem', 'tie']);
+      expect(s.toList(), ['ett', 'två', 'tre', 'fem', 'tie']);
       s.append('fifteen', 'femton');
       expect(s.labels, ['one', 'two', 'three', 'five', 'ten', 'fifteen']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre', 'fem', 'tie', 'femton']);
+      expect(s.toList(), ['ett', 'två', 'tre', 'fem', 'tie', 'femton']);
       expect(
           () => s.append('ten', 'tie'), throwsA(new isInstanceOf<Exception>()));
       s.remove(4);
       expect(s.labels, ['one', 'two', 'three', 'five', 'fifteen']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre', 'fem', 'femton']);
+      expect(s.toList(), ['ett', 'två', 'tre', 'fem', 'femton']);
       s.removeMany([3, 4]);
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.toList(), ['ett', 'två', 'tre']);
       s.drop('two');
       expect(s.labels, ['one', 'three']);
-      expect(s.data.asIterable, ['ett', 'tre']);
+      expect(s.toList(), ['ett', 'tre']);
       s.assignMap({'five': 'fem', 'ten': 'tie'});
       expect(s.labels, ['one', 'three', 'five', 'ten']);
-      expect(s.data.asIterable, ['ett', 'tre', 'fem', 'tie']);
+      expect(s.toList(), ['ett', 'tre', 'fem', 'tie']);
       s.dropMany(['one', 'three']);
       expect(s.labels, ['five', 'ten']);
-      expect(s.data.asIterable, ['fem', 'tie']);
+      expect(s.toList(), ['fem', 'tie']);
       s.apply((s) => s + '.');
       expect(s.labels, ['five', 'ten']);
-      expect(s.data.asIterable, ['fem.', 'tie.']);
+      expect(s.toList(), ['fem.', 'tie.']);
       s.apply((s) => s.substring(0, s.length - 1));
       expect(s.labels, ['five', 'ten']);
-      expect(s.data.asIterable, ['fem', 'tie']);
+      expect(s.toList(), ['fem', 'tie']);
       s.assign(new StringSeriesView.fromMap(
           {'one': 'ett', 'two': 'två', 'three': 'tre'}));
       expect(s.labels, ['five', 'ten', 'one', 'two', 'three']);
-      expect(s.data.asIterable, ['fem', 'tie', 'ett', 'två', 'tre']);
+      expect(s.toList(), ['fem', 'tie', 'ett', 'två', 'tre']);
       s.sortByLabel();
       expect(s.labels, ['five', 'one', 'ten', 'three', 'two']);
-      expect(s.data.asIterable, ['fem', 'ett', 'tie', 'tre', 'två']);
+      expect(s.toList(), ['fem', 'ett', 'tie', 'tre', 'två']);
       s.sortByLabel(descending: true);
       expect(s.labels, ['two', 'three', 'ten', 'one', 'five']);
-      expect(s.data.asIterable, ['två', 'tre', 'tie', 'ett', 'fem']);
+      expect(s.toList(), ['två', 'tre', 'tie', 'ett', 'fem']);
       s.sortByValue();
       expect(s.labels, ['one', 'five', 'ten', 'three', 'two']);
-      expect(s.data.asIterable, ['ett', 'fem', 'tie', 'tre', 'två']);
+      expect(s.toList(), ['ett', 'fem', 'tie', 'tre', 'två']);
       s.sortByValue(descending: true);
       expect(s.labels, ['two', 'three', 'ten', 'five', 'one']);
-      expect(s.data.asIterable, ['två', 'tre', 'tie', 'fem', 'ett']);
-      s.mask(new Iter<bool>([true, false, true, false, true]));
+      expect(s.toList(), ['två', 'tre', 'tie', 'fem', 'ett']);
+      s.keepLabels([true, false, true, false, true]);
       expect(s.labels, ['two', 'ten', 'one']);
-      expect(s.data.asIterable, ['två', 'tie', 'ett']);
+      expect(s.toList(), ['två', 'tie', 'ett']);
     });
   });
 }

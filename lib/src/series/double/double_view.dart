@@ -31,6 +31,13 @@ class DoubleSeriesView<LT> extends Object
     return new DoubleSeriesView._build(madeLabels, d, name);
   }
 
+  factory DoubleSeriesView.constant(double data,
+          {name, Iterable<LT> labels, int length}) =>
+      new DoubleSeriesView(
+          new ConstantIterable<double>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
+
   factory DoubleSeriesView.fromMap(Map<LT, double> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
     final data = new Double1D.sized(map.length);
@@ -50,6 +57,10 @@ class DoubleSeriesView<LT> extends Object
           name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
+
+  Stats<double> _stats;
+
+  Stats<double> get stats => _stats ??= new StatsImpl<double>(data);
 
   DoubleSeriesView<LT> get view => this;
 }

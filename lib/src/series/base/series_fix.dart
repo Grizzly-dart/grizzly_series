@@ -53,4 +53,14 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
       _data[i] = func(_data[i]);
     }
   }
+
+  NumericSeriesFix<LT, int> get asInt => this as NumericSeriesFix<LT, int>;
+
+  NumericSeriesFix<LT, double> get asDouble => this as NumericSeriesFix<LT, double>;
+
+  BoolSeriesFixBase<LT> get asBool => this as BoolSeriesFixBase<LT>;
+
+  StringSeriesFixBase<LT> get asString => this as StringSeriesFixBase<LT>;
+
+  DynamicSeriesFixBase<LT> get asDynamic => this as DynamicSeriesFixBase<LT>;
 }

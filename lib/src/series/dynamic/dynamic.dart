@@ -6,18 +6,18 @@ class DynamicSeries<LT> extends Object
         SeriesFixMixin<LT, dynamic>,
         SeriesMixin<LT, dynamic>,
         DynamicSeriesViewMixin<LT>
-    implements DynamicSeriesBase<LT> {
+    implements DynamicSeriesFix<LT>, DynamicSeriesBase<LT> {
   final List<LT> _labels;
 
   final Dynamic1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  DynamicSeries._(this._labels, this._data, this.name, this._mapper);
+  DynamicSeries._(this._labels, this._data, this._name, this._mapper);
 
-  DynamicSeries._build(this._labels, this._data, this.name)
+  DynamicSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
   factory DynamicSeries(/* Iterable<dynamic> | IterView<dynamic> */ data,
@@ -59,6 +59,8 @@ class DynamicSeries<LT> extends Object
   Iterable<LT> get labels => _labels;
 
   DynamicArrayView get data => _data.view;
+
+  String get name => _name is Function ? _name() : _name.toString();
 
   DynamicSeriesView<LT> _view;
 

@@ -5,7 +5,7 @@ class DynamicSeriesFix<LT> extends Object
         SeriesViewMixin<LT, dynamic>,
         SeriesFixMixin<LT, dynamic>,
         DynamicSeriesViewMixin<LT>
-    implements DynamicSeriesFixBase<LT> {
+    implements DynamicSeriesView<LT>, DynamicSeriesFixBase<LT> {
   final List<LT> _labels;
 
   final Dynamic1D _data;

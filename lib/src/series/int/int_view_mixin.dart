@@ -20,7 +20,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
   Int1D makeValueArray(Iterable<int> data) => new Int1D(data);
 
   @override
-  int compareVT(int a, int b) => a.compareTo(b);
+  int compareValue(int a, int b) => a.compareTo(b);
 
   int get max => data.max;
 

@@ -21,27 +21,7 @@ abstract class DynamicSeriesViewMixin<LT> implements DynamicSeriesViewBase<LT> {
   Dynamic1D makeValueArray(Iterable<dynamic> data) => new Dynamic1D(data);
 
   @override
-  int compareVT(dynamic a, dynamic b) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator <(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator <=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
-    throw new UnimplementedError();
-  }
-
-  BoolSeriesBase<LT> operator >=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+  int compareValue(dynamic a, dynamic b) {
     throw new UnimplementedError();
   }
 }

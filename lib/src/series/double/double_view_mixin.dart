@@ -22,7 +22,7 @@ abstract class DoubleSeriesViewMixin<LT>
   Double1D makeValueArray(Iterable<double> data) => new Double1D(data);
 
   @override
-  int compareVT(double a, double b) => a.compareTo(b);
+  int compareValue(double a, double b) => a.compareTo(b);
 
   double get max => data.max;
 

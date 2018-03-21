@@ -6,18 +6,18 @@ class StringSeries<LT> extends Object
         SeriesFixMixin<LT, String>,
         SeriesMixin<LT, String>,
         StringSeriesViewMixin<LT>
-    implements Series<LT, String> {
+    implements StringSeriesFix<LT>, Series<LT, String> {
   final List<LT> _labels;
 
   final String1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  StringSeries._(this._labels, this._data, this.name, this._mapper);
+  StringSeries._(this._labels, this._data, this._name, this._mapper);
 
-  StringSeries._build(this._labels, this._data, this.name)
+  StringSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
   factory StringSeries(/* Iterable<String> | IterView<String> */ data,
@@ -69,6 +69,8 @@ class StringSeries<LT> extends Object
 
   StringSeriesFix<LT> get fixed =>
       _fixed ??= new StringSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  String get name => _name is Function ? _name() : _name.toString();
 }
 
 /* TODO

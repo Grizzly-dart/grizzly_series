@@ -33,6 +33,13 @@ class IntSeriesView<LT> extends Object
     return new IntSeriesView._build(madeLabels, d, name);
   }
 
+  factory IntSeriesView.constant(int data,
+      {name, Iterable<LT> labels, int length}) =>
+      new IntSeriesView(
+          new ConstantIterable<int>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
+
   factory IntSeriesView.fromMap(Map<LT, int> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
     final data = new Int1D.sized(map.length);
@@ -52,6 +59,10 @@ class IntSeriesView<LT> extends Object
           name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();
+
+  Stats<int> _stats;
+
+  Stats<int> get stats => _stats ??= new StatsImpl<int>(data);
 
   IntSeriesView<LT> get view => this;
 }
