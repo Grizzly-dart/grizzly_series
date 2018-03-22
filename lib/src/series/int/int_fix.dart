@@ -68,9 +68,7 @@ class IntSeriesFix<LT> extends Object
 
   String get name => _name is Function ? _name() : _name.toString();
 
-  Stats<int> _stats;
-
-  Stats<int> get stats => _stats ??= new StatsImpl<int>(data);
+  Stats<int> get stats => _data.stats;
 
   @override
   void negate() {

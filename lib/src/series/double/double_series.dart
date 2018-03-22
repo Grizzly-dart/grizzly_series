@@ -20,13 +20,15 @@ class DoubleSeries<LT> extends Object
   DoubleSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DoubleSeries(/* Iterable<int> | IterView<int> */ data,
+  factory DoubleSeries(/* Iterable<double> | IterView<double> */ data,
       {dynamic name, Iterable<LT> labels}) {
     Double1D d;
     if (data is Iterable<double>) {
       d = new Double1D(data);
     } else if (data is IterView<double>) {
       d = new Double1D.copy(data);
+    } else if (data is Iterable<num> || data is IterView<num>) {
+      d = new Double1D.fromNum(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }
@@ -58,7 +60,7 @@ class DoubleSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  Numeric1DView<double> get data => _data.view;
+  Double1DView get data => _data.view;
 
   DoubleSeriesView<LT> _view;
 
@@ -72,9 +74,7 @@ class DoubleSeries<LT> extends Object
 
   String get name => _name is Function ? _name() : _name;
 
-  Stats<double> _stats;
-
-  Stats<double> get stats => _stats ??= new StatsImpl<double>(data);
+  Stats<double> get stats => data.stats;
 
   @override
   void negate() {

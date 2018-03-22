@@ -58,9 +58,7 @@ class DoubleSeriesView<LT> extends Object
 
   String get name => _name is Function ? _name() : _name;
 
-  Stats<double> _stats;
-
-  Stats<double> get stats => _stats ??= new StatsImpl<double>(data);
+  Stats<double> get stats => data.stats;
 
   DoubleSeriesView<LT> get view => this;
 }

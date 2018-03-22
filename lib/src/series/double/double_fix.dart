@@ -59,16 +59,14 @@ class DoubleSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  Numeric1DView<double> get data => _data.view;
+  Double1DView get data => _data.view;
+
+  Stats<double> get stats => data.stats;
 
   DoubleSeriesView<LT> get view =>
       _view ??= new DoubleSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
   DoubleSeriesFix<LT> get fixed => this;
-
-  Stats<double> _stats;
-
-  Stats<double> get stats => _stats ??= new StatsImpl<double>(data);
 
   String get name => _name is Function ? _name() : _name;
 
