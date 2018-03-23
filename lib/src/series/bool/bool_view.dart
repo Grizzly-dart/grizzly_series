@@ -7,7 +7,7 @@ class BoolSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final BoolArrayView data;
+  final Bool1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -18,11 +18,11 @@ class BoolSeriesView<LT> extends Object
 
   factory BoolSeriesView(/* Iterable<bool> | IterView<bool> */ data,
       {name, Iterable<LT> labels}) {
-    Bool1D d;
+    Bool1DView d;
     if (data is Iterable<bool>) {
-      d = new Bool1D(data);
+      d = new Bool1DView(data);
     } else if (data is IterView<bool>) {
-      d = new Bool1D.copy(data);
+      d = new Bool1DView.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }

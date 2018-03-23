@@ -11,6 +11,8 @@ void main() {
   print(df['num'] > df['other']);
   print(df['num'].eq(df['other']));
 
+  print(df.select(df['num'] > df['other']));
+
   df.keepIf(df['num'] > df['other']);
   print(df);
 }

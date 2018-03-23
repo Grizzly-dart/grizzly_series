@@ -7,7 +7,7 @@ class DoubleSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final Numeric1DView<double> data;
+  final Double1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -18,11 +18,11 @@ class DoubleSeriesView<LT> extends Object
 
   factory DoubleSeriesView(/* Iterable<double> | IterView<double> */ data,
       {name, Iterable<LT> labels}) {
-    Double1D d;
+    Double1DView d;
     if (data is Iterable<double>) {
-      d = new Double1D(data);
+      d = new Double1DView(data);
     } else if (data is IterView<double>) {
-      d = new Double1D.copy(data);
+      d = new Double1DView.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }

@@ -8,7 +8,7 @@ class BoolSeriesFix<LT> extends Object
     implements BoolSeriesView<LT>, BoolSeriesFixBase<LT> {
   final List<LT> _labels;
 
-  final Bool1D _data;
+  final Bool1DFix _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -23,11 +23,11 @@ class BoolSeriesFix<LT> extends Object
 
   factory BoolSeriesFix(/* Iterable<bool> | IterView<bool> */ data,
       {dynamic name, Iterable<LT> labels}) {
-    Bool1D d;
+    Bool1DFix d;
     if (data is Iterable<bool>) {
-      d = new Bool1D(data);
+      d = new Bool1DFix(data);
     } else if (data is IterView<bool>) {
-      d = new Bool1D.copy(data);
+      d = new Bool1DFix.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }
@@ -59,7 +59,7 @@ class BoolSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  BoolArrayView get data => _data.view;
+  Bool1DFix get data => _data;
 
   BoolSeriesView<LT> get view =>
       _view ??= new BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);

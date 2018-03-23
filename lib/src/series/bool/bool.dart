@@ -57,7 +57,7 @@ class BoolSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  BoolArrayView get data => _data.view;
+  Bool1DFix get data => _data.fixed;
 
   BoolSeriesView<LT> _view;
 

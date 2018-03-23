@@ -58,7 +58,7 @@ class DynamicSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  DynamicArrayView get data => _data.view;
+  Dynamic1DFix get data => _data.fixed;
 
   String get name => _name is Function ? _name() : _name.toString();
 

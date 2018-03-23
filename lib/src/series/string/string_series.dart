@@ -58,7 +58,7 @@ class StringSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  StringArrayView get data => _data.view;
+  String1DFix get data => _data.fixed;
 
   StringSeriesView<LT> _view;
 

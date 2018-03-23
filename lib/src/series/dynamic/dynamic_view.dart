@@ -7,7 +7,7 @@ class DynamicSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final DynamicArrayView data;
+  final Dynamic1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -18,11 +18,11 @@ class DynamicSeriesView<LT> extends Object
 
   factory DynamicSeriesView(/* Iterable<dynamic> | IterView<dynamic> */ data,
       {name, Iterable<LT> labels}) {
-    Dynamic1D d;
+    Dynamic1DView d;
     if (data is Iterable<dynamic>) {
-      d = new Dynamic1D(data);
+      d = new Dynamic1DView(data);
     } else if (data is IterView<dynamic>) {
-      d = new Dynamic1D.copy(data);
+      d = new Dynamic1DView.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }

@@ -26,8 +26,8 @@ class DataFrame<LT> implements DataFrameBase<LT> {
                   String,
                   /* IterView<VT> | Iterable<VT> | SeriesView<LT, VT> | Map<LT, VT> */ dynamic>
               data,
-          {List<LT> labels}) =>
-      _makeDf(data, labels: labels);
+          {Iterable<LT> labels}) =>
+      _makeDf(data, labels: labels?.toList());
 
   int get numCols => _columns.length;
 
@@ -147,7 +147,10 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   void setByLabel(
       LT label,
       /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> */ value) {
-    if (!_mapper.containsKey(label)) throw labelNotFound(label);
+    if (!_mapper.containsKey(label)) {
+      // TODO append
+      return;
+    }
     setByPos(_mapper[label], value);
   }
 
@@ -344,6 +347,66 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     }
     removeManyByPos(pos);
   }
+
+  DataFrame<LT> select(mask) {
+    if (mask is BoolSeriesViewBase<LT>) {
+      return selectIf(mask);
+    } else if (mask is Labeled<LT>) {
+      return selectOnly(mask);
+    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+      return selectLabels(mask);
+    } else if (mask is DfCond<LT>) {
+      return selectWhen(mask);
+    }
+    throw new UnimplementedError();
+  }
+
+  DataFrame<LT> selectOnly(Labeled<LT> mask) {
+    if (numRows != mask.labels.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.labels.length, subject: 'mask');
+
+    final ret = new DataFrame<LT>({});
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab)) ret.setByLabel(lab, getByLabel(lab));
+    }
+    return ret;
+  }
+
+  DataFrame<LT> selectLabels(/* Iterable<LT> | IterView<LT> */ mask) {
+    if (mask is IterView<LT>) {
+      mask = mask.asIterable;
+    }
+    if (mask is Iterable<LT>) {
+      if (numRows != mask.length)
+        throw lengthMismatch(
+            expected: numRows, found: mask.length, subject: 'mask');
+
+      return selectOnly(new BoolSeriesView.constant(true, labels: mask));
+    }
+    throw new UnimplementedError();
+  }
+
+  DataFrame<LT> selectIf(BoolSeriesViewBase<LT> mask) {
+    if (numRows != mask.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.length, subject: 'mask');
+
+    final ret = new DataFrame<LT>({});
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab) && mask[lab])
+        ret.setByLabel(lab, getByLabel(lab));
+    }
+    return ret;
+  }
+
+  DataFrame<LT> selectWhen(DfCond<LT> cond) {
+    final ret = new DataFrame<LT>({});
+    for (LT lab in labels) {
+      if (cond(lab, this)) ret.setByLabel(lab, getByLabel(lab));
+    }
+    return ret;
+  }
 }
 
 /*
@@ -462,4 +525,5 @@ DataFrame _makeDf<LT>(
   return new DataFrame<LT>._(data.keys.toList(), labs, d, mapper);
 }
 
-const IterableEquality _iterEquality = const IterableEquality();
+const UnorderedIterableEquality _iterEquality =
+    const UnorderedIterableEquality();

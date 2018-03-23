@@ -1,14 +1,111 @@
 part of grizzly.series;
 
+abstract class DoubleSeriesFixMixin<LT>
+    implements NumericSeriesFix<LT, double> {
+  @override
+  void addition(
+      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] += other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num ||
+        other is IterView<num> ||
+        other is Iterable<num>) {
+      data.addition(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void subtract(
+      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] -= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num ||
+        other is IterView<num> ||
+        other is Iterable<num>) {
+      data.subtract(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void multiply(
+      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] *= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num ||
+        other is IterView<num> ||
+        other is Iterable<num>) {
+      data.multiply(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void divide(
+      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] /= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num ||
+        other is IterView<num> ||
+        other is Iterable<num>) {
+      data.divide(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void truncDiv(
+          /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) =>
+      divide(other);
+}
+
 class DoubleSeriesFix<LT> extends Object
     with
         SeriesViewMixin<LT, double>,
         SeriesFixMixin<LT, double>,
-        DoubleSeriesViewMixin<LT>
+        DoubleSeriesViewMixin<LT>,
+        DoubleSeriesFixMixin<LT>
     implements DoubleSeriesView<LT>, NumericSeriesFix<LT, double> {
   final List<LT> _labels;
 
-  final Double1D _data;
+  final Double1DFix _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -23,11 +120,11 @@ class DoubleSeriesFix<LT> extends Object
 
   factory DoubleSeriesFix(/* Iterable<int> | IterView<int> */ data,
       {dynamic name, Iterable<LT> labels}) {
-    Double1D d;
+    Double1DFix d;
     if (data is Iterable<double>) {
-      d = new Double1D(data);
+      d = new Double1DFix(data);
     } else if (data is IterView<double>) {
-      d = new Double1D.copy(data);
+      d = new Double1DFix.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }
@@ -59,7 +156,7 @@ class DoubleSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  Double1DView get data => _data.view;
+  Double1DFix get data => _data;
 
   Stats<double> get stats => data.stats;
 

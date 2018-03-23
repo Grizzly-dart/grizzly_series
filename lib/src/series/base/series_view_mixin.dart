@@ -253,6 +253,81 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     throw new UnimplementedError();
   }
 
+  BoolSeries<LT> boolean(SeriesCond<LT, VT> cond) {
+    final ret = new BoolSeries<LT>([]);
+    for (LT lab in labels) {
+      ret[lab] = cond(lab, this);
+    }
+    return ret;
+  }
+
+  Iter<LT> labelsWhere(SeriesCond<LT, VT> cond) {
+    final ret = new List<LT>();
+    for (LT lab in labels) {
+      if (cond(lab, this)) ret.add(lab);
+    }
+    return new Iter(ret);
+  }
+
+  Series<LT, VT> select(mask) {
+    if(mask is BoolSeriesViewBase<LT>) {
+      return selectIf(mask);
+    } else if(mask is Labeled<LT>) {
+      return selectOnly(mask);
+    } else if(mask is Iterable<LT> || mask is IterView<LT>) {
+      return selectLabels(mask);
+    } else if(mask is SeriesCond<LT, VT>) {
+      return selectWhen(mask);
+    }
+    throw new UnimplementedError();
+  }
+
+  Series<LT, VT> selectOnly(Labeled<LT> mask) {
+    if (length != mask.labels.length)
+      throw lengthMismatch(
+          expected: length, found: mask.labels.length, subject: 'mask');
+
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab)) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
+  Series<LT, VT> selectLabels(/* Iterable<LT> | IterView<LT> */ mask) {
+    if (mask is IterView<LT>) {
+      mask = mask.asIterable;
+    }
+    if (mask is Iterable<LT>) {
+      if (length != mask.length)
+        throw lengthMismatch(
+            expected: length, found: mask.length, subject: 'mask');
+
+      return selectOnly(new BoolSeriesView.constant(true, labels: mask));
+    }
+    throw new UnimplementedError();
+  }
+
+  Series<LT, VT> selectIf(BoolSeriesViewBase<LT> mask) {
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
+
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab) && mask[lab]) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
+  Series<LT, VT> selectWhen(SeriesCond<LT, VT> cond) {
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (cond(lab, this)) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
   NumericSeriesView<LT, int> get asInt => this as NumericSeriesView<LT, int>;
 
   NumericSeriesView<LT, double> get asDouble =>
@@ -265,4 +340,5 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   DynamicSeriesViewBase<LT> get asDynamic => this as DynamicSeriesViewBase<LT>;
 }
 
-const IterableEquality _iterEquality = const IterableEquality();
+const UnorderedIterableEquality _iterEquality =
+    const UnorderedIterableEquality();

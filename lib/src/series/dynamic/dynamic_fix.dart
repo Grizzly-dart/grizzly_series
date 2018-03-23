@@ -8,7 +8,7 @@ class DynamicSeriesFix<LT> extends Object
     implements DynamicSeriesView<LT>, DynamicSeriesFixBase<LT> {
   final List<LT> _labels;
 
-  final Dynamic1D _data;
+  final Dynamic1DFix _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -23,11 +23,11 @@ class DynamicSeriesFix<LT> extends Object
 
   factory DynamicSeriesFix(/* Iterable<dynamic> | IterView<dynamic> */ data,
       {dynamic name, Iterable<LT> labels}) {
-    Dynamic1D d;
+    Dynamic1DFix d;
     if (data is Iterable<dynamic>) {
-      d = new Dynamic1D(data);
+      d = new Dynamic1DFix(data);
     } else if (data is IterView<dynamic>) {
-      d = new Dynamic1D.copy(data);
+      d = new Dynamic1DFix.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }
@@ -59,7 +59,7 @@ class DynamicSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  DynamicArrayView get data => _data.view;
+  Dynamic1DFix get data => _data;
 
   DynamicSeriesView<LT> get view => _view ??=
       new DynamicSeriesView<LT>._(_labels, _data, () => name, _mapper);

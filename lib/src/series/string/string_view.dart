@@ -7,7 +7,7 @@ class StringSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final StringArrayView data;
+  final String1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -18,11 +18,11 @@ class StringSeriesView<LT> extends Object
 
   factory StringSeriesView(/* Iterable<String> | IterView<String> */ data,
       {name, Iterable<LT> labels}) {
-    String1D d;
+    String1DView d;
     if (data is Iterable<String>) {
-      d = new String1D(data);
+      d = new String1DView(data);
     } else if (data is IterView<String>) {
-      d = new String1D.copy(data);
+      d = new String1DView.copy(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }

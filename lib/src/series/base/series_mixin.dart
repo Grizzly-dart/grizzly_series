@@ -189,7 +189,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     } else if(mask is Iterable<LT> || mask is IterView<LT>) {
       keepLabels(mask);
       return;
-    } else if(mask is SeriesCond<LT>) {
+    } else if(mask is SeriesCond<LT, VT>) {
       keepWhen(mask);
       return;
     }
@@ -235,7 +235,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     removeMany(pos);
   }
 
-  void keepWhen(SeriesCond<LT> cond) {
+  void keepWhen(SeriesCond<LT, VT> cond) {
     final pos = <int>[];
     for (LT lab in labels) {
       if (!cond(lab, this)) pos.add(posOf(lab));
