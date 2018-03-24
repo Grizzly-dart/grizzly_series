@@ -28,6 +28,23 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     _mapper[label] = _data.length - 1;
   }
 
+  void insert(int pos, LT label, VT value) {
+    if (pos > length) throw new RangeError.range(pos, 0, length);
+    if (containsLabel(label)) drop(label);
+
+    _updatePosOnInsert(pos);
+    _mapper[label] = pos;
+    _labels.insert(pos, label);
+    _data.insert(pos, value);
+  }
+
+  void _updatePosOnInsert(int posLimit) {
+    for (LT label in _mapper.keys) {
+      int pos = _mapper[label];
+      if (pos > posLimit) _mapper[label]++;
+    }
+  }
+
   void _updatePosOnRemove(int posLimit) {
     for (LT label in _mapper.keys) {
       int pos = _mapper[label];
@@ -84,7 +101,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   void dropMany(/* Iterable<LT> | IterView<LT> | Labeled */ labels) {
     if (labels is IterView<LT>) {
       labels = labels.asIterable;
-    } else if(labels is Labeled<LT>) {
+    } else if (labels is Labeled<LT>) {
       labels = labels.labels;
     }
     for (LT label in labels) {
@@ -100,7 +117,8 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  void assign(/* SeriesView<LT, VT> | IterView<VT> */ other, {bool addNew: true}) {
+  void assign(/* SeriesView<LT, VT> | IterView<VT> */ other,
+      {bool addNew: true}) {
     if (other is SeriesView<LT, VT>) {
       for (LT label in other.labels) {
         if (containsLabel(label)) {
@@ -180,16 +198,16 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   void keep(mask) {
-    if(mask is BoolSeriesViewBase<LT>) {
+    if (mask is BoolSeriesViewBase<LT>) {
       keepIf(mask);
       return;
-    } else if(mask is Labeled<LT>) {
+    } else if (mask is Labeled<LT>) {
       keepOnly(mask);
       return;
-    } else if(mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
       keepLabels(mask);
       return;
-    } else if(mask is SeriesCond<LT, VT>) {
+    } else if (mask is SeriesCond<LT, VT>) {
       keepWhen(mask);
       return;
     }
@@ -253,4 +271,3 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
   DynamicSeriesBase<LT> get asDynamic => this as DynamicSeriesBase<LT>;
 }
-

@@ -6,7 +6,7 @@ class StringSeries<LT> extends Object
         SeriesFixMixin<LT, String>,
         SeriesMixin<LT, String>,
         StringSeriesViewMixin<LT>
-    implements StringSeriesFix<LT>, Series<LT, String> {
+    implements StringSeriesFix<LT>, StringSeriesBase<LT> {
   final List<LT> _labels;
 
   final String1D _data;
@@ -72,22 +72,3 @@ class StringSeries<LT> extends Object
 
   String get name => _name is Function ? _name() : _name.toString();
 }
-
-/* TODO
-  IntSeries<LT> toInt({int radix, int fillVal}) {
-    return new IntSeries<LT>(
-        _data
-            .map((String v) =>
-                int.parse(v, radix: radix, onError: (_) => fillVal))
-            .toList(),
-        name: name,
-        labels: _labels.toList());
-  }
-
-  DoubleSeries<LT> toDouble({double fillVal}) {
-    return new DoubleSeries<LT>(
-        _data.map((String v) => double.parse(v, (_) => fillVal)).toList(),
-        name: name,
-        labels: _labels.toList());
-  }
-  */

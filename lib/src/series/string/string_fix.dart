@@ -5,7 +5,7 @@ class StringSeriesFix<LT> extends Object
         SeriesViewMixin<LT, String>,
         SeriesFixMixin<LT, String>,
         StringSeriesViewMixin<LT>
-    implements StringSeriesView<LT>, SeriesFix<LT, String> {
+    implements StringSeriesView<LT>, StringSeriesFixBase<LT> {
   final List<LT> _labels;
 
   final String1DFix _data;

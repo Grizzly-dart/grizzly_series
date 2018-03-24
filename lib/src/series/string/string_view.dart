@@ -2,7 +2,7 @@ part of grizzly.series;
 
 class StringSeriesView<LT> extends Object
     with SeriesViewMixin<LT, String>, StringSeriesViewMixin<LT>
-    implements SeriesView<LT, String> {
+    implements StringSeriesViewBase<LT> {
   final _name;
 
   final Iterable<LT> labels;
@@ -32,7 +32,7 @@ class StringSeriesView<LT> extends Object
   }
 
   factory StringSeriesView.constant(String data,
-      {name, Iterable<LT> labels, int length}) =>
+          {name, Iterable<LT> labels, int length}) =>
       new StringSeriesView(
           new ConstantIterable<String>(data, length ?? labels.length),
           name: name,
@@ -61,7 +61,7 @@ class StringSeriesView<LT> extends Object
   StringSeriesView<LT> get view => this;
 }
 
-abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
+abstract class StringSeriesViewMixin<LT> implements StringSeriesViewBase<LT> {
   StringSeries<LT> toSeries() =>
       new StringSeries<LT>(data, name: name, labels: labels);
 
@@ -83,6 +83,23 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
 
   @override
   int compareValue(String a, String b) => a.compareTo(b);
+
+  @override
+  DoubleSeries<LT> toDouble(
+          {double defaultValue, double onError(String source)}) =>
+      new DoubleSeries<LT>(
+          data.toDouble(defaultValue: defaultValue, onError: onError),
+          name: name,
+          labels: labels);
+
+  @override
+  IntSeries<LT> toInt(
+          {int radix, int defaultValue, int onError(String source)}) =>
+      new IntSeries<LT>(
+          data.toInt(
+              radix: radix, defaultValue: defaultValue, onError: onError),
+          name: name,
+          labels: labels);
 
   String max() {
     String ret;

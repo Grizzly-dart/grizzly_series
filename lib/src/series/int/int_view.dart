@@ -34,7 +34,7 @@ class IntSeriesView<LT> extends Object
   }
 
   factory IntSeriesView.constant(int data,
-      {name, Iterable<LT> labels, int length}) =>
+          {name, Iterable<LT> labels, int length}) =>
       new IntSeriesView(
           new ConstantIterable<int>(data, length ?? labels.length),
           name: name,

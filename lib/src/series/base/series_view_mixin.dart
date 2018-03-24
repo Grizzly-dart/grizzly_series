@@ -270,13 +270,13 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   }
 
   Series<LT, VT> select(mask) {
-    if(mask is BoolSeriesViewBase<LT>) {
+    if (mask is BoolSeriesViewBase<LT>) {
       return selectIf(mask);
-    } else if(mask is Labeled<LT>) {
+    } else if (mask is Labeled<LT>) {
       return selectOnly(mask);
-    } else if(mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
       return selectLabels(mask);
-    } else if(mask is SeriesCond<LT, VT>) {
+    } else if (mask is SeriesCond<LT, VT>) {
       return selectWhen(mask);
     }
     throw new UnimplementedError();

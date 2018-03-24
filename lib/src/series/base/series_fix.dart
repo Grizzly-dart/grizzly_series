@@ -56,7 +56,8 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
 
   NumericSeriesFix<LT, int> get asInt => this as NumericSeriesFix<LT, int>;
 
-  NumericSeriesFix<LT, double> get asDouble => this as NumericSeriesFix<LT, double>;
+  NumericSeriesFix<LT, double> get asDouble =>
+      this as NumericSeriesFix<LT, double>;
 
   BoolSeriesFixBase<LT> get asBool => this as BoolSeriesFixBase<LT>;
 
