@@ -15,7 +15,7 @@ dependencies:
     path: ../grizzly_primitives
   grizzly_scales: ^0.0.4-dev
     #path: ../grizzly_scales
-  text_table: ^2.5.2
+  text_table: ^2.5.3
 
 dev_dependencies:
   test: ^0.12.0

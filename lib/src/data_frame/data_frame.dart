@@ -40,13 +40,13 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   Iterable<LT> get labels => _labels;
 
-  @override
-  int posOf(LT label) => _mapper[label];
-
   LT labelAt(int position) {
     if (position >= numRows) throw new RangeError.range(position, 0, numRows);
     return labels.elementAt(position);
   }
+
+  @override
+  int posOf(LT label) => _mapper[label];
 
   @override
   bool containsLabel(LT label) => _mapper.containsKey(label);
@@ -167,40 +167,61 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     if (_mapper.containsKey(label))
       throw new Exception('Label already exists!');
 
-    if (value is IterView) {
-      if (value.length != _columns.length)
-        throw new Exception('Value does not match number of columns!');
+    if (_columns.length != 0) {
+      if (value is IterView) {
+        if (value.length != _columns.length)
+          throw new Exception('Value does not match number of columns!');
 
-      for (int i = 0; i < _columns.length; i++) {
-        _data[i].append(label, value[i]);
+        for (int i = 0; i < _columns.length; i++) {
+          _data[i].append(label, value[i]);
+        }
+      } else if (value is SeriesView<String, dynamic>) {
+        for (int i = 0; i < _columns.length; i++) {
+          String colname = _columns[i];
+          if (value.containsLabel(colname))
+            _data[i].append(label, value[colname]);
+          else
+            _data[i].append(label, null);
+        }
+      } else if (value is Map<String, dynamic>) {
+        for (int i = 0; i < _columns.length; i++) {
+          String colname = _columns[i];
+          if (value.containsKey(colname))
+            _data[i].append(label, value[colname]);
+          else
+            _data[i].append(label, null);
+        }
+      } else if (value is DfCellSetter<LT, dynamic>) {
+        for (int i = 0; i < _columns.length; i++) {
+          String colname = _columns[i];
+          _data[i].append(label, value(colname, label));
+        }
+      } else {
+        throw new UnsupportedError('Type not supported!');
       }
-    } else if (value is SeriesView<String, dynamic>) {
-      for (int i = 0; i < _columns.length; i++) {
-        String colname = _columns[i];
-        if (value.containsLabel(colname))
-          _data[i].append(label, value[colname]);
-        else
-          _data[i].append(label, null);
-      }
-    } else if (value is Map<String, dynamic>) {
-      for (int i = 0; i < _columns.length; i++) {
-        String colname = _columns[i];
-        if (value.containsKey(colname))
-          _data[i].append(label, value[colname]);
-        else
-          _data[i].append(label, null);
-      }
-    } else if (value is DfCellSetter<LT, dynamic>) {
-      for (int i = 0; i < _columns.length; i++) {
-        String colname = _columns[i];
-        _data[i].append(label, value(colname, label));
-      }
+      _labels.add(label);
+      _mapper[label] = _labels.length - 1;
     } else {
-      throw new UnsupportedError('Type not supported!');
+      if (value is SeriesView<String, dynamic>) {
+        _columns.addAll(value.labels);
+        for (int i = 0; i < _columns.length; i++) {
+          String colname = _columns[i];
+          _data.add(new DynamicSeries<LT>([value[colname]],
+              name: colname, labels: <LT>[label]));
+        }
+      } else if (value is Map<String, dynamic>) {
+        _columns.addAll(value.keys);
+        for (int i = 0; i < _columns.length; i++) {
+          String colname = _columns[i];
+          _data.add(new DynamicSeries<LT>([value[colname]],
+              name: colname, labels: <LT>[label]));
+        }
+      } else {
+        throw new UnsupportedError('Type not supported!');
+      }
+      _labels.add(label);
+      _mapper[label] = _labels.length - 1;
     }
-    _labels.add(label);
-    _mapper[label] = _data.length - 1;
-    return;
   }
 
   void insert(
@@ -246,6 +267,185 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       throw new UnsupportedError('Type not supported!');
     }
   }
+
+  void appendColumn(
+      String name,
+      /* SeriesView<LT, dynamic> | IterView | Iterable | Map<VT, dynamic> | int | double | String */ value) {
+    if (_columns.contains(name)) removeColumn(name);
+
+    if (value is SeriesView<LT, dynamic>) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        LT lab = labelAt(i);
+        if (value.containsLabel(lab)) {
+          d[i] = value.get(lab);
+        }
+      }
+      _data.add(value.make<LT>(d, name: name, labels: labels));
+      _columns.add(name);
+      return;
+    } else if (value is IterView || value is Iterable) {
+      if (value is Iterable) {
+        value = new IterView(value);
+      }
+
+      if (value is IterView) {
+        if (value.length != numRows)
+          throw lengthMismatch(
+              expected: numRows, found: value.length, subject: 'value');
+        _data.add(new DynamicSeries<LT>(value, name: name, labels: labels));
+        _columns.add(name);
+        return;
+      }
+    } else if (value is Map<LT, dynamic>) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        LT lab = labelAt(i);
+        if (value.containsKey(lab)) {
+          d[i] = value[lab];
+        }
+      }
+      _data.add(new DynamicSeries<LT>(d, name: name, labels: labels));
+      _columns.add(name);
+      return;
+    } else if (value is int) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.add(new IntSeries<LT>(d, name: name, labels: labels));
+      _columns.add(name);
+      return;
+    } else if (value is double) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.add(new DoubleSeries<LT>(d, name: name, labels: labels));
+      _columns.add(name);
+      return;
+    } else if (value is String) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.add(new StringSeries<LT>(d, name: name, labels: labels));
+      _columns.add(name);
+      return;
+    }
+    throw new UnsupportedError('');
+  }
+
+  void insertColumn(
+      int pos,
+      String name,
+      /* SeriesView<LT, dynamic> | IterView | Iterable | Map<VT, dynamic> | int | double | String */ value) {
+    if (containsColumn(name)) removeColumn(name);
+
+    if (pos > numCols) throw new Exception('Invalid position!');
+
+    if (value is SeriesView<LT, dynamic>) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        LT lab = labelAt(i);
+        if (value.containsLabel(lab)) {
+          d[i] = value.get(lab);
+        }
+      }
+      _data.insert(pos, value.make(d, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
+    } else if (value is IterView || value is Iterable) {
+      if (value is Iterable) {
+        value = new IterView(value);
+      }
+
+      if (value is IterView) {
+        if (value.length != numRows)
+          throw lengthMismatch(
+              expected: numRows, found: value.length, subject: 'value');
+        _data.insert(
+            pos, new DynamicSeries<LT>(value, name: name, labels: labels));
+        _columns.insert(pos, name);
+        return;
+      }
+    } else if (value is Map<LT, dynamic>) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        LT lab = labelAt(i);
+        if (value.containsKey(lab)) {
+          d[i] = value[lab];
+        }
+      }
+      _data.insert(pos, new DynamicSeries<LT>(d, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
+    } else if (value is int) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.insert(pos, new IntSeries<LT>(d, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
+    } else if (value is double) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.insert(pos, new DoubleSeries<LT>(d, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
+    } else if (value is String) {
+      final d = new List()..length = numRows;
+      for (int i = 0; i < numRows; i++) {
+        d[i] = value;
+      }
+      _data.insert(pos, new StringSeries<LT>(d, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
+    }
+    throw new UnsupportedError('');
+  }
+
+  void setColumn(String name, value) {
+    if (!containsColumn(name)) {
+      appendColumn(name, value);
+      return;
+    }
+
+    int index = _columns.indexOf(name);
+    if (value is SeriesView<LT, dynamic>) {
+      _data[index].assign(value, addNew: false);
+      return;
+    } else if (value is IterView || value is Iterable) {
+      if (value is Iterable) {
+        value = new IterView(value);
+      }
+
+      if (value is IterView) {
+        _data[index].assign(value, addNew: false);
+        return;
+      }
+    } else if (value is Map<LT, dynamic>) {
+      _data[index].assignMap(value, addNew: false);
+      return;
+    } else if (value is int || value is double || value is String) {
+      _data[index].assign(value, addNew: false);
+      _columns.add(name);
+      return;
+    }
+    throw new UnsupportedError('');
+  }
+
+  void removeColumn(String name) {
+    int index = _columns.indexOf(name);
+    if (index < 0) return;
+    _columns.removeAt(index);
+    _data.removeAt(index);
+  }
+
+  bool containsColumn(String column) => _columns.contains(column);
 
   Pair<LT, DynamicSeriesFixBase<String>> pairByPos(int position) {
     if (position >= numRows) throw new RangeError.range(position, 0, numRows);
