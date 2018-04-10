@@ -28,8 +28,10 @@ class DoubleSeries<LT> extends Object
       d = new Double1D(data);
     } else if (data is IterView<double>) {
       d = new Double1D.copy(data);
-    } else if (data is Iterable<num> || data is IterView<num>) {
-      d = new Double1D.fromNum(data);
+    } else if (data is Iterable<num>) {
+      d = new Double1D.nums(data);
+    } else if(data is IterView<num>) {
+      d = new Double1D.copyNums(data);
     } else {
       throw new UnsupportedError('Type not supported!');
     }
