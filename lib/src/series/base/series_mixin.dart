@@ -98,10 +98,8 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   /// Drop elements by label [label]
-  void dropMany(/* Iterable<LT> | IterView<LT> | Labeled */ labels) {
-    if (labels is IterView<LT>) {
-      labels = labels.asIterable;
-    } else if (labels is Labeled<LT>) {
+  void dropMany(/* Iterable<LT> | Labeled */ labels) {
+    if (labels is Labeled<LT>) {
       labels = labels.labels;
     }
     for (LT label in labels) {
@@ -117,7 +115,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
   }
 
-  void assign(/* SeriesView<LT, VT> | IterView<VT> */ other,
+  void assign(/* SeriesView<LT, VT> | Iterable<VT> */ other,
       {bool addNew: true}) {
     if (other is SeriesView<LT, VT>) {
       for (LT label in other.labels) {
@@ -128,12 +126,12 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
           if (addNew) set(label, other[label]);
         }
       }
-    } else if (other is IterView<VT>) {
+    } else if (other is Iterable<VT>) {
       if (length != other.length)
         throw lengthMismatch(
             expected: length, found: other.length, subject: 'other');
       for (int i = 0; i < length; i++) {
-        _data[i] = other[i];
+        _data[i] = other.elementAt(i);
       }
     } else {
       throw new UnsupportedError('Type not supported!');
@@ -192,7 +190,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
 
     _labels.replaceRange(0, _labels.length, labs);
-    _data.assign(d);
+    _data.assign = d;
     _mapper.clear();
     _mapper.addAll(mapper);
   }
@@ -204,7 +202,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     } else if (mask is Labeled<LT>) {
       keepOnly(mask);
       return;
-    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT>) {
       keepLabels(mask);
       return;
     } else if (mask is SeriesCond<LT, VT>) {
@@ -226,19 +224,13 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     removeMany(pos);
   }
 
-  void keepLabels(/* Iterable<LT> | IterView<LT> */ mask) {
-    if (mask is IterView<LT>) {
-      mask = mask.asIterable;
-    }
-    if (mask is Iterable<LT>) {
+  void keepLabels(Iterable<LT> mask) {
       if (length != mask.length)
         throw lengthMismatch(
             expected: length, found: mask.length, subject: 'mask');
 
       keepOnly(new BoolSeriesView.constant(true, labels: mask));
       return;
-    }
-    throw new UnimplementedError();
   }
 
   void keepIf(BoolSeriesViewBase<LT> mask) {

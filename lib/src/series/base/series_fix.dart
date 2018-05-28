@@ -19,7 +19,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
     _data[position] = value;
   }
 
-  void assign(/* Series<LT, VT> | IterView<VT> */ other) {
+  void assign(/* Series<LT, VT> | Iterable<VT> */ other) {
     if (other is Series<LT, VT>) {
       for (LT label in other.labels) {
         if (containsLabel(label)) {
@@ -27,13 +27,12 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
           _data[sourcePos] = other[label];
         }
       }
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
-      if (other is Iterable<VT>) other = new IterView<VT>(other);
+    } else if (other is Iterable<VT>) {
       if (length != other.length)
         throw lengthMismatch(
             expected: length, found: other.length, subject: 'other');
       for (int i = 0; i < length; i++) {
-        _data[i] = other[i];
+        _data[i] = other.elementAt(i);
       }
     } else if (other is VT) {
       for (int i = 0; i < length; i++) {

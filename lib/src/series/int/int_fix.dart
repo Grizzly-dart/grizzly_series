@@ -3,7 +3,7 @@ part of grizzly.series;
 abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
   @override
   void addition(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -14,9 +14,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.addition(other);
       return;
     }
@@ -25,7 +23,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
 
   @override
   void subtract(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -36,9 +34,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.subtract(other);
       return;
     }
@@ -47,7 +43,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
 
   @override
   void multiply(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -58,9 +54,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.multiply(other);
       return;
     }
@@ -69,12 +63,12 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
 
   @override
   void divide(
-          /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) =>
+          /* E | NumericSeriesView<E> | Iterable<E> */ other) =>
       truncDiv(other);
 
   @override
   void truncDiv(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -85,9 +79,7 @@ abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.truncDiv(other);
       return;
     }
@@ -115,17 +107,16 @@ class IntSeriesFix<LT> extends Object
   IntSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory IntSeriesFix(/* Iterable<int> | IterView<int> */ data,
+  factory IntSeriesFix(Iterable<int> data,
       {dynamic name, Iterable<LT> labels}) {
-    Int1D d;
-    if (data is Iterable<int>) {
-      d = new Int1D(data);
-    } else if (data is IterView<int>) {
-      d = new Int1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Int1D d = new Int1D(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new IntSeriesFix._build(madeLabels, d, name);
+  }
 
+  factory IntSeriesFix.fromNums(Iterable<num> data,
+      {dynamic name, Iterable<LT> labels}) {
+    Int1D d = new Int1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new IntSeriesFix._build(madeLabels, d, name);
   }

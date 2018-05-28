@@ -3,13 +3,11 @@ part of grizzly.series;
 abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
   IntSeries<LT> toSeries() => new IntSeries(data, name: name, labels: labels);
 
-  IntSeriesView<NLT> makeView<NLT>(
-          /* Iterable<int> | IterView<int> */ data,
-          {dynamic name,
-          Iterable<NLT> labels}) =>
+  IntSeriesView<NLT> makeView<NLT>(Iterable<int> data,
+          {dynamic name, Iterable<NLT> labels}) =>
       new IntSeriesView<NLT>(data, name: name, labels: labels);
 
-  IntSeries<NLT> make<NLT>(/* Iterable<int> | IterView<int> */ data,
+  IntSeries<NLT> make<NLT>(Iterable<int> data,
           {dynamic name, Iterable<NLT> labels}) =>
       new IntSeries<NLT>(data, name: name, labels: labels);
 
@@ -49,7 +47,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
       new DoubleSeries(data.exp, name: name, labels: labels);
 
   NumericSeries<LT, double> get abs =>
-      new DoubleSeries(data.abs, name: name, labels: labels);
+      new DoubleSeries.fromNums(data.abs(), name: name, labels: labels);
 
   DoubleSeries<LT> get toDouble =>
       new DoubleSeries<LT>(data.toDouble, name: name, labels: labels.toList());
@@ -59,7 +57,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   IntSeries<LT> operator +(
-      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+      /* int | Iterable<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
     if (other is int) {
       return new IntSeries<LT>(data + other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -71,7 +69,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new IntSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new IntSeries<LT>(data + other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -79,7 +77,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   IntSeries<LT> operator -(
-      /* int | IterView<int> | NumericSeriesView<LT, int> | Numeric1DView<int> */ other) {
+      /* int | Iterable<int> | NumericSeriesView<LT, int> | Numeric1DView<int> */ other) {
     if (other is int) {
       return new IntSeries<LT>(data - other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -91,7 +89,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new IntSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new IntSeries<LT>(data - other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -99,7 +97,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   IntSeries<LT> operator *(
-      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+      /* int | Iterable<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
     if (other is int) {
       return new IntSeries<LT>(data * other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -111,7 +109,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new IntSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new IntSeries<LT>(data * other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -119,7 +117,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   DoubleSeries<LT> operator /(
-      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+      /* int | Iterable<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
     if (other is num) {
       return new DoubleSeries<LT>(data / other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, num>) {
@@ -131,7 +129,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new DoubleSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<num>) {
+    } else if (other is Iterable<num>) {
       return new DoubleSeries<LT>(data / other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -139,7 +137,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   IntSeries<LT> operator ~/(
-      /* int | IterView<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
+      /* int | Iterable<int> | NumericSeriesView<int> | Numeric1DView<int> */ other) {
     if (other is num) {
       return new IntSeries<LT>(data ~/ other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, num>) {
@@ -151,7 +149,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new IntSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<num>) {
+    } else if (other is Iterable<num>) {
       return new IntSeries<LT>(data ~/ other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -162,7 +160,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   BoolSeries<LT> operator >=(
-      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+      /* E | Iterable<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is int) {
       return new BoolSeries<LT>(data >= other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -174,7 +172,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new BoolSeries<LT>(data >= other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -182,7 +180,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   BoolSeriesBase<LT> operator >(
-      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+      /* E | Iterable<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is int) {
       return new BoolSeries<LT>(data > other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -194,7 +192,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new BoolSeries<LT>(data > other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -202,7 +200,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   BoolSeriesBase<LT> operator <=(
-      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+      /* E | Iterable<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is int) {
       return new BoolSeries<LT>(data <= other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -214,7 +212,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new BoolSeries<LT>(data <= other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -222,7 +220,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   @override
   BoolSeriesBase<LT> operator <(
-      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+      /* E | Iterable<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is int) {
       return new BoolSeries<LT>(data < other, name: name, labels: labels);
     } else if (other is NumericSeriesView<LT, int>) {
@@ -234,7 +232,7 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<int>) {
+    } else if (other is Iterable<int>) {
       return new BoolSeries<LT>(data < other, name: name, labels: labels);
     }
     throw new UnimplementedError();

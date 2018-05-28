@@ -21,17 +21,9 @@ class DynamicSeriesFix<LT> extends Object
   DynamicSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DynamicSeriesFix(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  factory DynamicSeriesFix(Iterable<dynamic> data,
       {dynamic name, Iterable<LT> labels}) {
-    Dynamic1DFix d;
-    if (data is Iterable<dynamic>) {
-      d = new Dynamic1DFix(data);
-    } else if (data is IterView<dynamic>) {
-      d = new Dynamic1DFix.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    Dynamic1DFix d = new Dynamic1DFix(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DynamicSeriesFix._build(madeLabels, d, name);
   }

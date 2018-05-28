@@ -21,21 +21,16 @@ class DoubleSeries<LT> extends Object
   DoubleSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DoubleSeries(/* Iterable<double> | IterView<double> */ data,
+  factory DoubleSeries(Iterable<double> data,
       {dynamic name, Iterable<LT> labels}) {
-    Double1D d;
-    if (data is Iterable<double>) {
-      d = new Double1D(data);
-    } else if (data is IterView<double>) {
-      d = new Double1D.copy(data);
-    } else if (data is Iterable<num>) {
-      d = new Double1D.nums(data);
-    } else if(data is IterView<num>) {
-      d = new Double1D.copyNums(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Double1D d = new Double1D(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new DoubleSeries._build(madeLabels, d, name);
+  }
 
+  factory DoubleSeries.fromNums(Iterable<num> data,
+      {dynamic name, Iterable<LT> labels}) {
+    Double1D d = new Double1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DoubleSeries._build(madeLabels, d, name);
   }

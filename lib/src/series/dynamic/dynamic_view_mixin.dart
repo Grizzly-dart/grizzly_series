@@ -4,13 +4,11 @@ abstract class DynamicSeriesViewMixin<LT> implements DynamicSeriesViewBase<LT> {
   DynamicSeries<LT> toSeries() =>
       new DynamicSeries<LT>(data, name: name, labels: labels);
 
-  DynamicSeriesView<LLT> makeView<LLT>(
-          /* Iterable<LLT> | IterView<LLT> */ data,
-          {dynamic name,
-          Iterable<LLT> labels}) =>
+  DynamicSeriesView<LLT> makeView<LLT>(Iterable<dynamic> data,
+          {dynamic name, Iterable<LLT> labels}) =>
       new DynamicSeriesView(data, name: name, labels: labels);
 
-  DynamicSeries<IIT> make<IIT>(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  DynamicSeries<IIT> make<IIT>(Iterable<dynamic> data,
           {dynamic name, Iterable<IIT> labels}) =>
       new DynamicSeries<IIT>(data, name: name, labels: labels);
 

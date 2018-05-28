@@ -16,17 +16,14 @@ class DoubleSeriesView<LT> extends Object
   DoubleSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory DoubleSeriesView(/* Iterable<double> | IterView<double> */ data,
-      {name, Iterable<LT> labels}) {
-    Double1DView d;
-    if (data is Iterable<double>) {
-      d = new Double1DView(data);
-    } else if (data is IterView<double>) {
-      d = new Double1DView.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+  factory DoubleSeriesView(Iterable<double> data, {name, Iterable<LT> labels}) {
+    Double1DView d = new Double1DView(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new DoubleSeriesView._build(madeLabels, d, name);
+  }
 
+  factory DoubleSeriesView.fromNums(Iterable<num> data, {name, Iterable<LT> labels}) {
+    Double1DView d = new Double1DView.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DoubleSeriesView._build(madeLabels, d, name);
   }
@@ -52,7 +49,7 @@ class DoubleSeriesView<LT> extends Object
     return new DoubleSeriesView._(labels, data, name, mapper);
   }
 
-  factory DoubleSeriesView.copy(SeriesView<LT, String> series) =>
+  factory DoubleSeriesView.copy(SeriesView<LT, double> series) =>
       new DoubleSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 

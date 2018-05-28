@@ -16,19 +16,14 @@ class IntSeriesView<LT> extends Object
   IntSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory IntSeriesView(
-      /* Iterable<int> | IterView<int> | ArrayView<int> */ data,
-      {name,
-      Iterable<LT> labels}) {
-    Int1D d;
-    if (data is Iterable<int>) {
-      d = new Int1D(data);
-    } else if (data is IterView<int>) {
-      d = new Int1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+  factory IntSeriesView(Iterable<int> data, {name, Iterable<LT> labels}) {
+    Int1D d = new Int1D(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new IntSeriesView._build(madeLabels, d, name);
+  }
 
+  factory IntSeriesView.fromNums(Iterable<num> data, {name, Iterable<LT> labels}) {
+    Int1D d = new Int1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new IntSeriesView._build(madeLabels, d, name);
   }
@@ -54,7 +49,7 @@ class IntSeriesView<LT> extends Object
     return new IntSeriesView._(labels, data, name, mapper);
   }
 
-  factory IntSeriesView.copy(SeriesView<LT, String> series) =>
+  factory IntSeriesView.copy(SeriesView<LT, int> series) =>
       new IntSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 

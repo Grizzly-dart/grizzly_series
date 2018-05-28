@@ -70,10 +70,10 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   void set<VT>(
       String column,
-      /* SeriesView<LT, VT> | IterView<VT> | Iterable<VT> */ value) {
+      /* SeriesView<LT, VT> | Iterable<VT> */ value) {
     int columnPos = _columns.indexOf(column);
     if (columnPos == -1) {
-      if (value is IterView<VT> || value is Iterable<VT>) {
+      if (value is Iterable<VT>) {
         if (value.length != numRows) {
           throw new Exception('Mismatching column lengths!');
         }
@@ -108,16 +108,16 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   void setByPos(
       int position,
-      /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> */ value) {
+      /* SeriesView<String, dynamic> | Iterable<dynamic> | Map<String, dynamic> */ value) {
     if (position >= _labels.length)
       throw new RangeError.range(position, 0, _labels.length);
 
-    if (value is IterView) {
+    if (value is Iterable) {
       if (value.length != _columns.length)
         throw new Exception('Value does not match number of columns!');
 
       for (int i = 0; i < _columns.length; i++) {
-        _data[i].setByPos(position, value[i]);
+        _data[i].setByPos(position, value.elementAt(i));
       }
     } else if (value is SeriesView<String, dynamic>) {
       for (int i = 0; i < _columns.length; i++) {
@@ -163,17 +163,17 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   void append(
       LT label,
-      /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> | DfCellSetter */ value) {
+      /* SeriesView<String, dynamic> | Iterable<dynamic> | Map<String, dynamic> | DfCellSetter */ value) {
     if (_mapper.containsKey(label))
       throw new Exception('Label already exists!');
 
     if (_columns.length != 0) {
-      if (value is IterView) {
+      if (value is Iterable) {
         if (value.length != _columns.length)
           throw new Exception('Value does not match number of columns!');
 
         for (int i = 0; i < _columns.length; i++) {
-          _data[i].append(label, value[i]);
+          _data[i].append(label, value.elementAt(i));
         }
       } else if (value is SeriesView<String, dynamic>) {
         for (int i = 0; i < _columns.length; i++) {
@@ -227,7 +227,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   void insert(
       int pos,
       LT label,
-      /* SeriesView<String, dynamic> | IterView | Map<String, dynamic> | DfCellSetter */ value) {
+      /* SeriesView<String, dynamic> | Iterable | Map<String, dynamic> | DfCellSetter */ value) {
     if (pos > numRows) throw new RangeError.range(pos, 0, numRows);
     if (containsLabel(label)) drop(label);
 
@@ -235,12 +235,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     _mapper[label] = pos;
     _labels.insert(pos, label);
 
-    if (value is IterView) {
+    if (value is Iterable) {
       if (value.length != _columns.length)
         throw new Exception('Value does not match number of columns!');
 
       for (int i = 0; i < _columns.length; i++) {
-        _data[i].insert(pos, label, value[i]);
+        _data[i].insert(pos, label, value.elementAt(i));
       }
     } else if (value is SeriesView<String, dynamic>) {
       for (int i = 0; i < _columns.length; i++) {
@@ -270,7 +270,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   void appendColumn(
       String name,
-      /* SeriesView<LT, dynamic> | IterView | Iterable | Map<VT, dynamic> | int | double | String */ value) {
+      /* SeriesView<LT, dynamic> | Iterable | Map<VT, dynamic> | int | double | String */ value) {
     if (_columns.contains(name)) removeColumn(name);
 
     if (value is SeriesView<LT, dynamic>) {
@@ -284,19 +284,13 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       _data.add(value.make<LT>(d, name: name, labels: labels));
       _columns.add(name);
       return;
-    } else if (value is IterView || value is Iterable) {
-      if (value is Iterable) {
-        value = new IterView(value);
-      }
-
-      if (value is IterView) {
-        if (value.length != numRows)
-          throw lengthMismatch(
-              expected: numRows, found: value.length, subject: 'value');
-        _data.add(new DynamicSeries<LT>(value, name: name, labels: labels));
-        _columns.add(name);
-        return;
-      }
+    } else if (value is Iterable) {
+      if (value.length != numRows)
+        throw lengthMismatch(
+            expected: numRows, found: value.length, subject: 'value');
+      _data.add(new DynamicSeries<LT>(value, name: name, labels: labels));
+      _columns.add(name);
+      return;
     } else if (value is Map<LT, dynamic>) {
       final d = new List()..length = numRows;
       for (int i = 0; i < numRows; i++) {
@@ -309,26 +303,20 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       _columns.add(name);
       return;
     } else if (value is int) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<int>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.add(new IntSeries<LT>(d, name: name, labels: labels));
       _columns.add(name);
       return;
     } else if (value is double) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<double>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.add(new DoubleSeries<LT>(d, name: name, labels: labels));
       _columns.add(name);
       return;
     } else if (value is String) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<String>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.add(new StringSeries<LT>(d, name: name, labels: labels));
       _columns.add(name);
       return;
@@ -339,7 +327,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   void insertColumn(
       int pos,
       String name,
-      /* SeriesView<LT, dynamic> | IterView | Iterable | Map<VT, dynamic> | int | double | String */ value) {
+      /* SeriesView<LT, dynamic> | Iterable | Map<VT, dynamic> | int | double | String */ value) {
     if (containsColumn(name)) removeColumn(name);
 
     if (pos > numCols) throw new Exception('Invalid position!');
@@ -355,20 +343,14 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       _data.insert(pos, value.make(d, name: name, labels: labels));
       _columns.insert(pos, name);
       return;
-    } else if (value is IterView || value is Iterable) {
-      if (value is Iterable) {
-        value = new IterView(value);
-      }
-
-      if (value is IterView) {
-        if (value.length != numRows)
-          throw lengthMismatch(
-              expected: numRows, found: value.length, subject: 'value');
-        _data.insert(
-            pos, new DynamicSeries<LT>(value, name: name, labels: labels));
-        _columns.insert(pos, name);
-        return;
-      }
+    } else if (value is Iterable) {
+      if (value.length != numRows)
+        throw lengthMismatch(
+            expected: numRows, found: value.length, subject: 'value');
+      _data.insert(
+          pos, new DynamicSeries<LT>(value, name: name, labels: labels));
+      _columns.insert(pos, name);
+      return;
     } else if (value is Map<LT, dynamic>) {
       final d = new List()..length = numRows;
       for (int i = 0; i < numRows; i++) {
@@ -381,26 +363,20 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       _columns.insert(pos, name);
       return;
     } else if (value is int) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<int>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.insert(pos, new IntSeries<LT>(d, name: name, labels: labels));
       _columns.insert(pos, name);
       return;
     } else if (value is double) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<double>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.insert(pos, new DoubleSeries<LT>(d, name: name, labels: labels));
       _columns.insert(pos, name);
       return;
     } else if (value is String) {
-      final d = new List()..length = numRows;
-      for (int i = 0; i < numRows; i++) {
-        d[i] = value;
-      }
+      final d = new List<String>(numRows);
+      for (int i = 0; i < numRows; i++) d[i] = value;
       _data.insert(pos, new StringSeries<LT>(d, name: name, labels: labels));
       _columns.insert(pos, name);
       return;
@@ -418,15 +394,9 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     if (value is SeriesView<LT, dynamic>) {
       _data[index].assign(value, addNew: false);
       return;
-    } else if (value is IterView || value is Iterable) {
-      if (value is Iterable) {
-        value = new IterView(value);
-      }
-
-      if (value is IterView) {
-        _data[index].assign(value, addNew: false);
-        return;
-      }
+    } else if (value is Iterable) {
+      _data[index].assign(value, addNew: false);
+      return;
     } else if (value is Map<LT, dynamic>) {
       _data[index].assignMap(value, addNew: false);
       return;
@@ -473,7 +443,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return Ranger.range(start, end).map(pairByPos);
+    return Ranger.between(start, end).map(pairByPos);
   }
 
   String toString() {
@@ -484,11 +454,8 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return tab.toString();
   }
 
-  bool labelsMatch(
-      final /* IterView<LT> | Labeled<LT> | Iterable<LT> */ labels) {
-    if (labels is IterView<LT>) {
-      return _iterEquality.equals(this.labels, labels.asIterable);
-    } else if (labels is Labeled<LT>) {
+  bool labelsMatch(final /* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled<LT>) {
       return _iterEquality.equals(this.labels, labels.labels);
     } else if (labels is Iterable<LT>) {
       return _iterEquality.equals(this.labels, labels);
@@ -562,16 +529,10 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     }
   }
 
-  void dropMany(/* Iterable<LT> | IterView<LT> | Labeled */ labels) {
-    if (labels is IterView<LT>) {
-      labels = (labels as IterView<LT>).asIterable;
-    } else if (labels is Labeled<LT>) {
-      labels = (labels as Labeled<LT>).labels;
-    }
+  void dropMany(/* Iterable<LT> | Labeled */ labels) {
+    if (labels is Labeled<LT>) labels = (labels as Labeled<LT>).labels;
     for (LT label in labels) {
-      if (!_mapper.containsKey(label)) {
-        continue;
-      }
+      if (!_mapper.containsKey(label)) continue;
 
       final int pos = _mapper[label];
       _labels.removeAt(pos);
@@ -591,7 +552,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     } else if (mask is Labeled<LT>) {
       keepOnly(mask);
       return;
-    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT>) {
       keepLabels(mask);
       return;
     } else if (mask is DfCond<LT>) {
@@ -613,19 +574,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     removeManyByPos(pos);
   }
 
-  void keepLabels(/* Iterable<LT> | IterView<LT> */ mask) {
-    if (mask is IterView<LT>) {
-      mask = mask.asIterable;
-    }
-    if (mask is Iterable<LT>) {
-      if (numRows != mask.length)
-        throw lengthMismatch(
-            expected: numRows, found: mask.length, subject: 'mask');
+  void keepLabels(Iterable<LT> mask) {
+    if (numRows != mask.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.length, subject: 'mask');
 
-      keepOnly(new BoolSeriesView.constant(true, labels: mask));
-      return;
-    }
-    throw new UnimplementedError();
+    keepOnly(new BoolSeriesView.constant(true, labels: mask));
   }
 
   void keepIf(BoolSeriesViewBase<LT> mask) {
@@ -653,7 +607,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       return selectIf(mask);
     } else if (mask is Labeled<LT>) {
       return selectOnly(mask);
-    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT>) {
       return selectLabels(mask);
     } else if (mask is DfCond<LT>) {
       return selectWhen(mask);
@@ -673,18 +627,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return ret;
   }
 
-  DataFrame<LT> selectLabels(/* Iterable<LT> | IterView<LT> */ mask) {
-    if (mask is IterView<LT>) {
-      mask = mask.asIterable;
-    }
-    if (mask is Iterable<LT>) {
-      if (numRows != mask.length)
-        throw lengthMismatch(
-            expected: numRows, found: mask.length, subject: 'mask');
+  DataFrame<LT> selectLabels(Iterable<LT> mask) {
+    if (numRows != mask.length)
+      throw lengthMismatch(
+          expected: numRows, found: mask.length, subject: 'mask');
 
-      return selectOnly(new BoolSeriesView.constant(true, labels: mask));
-    }
-    throw new UnimplementedError();
+    return selectOnly(new BoolSeriesView.constant(true, labels: mask));
   }
 
   DataFrame<LT> selectIf(BoolSeriesViewBase<LT> mask) {
@@ -729,7 +677,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       return filterIf(mask);
     } else if (mask is Labeled<String>) {
       return filterOnly(mask);
-    } else if (mask is Iterable<String> || mask is IterView<String>) {
+    } else if (mask is Iterable<String>) {
       return filterNamed(mask);
     } else if (mask is DfCond) {
       return filterWhen(mask);
@@ -749,18 +697,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
     return ret;
   }
 
-  DataFrame<LT> filterNamed(/* IterView<String> | Iterable<String> */ mask) {
-    if (mask is IterView<String>) {
-      mask = mask.asIterable;
-    }
-    if (mask is Iterable<String>) {
-      if (numCols != mask.length)
-        throw lengthMismatch(
-            expected: numCols, found: mask.length, subject: 'mask');
+  DataFrame<LT> filterNamed(Iterable<String> mask) {
+    if (numCols != mask.length)
+      throw lengthMismatch(
+          expected: numCols, found: mask.length, subject: 'mask');
 
-      return filterOnly(new BoolSeriesView.constant(true, labels: mask));
-    }
-    throw new UnimplementedError();
+    return filterOnly(new BoolSeriesView.constant(true, labels: mask));
   }
 
   DataFrame<LT> filterIf(BoolSeriesViewBase<String> mask) {
@@ -788,7 +730,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       bool convert: true,
       bool retype: false,
       bool parse: false}) {
-    final ret = new List<IterView<double>>();
+    final ret = new List<Iterable<double>>();
     for (Series<LT, dynamic> s in _data) {
       if (s is Series<LT, double>) {
         ret.add(s.data);
@@ -813,7 +755,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
         throw new Exception();
       }
     }
-    return new Double2D.from(ret);
+    return new Double2D(ret);
   }
 
   Int2D toInt2D(
@@ -821,7 +763,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       bool convert: true,
       bool retype: false,
       bool parse: false}) {
-    final ret = new List<IterView<int>>();
+    final ret = new List<Iterable<int>>();
     for (Series<LT, dynamic> s in _data) {
       if (s is Series<LT, int>) {
         ret.add(s.data);
@@ -846,7 +788,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
         throw new Exception();
       }
     }
-    return new Int2D.from(ret);
+    return new Int2D(ret);
   }
 
   Double2DView asDouble2D({bool skipInvalid: true, bool retype: false}) {
@@ -931,7 +873,7 @@ DataFrame _makeDf<LT>(
   labels ??= (data.values.firstWhere((v) => v is SeriesView, orElse: () => null)
           as SeriesView)
       ?.labels
-      ?.retype<LT>()
+      ?.cast<LT>()
       ?.toList();
   labels ??= (data.values.firstWhere((v) => v is Map, orElse: () => null)
           as Map<LT, dynamic>)

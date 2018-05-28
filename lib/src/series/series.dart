@@ -39,19 +39,19 @@ part 'dynamic/dynamic_view_mixin.dart';
 part 'numeric.dart';
 
 Series<LT, VT> series<LT, VT>(
-    /* Iterable | IterView | SeriesView<LT, VT> | Map<LT, VT> */ data,
+    /* Iterable | SeriesView<LT, VT> | Map<LT, VT> */ data,
     {name,
     Iterable<LT> labels}) {
-  if (data is Iterable<int> || data is IterView<int>) {
+  if (data is Iterable<int>) {
     return new IntSeries<LT>(data, name: name, labels: labels)
         as Series<LT, VT>;
-  } else if (data is Iterable<double> || data is IterView<double>) {
+  } else if (data is Iterable<double>) {
     return new DoubleSeries<LT>(data, name: name, labels: labels)
         as Series<LT, VT>;
-  } else if (data is Iterable<String> || data is IterView<String>) {
+  } else if (data is Iterable<String>) {
     return new StringSeries<LT>(data, name: name, labels: labels)
         as Series<LT, VT>;
-  } else if (data is Iterable<bool> || data is IterView<bool>) {
+  } else if (data is Iterable<bool>) {
     return new BoolSeries<LT>(data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is Map<dynamic, int>) {

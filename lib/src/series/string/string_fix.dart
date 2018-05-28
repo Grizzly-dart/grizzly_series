@@ -19,17 +19,9 @@ class StringSeriesFix<LT> extends Object
   StringSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory StringSeriesFix(/* Iterable<String> | IterView<String> */ data,
+  factory StringSeriesFix(Iterable<String> data,
       {dynamic name, Iterable<LT> labels}) {
-    String1DFix d;
-    if (data is Iterable<String>) {
-      d = new String1DFix(data);
-    } else if (data is IterView<String>) {
-      d = new String1DFix.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    String1DFix d = new String1DFix(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeriesFix._build(madeLabels, d, name);
   }

@@ -20,17 +20,9 @@ class StringSeries<LT> extends Object
   StringSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory StringSeries(/* Iterable<String> | IterView<String> */ data,
+  factory StringSeries(Iterable<String> data,
       {dynamic name, Iterable<LT> labels}) {
-    String1D d;
-    if (data is Iterable<String>) {
-      d = new String1D(data);
-    } else if (data is IterView<String>) {
-      d = new String1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    String1D d = new String1D(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeries._build(madeLabels, d, name);
   }

@@ -4,7 +4,7 @@ abstract class DoubleSeriesFixMixin<LT>
     implements NumericSeriesFix<LT, double> {
   @override
   void addition(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -15,9 +15,7 @@ abstract class DoubleSeriesFixMixin<LT>
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.addition(other);
       return;
     }
@@ -26,7 +24,7 @@ abstract class DoubleSeriesFixMixin<LT>
 
   @override
   void subtract(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -37,9 +35,7 @@ abstract class DoubleSeriesFixMixin<LT>
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.subtract(other);
       return;
     }
@@ -48,7 +44,7 @@ abstract class DoubleSeriesFixMixin<LT>
 
   @override
   void multiply(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -59,9 +55,7 @@ abstract class DoubleSeriesFixMixin<LT>
         }
       }
       return;
-    } else if (other is num ||
-        other is IterView<num> ||
-        other is Iterable<num>) {
+    } else if (other is num || other is Iterable<num>) {
       data.multiply(other);
       return;
     }
@@ -70,7 +64,7 @@ abstract class DoubleSeriesFixMixin<LT>
 
   @override
   void divide(
-      /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) {
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
     if (other is SeriesView<LT, num>) {
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
@@ -82,7 +76,6 @@ abstract class DoubleSeriesFixMixin<LT>
       }
       return;
     } else if (other is num ||
-        other is IterView<num> ||
         other is Iterable<num>) {
       data.divide(other);
       return;
@@ -118,17 +111,16 @@ class DoubleSeriesFix<LT> extends Object
   DoubleSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DoubleSeriesFix(/* Iterable<int> | IterView<int> */ data,
+  factory DoubleSeriesFix(Iterable<double> data,
       {dynamic name, Iterable<LT> labels}) {
-    Double1DFix d;
-    if (data is Iterable<double>) {
-      d = new Double1DFix(data);
-    } else if (data is IterView<double>) {
-      d = new Double1DFix.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Double1DFix d = new Double1DFix(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new DoubleSeriesFix._build(madeLabels, d, name);
+  }
 
+  factory DoubleSeriesFix.fromNums(Iterable<num> data,
+      {dynamic name, Iterable<LT> labels}) {
+    Double1DFix d = new Double1DFix.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DoubleSeriesFix._build(madeLabels, d, name);
   }

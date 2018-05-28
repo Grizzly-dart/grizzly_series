@@ -16,17 +16,8 @@ class StringSeriesView<LT> extends Object
   StringSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory StringSeriesView(/* Iterable<String> | IterView<String> */ data,
-      {name, Iterable<LT> labels}) {
-    String1DView d;
-    if (data is Iterable<String>) {
-      d = new String1DView(data);
-    } else if (data is IterView<String>) {
-      d = new String1DView.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+  factory StringSeriesView(Iterable<String> data, {name, Iterable<LT> labels}) {
+    String1DView d = new String1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeriesView._build(madeLabels, d, name);
   }
@@ -65,13 +56,11 @@ abstract class StringSeriesViewMixin<LT> implements StringSeriesViewBase<LT> {
   StringSeries<LT> toSeries() =>
       new StringSeries<LT>(data, name: name, labels: labels);
 
-  StringSeriesView<IIT> makeView<IIT>(
-          /* Iterable<String> | IterView<String> */ data,
-          {dynamic name,
-          Iterable<IIT> labels}) =>
+  StringSeriesView<IIT> makeView<IIT>(Iterable<String> data,
+          {dynamic name, Iterable<IIT> labels}) =>
       new StringSeriesView(data, name: name, labels: labels);
 
-  StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
+  StringSeries<IIT> make<IIT>(Iterable<String> data,
           {dynamic name, Iterable<IIT> labels}) =>
       new StringSeries<IIT>(data, name: name, labels: labels);
 
@@ -104,7 +93,7 @@ abstract class StringSeriesViewMixin<LT> implements StringSeriesViewBase<LT> {
   String max() {
     String ret;
 
-    for (String v in data.asIterable) {
+    for (String v in data) {
       if (v == null) continue;
       if (ret == null)
         ret = v;
@@ -117,7 +106,7 @@ abstract class StringSeriesViewMixin<LT> implements StringSeriesViewBase<LT> {
   String min() {
     String ret;
 
-    for (String v in data.asIterable) {
+    for (String v in data) {
       if (v == null) continue;
       if (ret == null)
         ret = v;

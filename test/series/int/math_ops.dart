@@ -24,8 +24,6 @@ void main() {
       final s2 = new IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'three', 'four', 'two']);
 
-      print(s2);
-
       final IntSeries<String> s3 = s1 + s2;
 
       expect(s3['one'], 2);

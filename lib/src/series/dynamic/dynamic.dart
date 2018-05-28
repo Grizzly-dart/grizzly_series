@@ -20,16 +20,9 @@ class DynamicSeries<LT> extends Object
   DynamicSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DynamicSeries(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  factory DynamicSeries(Iterable<dynamic> data,
       {dynamic name, Iterable<LT> labels}) {
-    Dynamic1D d;
-    if (data is Iterable<bool>) {
-      d = new Dynamic1D(data);
-    } else if (data is IterView<bool>) {
-      d = new Dynamic1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Dynamic1D d = new Dynamic1D(data);
 
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DynamicSeries._build(madeLabels, d, name);

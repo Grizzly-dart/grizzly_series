@@ -53,14 +53,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return Ranger.range(start, end).map(pairByPos);
+    return Ranger.between(start, end).map(pairByPos);
   }
 
   Series<int, VT> mode() {
     final LinkedHashMap<VT, int> map = new LinkedHashMap<VT, int>();
     int max = 0;
 
-    for (VT v in data.asIterable) {
+    for (VT v in data) {
       if (!map.containsKey(v)) map[v] = 0;
       map[v]++;
       if (map[v] > max) max = map[v];
@@ -117,11 +117,8 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return new DataFrame<LT>({column ?? name: data}, labels: labels);
   }
 
-  bool labelsMatch(
-      final /* IterView<LT> | Labeled<LT> | Iterable<LT> */ labels) {
-    if (labels is IterView<LT>) {
-      return _iterEquality.equals(this.labels, labels.asIterable);
-    } else if (labels is Labeled<LT>) {
+  bool labelsMatch(final /* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled<LT>) {
       return _iterEquality.equals(this.labels, labels.labels);
     } else if (labels is Iterable<LT>) {
       return _iterEquality.equals(this.labels, labels);
@@ -151,7 +148,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data.eq(other), name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -171,14 +168,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data.ne(other), name: name, labels: labels);
     }
     throw new UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator >=(
-      /* VT | IterView<VT> | SeriesView<VT> | ArrayView<VT> */ other) {
+      /* VT | Iterable<VT> | SeriesView<VT> | ArrayView<VT> */ other) {
     if (other is VT) {
       return new BoolSeries<LT>(data >= other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
@@ -190,14 +187,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data >= other, name: name, labels: labels);
     }
     throw new UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator >(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
       return new BoolSeries<LT>(data > other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
@@ -209,14 +206,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data > other, name: name, labels: labels);
     }
     throw new UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator <(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
       return new BoolSeries<LT>(data < other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
@@ -228,14 +225,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data < other, name: name, labels: labels);
     }
     throw new UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator <=(
-      /* E | IterView<E> | SeriesView<E> | ArrayView<E> */ other) {
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
       return new BoolSeries<LT>(data <= other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
@@ -247,7 +244,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
         }
       }
       return new BoolSeries<LT>(list, name: name, labels: labels);
-    } else if (other is IterView<VT> || other is Iterable<VT>) {
+    } else if (other is Iterable<VT>) {
       return new BoolSeries<LT>(data <= other, name: name, labels: labels);
     }
     throw new UnimplementedError();
@@ -261,12 +258,12 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return ret;
   }
 
-  Iter<LT> labelsWhere(SeriesCond<LT, VT> cond) {
+  Iterable<LT> labelsWhere(SeriesCond<LT, VT> cond) {
     final ret = new List<LT>();
     for (LT lab in labels) {
       if (cond(lab, this)) ret.add(lab);
     }
-    return new Iter(ret);
+    return ret;
   }
 
   Series<LT, VT> select(mask) {
@@ -274,7 +271,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       return selectIf(mask);
     } else if (mask is Labeled<LT>) {
       return selectOnly(mask);
-    } else if (mask is Iterable<LT> || mask is IterView<LT>) {
+    } else if (mask is Iterable<LT>) {
       return selectLabels(mask);
     } else if (mask is SeriesCond<LT, VT>) {
       return selectWhen(mask);
@@ -294,18 +291,12 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return ret;
   }
 
-  Series<LT, VT> selectLabels(/* Iterable<LT> | IterView<LT> */ mask) {
-    if (mask is IterView<LT>) {
-      mask = mask.asIterable;
-    }
-    if (mask is Iterable<LT>) {
-      if (length != mask.length)
-        throw lengthMismatch(
-            expected: length, found: mask.length, subject: 'mask');
+  Series<LT, VT> selectLabels(Iterable<LT> mask) {
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
 
-      return selectOnly(new BoolSeriesView.constant(true, labels: mask));
-    }
-    throw new UnimplementedError();
+    return selectOnly(new BoolSeriesView.constant(true, labels: mask));
   }
 
   Series<LT, VT> selectIf(BoolSeriesViewBase<LT> mask) {

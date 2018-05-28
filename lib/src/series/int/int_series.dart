@@ -21,17 +21,14 @@ class IntSeries<LT> extends Object
   IntSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory IntSeries(/* Iterable<int> | IterView<int> */ data,
-      {dynamic name, Iterable<LT> labels}) {
-    Int1D d;
-    if (data is Iterable<int>) {
-      d = new Int1D(data);
-    } else if (data is IterView<int>) {
-      d = new Int1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+  factory IntSeries(Iterable<int> data, {dynamic name, Iterable<LT> labels}) {
+    Int1D d = new Int1D(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new IntSeries._build(madeLabels, d, name);
+  }
 
+  factory IntSeries.fromNums(Iterable<num> data, {dynamic name, Iterable<LT> labels}) {
+    Int1D d = new Int1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new IntSeries._build(madeLabels, d, name);
   }
