@@ -49,10 +49,10 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
   NumericSeries<LT, double> get abs =>
       new DoubleSeries.fromNums(data.abs(), name: name, labels: labels);
 
-  DoubleSeries<LT> get toDouble =>
-      new DoubleSeries<LT>(data.toDouble, name: name, labels: labels.toList());
+  DoubleSeries<LT> toDouble() => new DoubleSeries<LT>(data.toDouble(),
+      name: name, labels: labels.toList());
 
-  IntSeries<LT> get toInt =>
+  IntSeries<LT> toInt() =>
       new IntSeries<LT>(data, name: name, labels: labels.toList());
 
   @override

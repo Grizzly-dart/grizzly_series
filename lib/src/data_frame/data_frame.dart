@@ -738,7 +738,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
       if (s is NumericSeries<LT, int>) {
         if (convert) {
-          ret.add(s.toDouble.data);
+          ret.add(s.toDouble().data);
           continue;
         }
       }
@@ -771,7 +771,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
       if (s is NumericSeries<LT, double>) {
         if (convert) {
-          ret.add(s.toInt.data);
+          ret.add(s.toInt().data);
           continue;
         }
       }
