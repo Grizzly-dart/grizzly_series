@@ -1,20 +1,19 @@
 name: grizzly_series
 description: Numpy and Pandas like NDArray, Series and DataFrame for Dart
-version: 0.4.2
+version: 0.5.0-dev
 homepage: https://github.com/Grizzly-dart/grizzly_series
 author: Ravi Teja Gudapati <tejainece@gmail.com>
-documentation:
 
 environment:
-  sdk: '>=1.20.1 <2.0.0'
+  sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  grizzly_array: ^0.4.5
-  grizzly_primitives: ^0.4.2
-  text_table: ^2.5.4
+  grizzly_array: ^0.5.0
+  #grizzly_primitives: ^0.4.2
+  text_table: ^2.6.0
 
 dev_dependencies:
-  test: ^0.12.0
+  test: ^1.14.3
 
 dev_dependency_overrides:
   grizzly_primitives:
