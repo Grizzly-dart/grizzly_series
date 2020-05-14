@@ -24,8 +24,6 @@ void main() {
       final s2 = new IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'three', 'four', 'two']);
 
-      print(s2);
-
       final IntSeries<String> s3 = s1 + s2;
 
       expect(s3['one'], 2);
@@ -38,7 +36,7 @@ void main() {
       final s1 = new IntSeries<int>([1, 2, 3, 4, 5]);
       final s2 = new IntSeries<int>([5, 4, 3, 2, 1]);
 
-      final BoolSeries<int> s3 = s1.gt(s2);
+      final BoolSeries<int> s3 = s1 > s2;
 
       expect(s3[0], false);
       expect(s3[1], false);
@@ -46,7 +44,7 @@ void main() {
       expect(s3[3], true);
       expect(s3[4], true);
 
-      expect(s3.data, [false, false, false, true, true]);
+      expect(s3.toList(), [false, false, false, true, true]);
       expect(s3.labels, [0, 1, 2, 3, 4]);
     });
 
@@ -54,7 +52,7 @@ void main() {
       final s1 = new IntSeries<int>([1, 2, 3, 4, 5]);
       final s2 = new IntSeries<int>([5, 4, 3, 2, 1]);
 
-      final BoolSeries<int> s3 = s1.lt(s2);
+      final BoolSeries<int> s3 = s1 < s2;
 
       expect(s3[0], true);
       expect(s3[1], true);
@@ -62,15 +60,8 @@ void main() {
       expect(s3[3], false);
       expect(s3[4], false);
 
-      expect(s3.data, [true, true, false, false, false]);
+      expect(s3.toList(), [true, true, false, false, false]);
       expect(s3.labels, [0, 1, 2, 3, 4]);
-    });
-
-    test('gt.NonIdenticalIndex', () {
-      final s1 = new IntSeries<int>([1, 2, 3], labels: [0, 1, 1]);
-      final s2 = new IntSeries<int>([5, 4, 3], labels: [0, 1, 0]);
-
-      expect(() => s1.gt(s2), throwsA(isException));
     });
   });
 }

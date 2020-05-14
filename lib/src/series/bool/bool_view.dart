@@ -2,12 +2,12 @@ part of grizzly.series;
 
 class BoolSeriesView<LT> extends Object
     with SeriesViewMixin<LT, bool>, BoolSeriesViewMixin<LT>
-    implements SeriesView<LT, bool> {
+    implements BoolSeriesViewBase<LT> {
   final _name;
 
   final Iterable<LT> labels;
 
-  final BoolArrayView data;
+  final Bool1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -16,20 +16,18 @@ class BoolSeriesView<LT> extends Object
   BoolSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory BoolSeriesView(/* Iterable<bool> | IterView<bool> */ data,
-      {name, Iterable<LT> labels}) {
-    Bool1D d;
-    if (data is Iterable<bool>) {
-      d = new Bool1D(data);
-    } else if (data is IterView<bool>) {
-      d = new Bool1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+  factory BoolSeriesView(Iterable<bool> data, {name, Iterable<LT> labels}) {
+    Bool1DView d = new Bool1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new BoolSeriesView._build(madeLabels, d, name);
   }
+
+  factory BoolSeriesView.constant(bool data,
+          {name, Iterable<LT> labels, int length}) =>
+      new BoolSeriesView(
+          new ConstantIterable<bool>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
 
   factory BoolSeriesView.fromMap(Map<LT, bool> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
@@ -58,13 +56,11 @@ class BoolSeriesView<LT> extends Object
 abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   BoolSeries<LT> toSeries() => new BoolSeries(data, name: name, labels: labels);
 
-  BoolSeriesView<IIT> makeView<IIT>(
-          /* Iterable<bool> | IterView<bool> */ data,
-          {dynamic name,
-          Iterable<IIT> labels}) =>
+  BoolSeriesView<IIT> makeView<IIT>(Iterable<bool> data,
+          {dynamic name, Iterable<IIT> labels}) =>
       new BoolSeriesView(data, name: name, labels: labels);
 
-  BoolSeries<IIT> make<IIT>(/* Iterable<bool> | IterView<bool> */ data,
+  BoolSeries<IIT> make<IIT>(Iterable<bool> data,
           {dynamic name, Iterable<IIT> labels}) =>
       new BoolSeries<IIT>(data, name: name, labels: labels);
 
@@ -75,10 +71,10 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   Bool1D makeValueArray(Iterable<bool> data) => new Bool1D(data);
 
   @override
-  int compareVT(bool a, bool b) => a == b ? 0 : a ? 1 : -1;
+  int compareValue(bool a, bool b) => a == b ? 0 : a ? 1 : -1;
 
   bool get max {
-    for (bool v in data.asIterable) {
+    for (bool v in data) {
       if (v == null) continue;
       if (v) return true;
     }
@@ -87,7 +83,7 @@ abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
   }
 
   bool get min {
-    for (bool v in data.asIterable) {
+    for (bool v in data) {
       if (v == null) continue;
       if (!v) return false;
     }

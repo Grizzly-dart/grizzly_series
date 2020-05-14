@@ -2,12 +2,12 @@ part of grizzly.series;
 
 class StringSeriesView<LT> extends Object
     with SeriesViewMixin<LT, String>, StringSeriesViewMixin<LT>
-    implements SeriesView<LT, String> {
+    implements StringSeriesViewBase<LT> {
   final _name;
 
   final Iterable<LT> labels;
 
-  final StringArrayView data;
+  final String1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -16,20 +16,18 @@ class StringSeriesView<LT> extends Object
   StringSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory StringSeriesView(/* Iterable<String> | IterView<String> */ data,
-      {name, Iterable<LT> labels}) {
-    String1D d;
-    if (data is Iterable<String>) {
-      d = new String1D(data);
-    } else if (data is IterView<String>) {
-      d = new String1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+  factory StringSeriesView(Iterable<String> data, {name, Iterable<LT> labels}) {
+    String1DView d = new String1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeriesView._build(madeLabels, d, name);
   }
+
+  factory StringSeriesView.constant(String data,
+          {name, Iterable<LT> labels, int length}) =>
+      new StringSeriesView(
+          new ConstantIterable<String>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
 
   factory StringSeriesView.fromMap(Map<LT, String> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
@@ -54,17 +52,15 @@ class StringSeriesView<LT> extends Object
   StringSeriesView<LT> get view => this;
 }
 
-abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
+abstract class StringSeriesViewMixin<LT> implements StringSeriesViewBase<LT> {
   StringSeries<LT> toSeries() =>
       new StringSeries<LT>(data, name: name, labels: labels);
 
-  StringSeriesView<IIT> makeView<IIT>(
-          /* Iterable<String> | IterView<String> */ data,
-          {dynamic name,
-          Iterable<IIT> labels}) =>
+  StringSeriesView<IIT> makeView<IIT>(Iterable<String> data,
+          {dynamic name, Iterable<IIT> labels}) =>
       new StringSeriesView(data, name: name, labels: labels);
 
-  StringSeries<IIT> make<IIT>(/* Iterable<String> | IterView<String> */ data,
+  StringSeries<IIT> make<IIT>(Iterable<String> data,
           {dynamic name, Iterable<IIT> labels}) =>
       new StringSeries<IIT>(data, name: name, labels: labels);
 
@@ -75,12 +71,29 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   String1D makeValueArray(Iterable<String> data) => new String1D(data);
 
   @override
-  int compareVT(String a, String b) => a.compareTo(b);
+  int compareValue(String a, String b) => a.compareTo(b);
+
+  @override
+  DoubleSeries<LT> toDouble(
+          {double defaultValue, double onError(String source)}) =>
+      new DoubleSeries<LT>(
+          data.toDouble(defaultValue: defaultValue, onError: onError),
+          name: name,
+          labels: labels);
+
+  @override
+  IntSeries<LT> toInt(
+          {int radix, int defaultValue, int onError(String source)}) =>
+      new IntSeries<LT>(
+          data.toInt(
+              radix: radix, defaultValue: defaultValue, onError: onError),
+          name: name,
+          labels: labels);
 
   String max() {
     String ret;
 
-    for (String v in data.asIterable) {
+    for (String v in data) {
       if (v == null) continue;
       if (ret == null)
         ret = v;
@@ -93,7 +106,7 @@ abstract class StringSeriesViewMixin<LT> implements SeriesView<LT, String> {
   String min() {
     String ret;
 
-    for (String v in data.asIterable) {
+    for (String v in data) {
       if (v == null) continue;
       if (ret == null)
         ret = v;

@@ -53,14 +53,14 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return Ranger.range(start, end).map(pairByPos);
+    return Ranger.between(start, end).map(pairByPos);
   }
 
   Series<int, VT> mode() {
     final LinkedHashMap<VT, int> map = new LinkedHashMap<VT, int>();
     int max = 0;
 
-    for (VT v in data.asIterable) {
+    for (VT v in data) {
       if (!map.containsKey(v)) map[v] = 0;
       map[v]++;
       if (map[v] > max) max = map[v];
@@ -117,11 +117,8 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return new DataFrame<LT>({column ?? name: data}, labels: labels);
   }
 
-  bool labelsMatch(
-      final /* IterView<LT> | Series<LT, dynamic> | Iterable<LT> */ labels) {
-    if (labels is IterView<LT>) {
-      return _iterEquality.equals(this.labels, labels.asIterable);
-    } else if (labels is Series<LT, dynamic>) {
+  bool labelsMatch(final /* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled<LT>) {
       return _iterEquality.equals(this.labels, labels.labels);
     } else if (labels is Iterable<LT>) {
       return _iterEquality.equals(this.labels, labels);
@@ -136,6 +133,203 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     }
     return tab.toString();
   }
+
+  @override
+  BoolSeriesBase<LT> eq(
+      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data.eq(other), name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] == other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data.eq(other), name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  BoolSeriesBase<LT> ne(
+      /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data.ne(other), name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = data[i] != other[label];
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data.ne(other), name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >=(
+      /* VT | Iterable<VT> | SeriesView<VT> | ArrayView<VT> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = compareValue(data[i], other[label]) >= 0;
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator >(
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = compareValue(data[i], other[label]) > 0;
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator <(
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = compareValue(data[i], other[label]) < 0;
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  BoolSeriesBase<LT> operator <=(
+      /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
+    if (other is VT) {
+      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+    } else if (other is SeriesView<LT, VT>) {
+      final list = new List<bool>()..length = length;
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          list[i] = compareValue(data[i], other[label]) <= 0;
+        }
+      }
+      return new BoolSeries<LT>(list, name: name, labels: labels);
+    } else if (other is Iterable<VT>) {
+      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+    }
+    throw new UnimplementedError();
+  }
+
+  BoolSeries<LT> boolean(SeriesCond<LT, VT> cond) {
+    final ret = new BoolSeries<LT>([]);
+    for (LT lab in labels) {
+      ret[lab] = cond(lab, this);
+    }
+    return ret;
+  }
+
+  Iterable<LT> labelsWhere(SeriesCond<LT, VT> cond) {
+    final ret = new List<LT>();
+    for (LT lab in labels) {
+      if (cond(lab, this)) ret.add(lab);
+    }
+    return ret;
+  }
+
+  Series<LT, VT> select(mask) {
+    if (mask is BoolSeriesViewBase<LT>) {
+      return selectIf(mask);
+    } else if (mask is Labeled<LT>) {
+      return selectOnly(mask);
+    } else if (mask is Iterable<LT>) {
+      return selectLabels(mask);
+    } else if (mask is SeriesCond<LT, VT>) {
+      return selectWhen(mask);
+    }
+    throw new UnimplementedError();
+  }
+
+  Series<LT, VT> selectOnly(Labeled<LT> mask) {
+    if (length != mask.labels.length)
+      throw lengthMismatch(
+          expected: length, found: mask.labels.length, subject: 'mask');
+
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab)) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
+  Series<LT, VT> selectLabels(Iterable<LT> mask) {
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
+
+    return selectOnly(new BoolSeriesView.constant(true, labels: mask));
+  }
+
+  Series<LT, VT> selectIf(BoolSeriesViewBase<LT> mask) {
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
+
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (mask.containsLabel(lab) && mask[lab]) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
+  Series<LT, VT> selectWhen(SeriesCond<LT, VT> cond) {
+    final ret = make<LT>(<VT>[]);
+    for (LT lab in labels) {
+      if (cond(lab, this)) ret[lab] = this[lab];
+    }
+    return ret;
+  }
+
+  NumericSeriesView<LT, int> get asInt => this as NumericSeriesView<LT, int>;
+
+  NumericSeriesView<LT, double> get asDouble =>
+      this as NumericSeriesView<LT, double>;
+
+  BoolSeriesViewBase<LT> get asBool => this as BoolSeriesViewBase<LT>;
+
+  StringSeriesViewBase<LT> get asString => this as StringSeriesViewBase<LT>;
+
+  DynamicSeriesViewBase<LT> get asDynamic => this as DynamicSeriesViewBase<LT>;
 }
 
-const IterableEquality _iterEquality = const IterableEquality();
+const UnorderedIterableEquality _iterEquality =
+    const UnorderedIterableEquality();

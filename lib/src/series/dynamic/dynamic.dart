@@ -6,30 +6,23 @@ class DynamicSeries<LT> extends Object
         SeriesFixMixin<LT, dynamic>,
         SeriesMixin<LT, dynamic>,
         DynamicSeriesViewMixin<LT>
-    implements DynamicSeriesBase<LT> {
+    implements DynamicSeriesFix<LT>, DynamicSeriesBase<LT> {
   final List<LT> _labels;
 
   final Dynamic1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  DynamicSeries._(this._labels, this._data, this.name, this._mapper);
+  DynamicSeries._(this._labels, this._data, this._name, this._mapper);
 
-  DynamicSeries._build(this._labels, this._data, this.name)
+  DynamicSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory DynamicSeries(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  factory DynamicSeries(Iterable<dynamic> data,
       {dynamic name, Iterable<LT> labels}) {
-    Dynamic1D d;
-    if (data is Iterable<bool>) {
-      d = new Dynamic1D(data);
-    } else if (data is IterView<bool>) {
-      d = new Dynamic1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Dynamic1D d = new Dynamic1D(data);
 
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DynamicSeries._build(madeLabels, d, name);
@@ -58,7 +51,9 @@ class DynamicSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  DynamicArrayView get data => _data.view;
+  Dynamic1DFix get data => _data.fixed;
+
+  String get name => _name is Function ? _name() : _name.toString();
 
   DynamicSeriesView<LT> _view;
 

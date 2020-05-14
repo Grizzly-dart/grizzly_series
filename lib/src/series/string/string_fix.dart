@@ -5,10 +5,10 @@ class StringSeriesFix<LT> extends Object
         SeriesViewMixin<LT, String>,
         SeriesFixMixin<LT, String>,
         StringSeriesViewMixin<LT>
-    implements SeriesFix<LT, String> {
+    implements StringSeriesView<LT>, StringSeriesFixBase<LT> {
   final List<LT> _labels;
 
-  final String1D _data;
+  final String1DFix _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -19,17 +19,9 @@ class StringSeriesFix<LT> extends Object
   StringSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory StringSeriesFix(/* Iterable<String> | IterView<String> */ data,
+  factory StringSeriesFix(Iterable<String> data,
       {dynamic name, Iterable<LT> labels}) {
-    String1D d;
-    if (data is Iterable<String>) {
-      d = new String1D(data);
-    } else if (data is IterView<String>) {
-      d = new String1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    String1DFix d = new String1DFix(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeriesFix._build(madeLabels, d, name);
   }
@@ -57,7 +49,7 @@ class StringSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  StringArrayView get data => _data.view;
+  String1DFix get data => _data;
 
   StringSeriesView<LT> _view;
 

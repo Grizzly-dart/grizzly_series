@@ -7,7 +7,7 @@ class DoubleSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final Numeric1DView<double> data;
+  final Double1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -16,20 +16,24 @@ class DoubleSeriesView<LT> extends Object
   DoubleSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory DoubleSeriesView(/* Iterable<double> | IterView<double> */ data,
-      {name, Iterable<LT> labels}) {
-    Double1D d;
-    if (data is Iterable<double>) {
-      d = new Double1D(data);
-    } else if (data is IterView<double>) {
-      d = new Double1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+  factory DoubleSeriesView(Iterable<double> data, {name, Iterable<LT> labels}) {
+    Double1DView d = new Double1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DoubleSeriesView._build(madeLabels, d, name);
   }
+
+  factory DoubleSeriesView.fromNums(Iterable<num> data, {name, Iterable<LT> labels}) {
+    Double1DView d = new Double1DView.fromNums(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new DoubleSeriesView._build(madeLabels, d, name);
+  }
+
+  factory DoubleSeriesView.constant(double data,
+          {name, Iterable<LT> labels, int length}) =>
+      new DoubleSeriesView(
+          new ConstantIterable<double>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
 
   factory DoubleSeriesView.fromMap(Map<LT, double> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
@@ -45,11 +49,13 @@ class DoubleSeriesView<LT> extends Object
     return new DoubleSeriesView._(labels, data, name, mapper);
   }
 
-  factory DoubleSeriesView.copy(SeriesView<LT, String> series) =>
+  factory DoubleSeriesView.copy(SeriesView<LT, double> series) =>
       new DoubleSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
+
+  Stats<double> get stats => data.stats;
 
   DoubleSeriesView<LT> get view => this;
 }

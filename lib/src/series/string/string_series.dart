@@ -6,31 +6,23 @@ class StringSeries<LT> extends Object
         SeriesFixMixin<LT, String>,
         SeriesMixin<LT, String>,
         StringSeriesViewMixin<LT>
-    implements Series<LT, String> {
+    implements StringSeriesFix<LT>, StringSeriesBase<LT> {
   final List<LT> _labels;
 
   final String1D _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
-  String name;
+  dynamic _name;
 
-  StringSeries._(this._labels, this._data, this.name, this._mapper);
+  StringSeries._(this._labels, this._data, this._name, this._mapper);
 
-  StringSeries._build(this._labels, this._data, this.name)
+  StringSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory StringSeries(/* Iterable<String> | IterView<String> */ data,
+  factory StringSeries(Iterable<String> data,
       {dynamic name, Iterable<LT> labels}) {
-    String1D d;
-    if (data is Iterable<String>) {
-      d = new String1D(data);
-    } else if (data is IterView<String>) {
-      d = new String1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    String1D d = new String1D(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new StringSeries._build(madeLabels, d, name);
   }
@@ -58,7 +50,7 @@ class StringSeries<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  StringArrayView get data => _data.view;
+  String1DFix get data => _data.fixed;
 
   StringSeriesView<LT> _view;
 
@@ -69,23 +61,6 @@ class StringSeries<LT> extends Object
 
   StringSeriesFix<LT> get fixed =>
       _fixed ??= new StringSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+
+  String get name => _name is Function ? _name() : _name.toString();
 }
-
-/* TODO
-  IntSeries<LT> toInt({int radix, int fillVal}) {
-    return new IntSeries<LT>(
-        _data
-            .map((String v) =>
-                int.parse(v, radix: radix, onError: (_) => fillVal))
-            .toList(),
-        name: name,
-        labels: _labels.toList());
-  }
-
-  DoubleSeries<LT> toDouble({double fillVal}) {
-    return new DoubleSeries<LT>(
-        _data.map((String v) => double.parse(v, (_) => fillVal)).toList(),
-        name: name,
-        labels: _labels.toList());
-  }
-  */

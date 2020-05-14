@@ -1,11 +1,99 @@
 part of grizzly.series;
 
+abstract class IntSeriesFixMixin<LT> implements NumericSeriesFix<LT, int> {
+  @override
+  void addition(
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] += other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num || other is Iterable<num>) {
+      data.addition(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void subtract(
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] -= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num || other is Iterable<num>) {
+      data.subtract(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void multiply(
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] *= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num || other is Iterable<num>) {
+      data.multiply(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+
+  @override
+  void divide(
+          /* E | NumericSeriesView<E> | Iterable<E> */ other) =>
+      truncDiv(other);
+
+  @override
+  void truncDiv(
+      /* E | NumericSeriesView<E> | Iterable<E> */ other) {
+    if (other is SeriesView<LT, num>) {
+      for (int i = 0; i < length; i++) {
+        LT label = labelAt(i);
+        if (other.containsLabel(label)) {
+          data[i] ~/= other[label];
+        } else {
+          data[i] = null;
+        }
+      }
+      return;
+    } else if (other is num || other is Iterable<num>) {
+      data.truncDiv(other);
+      return;
+    }
+    throw new UnimplementedError();
+  }
+}
+
 class IntSeriesFix<LT> extends Object
     with
         SeriesViewMixin<LT, int>,
         SeriesFixMixin<LT, int>,
-        IntSeriesViewMixin<LT>
-    implements NumericFixSeries<LT, int>, IntSeriesView<LT> {
+        IntSeriesViewMixin<LT>,
+        IntSeriesFixMixin<LT>
+    implements NumericSeriesFix<LT, int>, IntSeriesView<LT> {
   final List<LT> _labels;
 
   final Int1D _data;
@@ -19,17 +107,16 @@ class IntSeriesFix<LT> extends Object
   IntSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory IntSeriesFix(/* Iterable<int> | IterView<int> */ data,
+  factory IntSeriesFix(Iterable<int> data,
       {dynamic name, Iterable<LT> labels}) {
-    Int1D d;
-    if (data is Iterable<int>) {
-      d = new Int1D(data);
-    } else if (data is IterView<int>) {
-      d = new Int1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
+    Int1D d = new Int1D(data);
+    final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
+    return new IntSeriesFix._build(madeLabels, d, name);
+  }
 
+  factory IntSeriesFix.fromNums(Iterable<num> data,
+      {dynamic name, Iterable<LT> labels}) {
+    Int1D d = new Int1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new IntSeriesFix._build(madeLabels, d, name);
   }
@@ -50,13 +137,13 @@ class IntSeriesFix<LT> extends Object
     return new IntSeriesFix._(labels, data, name, mapper);
   }
 
-  factory IntSeriesFix.copy(SeriesView<LT, int> series,
-          {name, Iterable<LT> labels}) =>
-      new IntSeriesFix(series.data, name: series.name, labels: series.labels);
+  factory IntSeriesFix.copy(SeriesView<LT, int> series, {name}) =>
+      new IntSeriesFix(series.data,
+          name: name ?? series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
-  Int1DView get data => _data.view;
+  Int1DFix get data => _data;
 
   IntSeriesView<LT> _view;
 
@@ -67,4 +154,11 @@ class IntSeriesFix<LT> extends Object
   SeriesFix<LT, int> get fixed => this;
 
   String get name => _name is Function ? _name() : _name.toString();
+
+  Stats<int> get stats => _data.stats;
+
+  @override
+  void negate() {
+    _data.negate();
+  }
 }

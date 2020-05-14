@@ -5,10 +5,10 @@ class BoolSeriesFix<LT> extends Object
         SeriesViewMixin<LT, bool>,
         SeriesFixMixin<LT, bool>,
         BoolSeriesViewMixin<LT>
-    implements SeriesFix<LT, bool> {
+    implements BoolSeriesView<LT>, BoolSeriesFixBase<LT> {
   final List<LT> _labels;
 
-  final Bool1D _data;
+  final Bool1DFix _data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -21,17 +21,9 @@ class BoolSeriesFix<LT> extends Object
   BoolSeriesFix._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory BoolSeriesFix(/* Iterable<bool> | IterView<bool> */ data,
+  factory BoolSeriesFix(Iterable<bool> data,
       {dynamic name, Iterable<LT> labels}) {
-    Bool1D d;
-    if (data is Iterable<bool>) {
-      d = new Bool1D(data);
-    } else if (data is IterView<bool>) {
-      d = new Bool1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    Bool1DFix d = new Bool1DFix(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new BoolSeriesFix._build(madeLabels, d, name);
   }
@@ -59,7 +51,7 @@ class BoolSeriesFix<LT> extends Object
 
   Iterable<LT> get labels => _labels;
 
-  BoolArrayView get data => _data.view;
+  Bool1DFix get data => _data;
 
   BoolSeriesView<LT> get view =>
       _view ??= new BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);
@@ -68,16 +60,4 @@ class BoolSeriesFix<LT> extends Object
   SeriesFix<LT, bool> get fixed => this;
 
   String get name => _name is Function ? _name() : _name;
-
-/* TODO
-  IntSeries<LT> toInt({int radix, int fillVal}) {
-    return new IntSeries<LT>(_data.map((bool v) => v ? 1 : 0).toList(),
-        name: name, labels: _labels.toList());
-  }
-
-  DoubleSeries<LT> toDouble({double fillVal}) {
-    return new DoubleSeries<LT>(_data.map((bool v) => v ? 1.0 : 0.0).toList(),
-        name: name, labels: _labels.toList());
-  }
-  */
 }

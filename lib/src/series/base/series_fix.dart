@@ -19,7 +19,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
     _data[position] = value;
   }
 
-  void assign(/* Series<LT, VT> | IterView<VT> */ other) {
+  void assign(/* Series<LT, VT> | Iterable<VT> */ other) {
     if (other is Series<LT, VT>) {
       for (LT label in other.labels) {
         if (containsLabel(label)) {
@@ -27,12 +27,16 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
           _data[sourcePos] = other[label];
         }
       }
-    } else if (other is IterView<VT>) {
+    } else if (other is Iterable<VT>) {
       if (length != other.length)
         throw lengthMismatch(
             expected: length, found: other.length, subject: 'other');
       for (int i = 0; i < length; i++) {
-        _data[i] = other[i];
+        _data[i] = other.elementAt(i);
+      }
+    } else if (other is VT) {
+      for (int i = 0; i < length; i++) {
+        _data[i] = other;
       }
     } else {
       throw new UnsupportedError('Type not supported!');
@@ -53,4 +57,15 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
       _data[i] = func(_data[i]);
     }
   }
+
+  NumericSeriesFix<LT, int> get asInt => this as NumericSeriesFix<LT, int>;
+
+  NumericSeriesFix<LT, double> get asDouble =>
+      this as NumericSeriesFix<LT, double>;
+
+  BoolSeriesFixBase<LT> get asBool => this as BoolSeriesFixBase<LT>;
+
+  StringSeriesFixBase<LT> get asString => this as StringSeriesFixBase<LT>;
+
+  DynamicSeriesFixBase<LT> get asDynamic => this as DynamicSeriesFixBase<LT>;
 }

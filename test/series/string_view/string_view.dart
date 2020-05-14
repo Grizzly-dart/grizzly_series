@@ -11,7 +11,7 @@ void main() {
       final s = new StringSeriesView<String>(['ett', 'två', 'tre'],
           labels: ['one', 'two', 'three']);
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.data, ['ett', 'två', 'tre']);
       expect(s.length, 3);
       expect(s.containsLabel('one'), true);
       expect(s.containsLabel('four'), false);
@@ -36,7 +36,7 @@ void main() {
         'three': 'tre',
       });
       expect(s.labels, ['one', 'two', 'three']);
-      expect(s.data.asIterable, ['ett', 'två', 'tre']);
+      expect(s.data, ['ett', 'två', 'tre']);
       expect(s.length, 3);
       expect(s.containsLabel('one'), true);
       expect(s.containsLabel('four'), false);

@@ -4,13 +4,11 @@ abstract class DynamicSeriesViewMixin<LT> implements DynamicSeriesViewBase<LT> {
   DynamicSeries<LT> toSeries() =>
       new DynamicSeries<LT>(data, name: name, labels: labels);
 
-  DynamicSeriesView<LLT> makeView<LLT>(
-          /* Iterable<LLT> | IterView<LLT> */ data,
-          {dynamic name,
-          Iterable<LLT> labels}) =>
+  DynamicSeriesView<LLT> makeView<LLT>(Iterable<dynamic> data,
+          {dynamic name, Iterable<LLT> labels}) =>
       new DynamicSeriesView(data, name: name, labels: labels);
 
-  DynamicSeries<IIT> make<IIT>(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  DynamicSeries<IIT> make<IIT>(Iterable<dynamic> data,
           {dynamic name, Iterable<IIT> labels}) =>
       new DynamicSeries<IIT>(data, name: name, labels: labels);
 
@@ -21,7 +19,7 @@ abstract class DynamicSeriesViewMixin<LT> implements DynamicSeriesViewBase<LT> {
   Dynamic1D makeValueArray(Iterable<dynamic> data) => new Dynamic1D(data);
 
   @override
-  int compareVT(dynamic a, dynamic b) {
+  int compareValue(dynamic a, dynamic b) {
     throw new UnimplementedError();
   }
 }

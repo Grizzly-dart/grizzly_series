@@ -7,7 +7,7 @@ class DynamicSeriesView<LT> extends Object
 
   final Iterable<LT> labels;
 
-  final DynamicArrayView data;
+  final Dynamic1DView data;
 
   final SplayTreeMap<LT, int> _mapper;
 
@@ -16,20 +16,19 @@ class DynamicSeriesView<LT> extends Object
   DynamicSeriesView._build(this.labels, this.data, this._name)
       : _mapper = labelsToMapper(labels);
 
-  factory DynamicSeriesView(/* Iterable<dynamic> | IterView<dynamic> */ data,
+  factory DynamicSeriesView(Iterable<dynamic> data,
       {name, Iterable<LT> labels}) {
-    Dynamic1D d;
-    if (data is Iterable<dynamic>) {
-      d = new Dynamic1D(data);
-    } else if (data is IterView<dynamic>) {
-      d = new Dynamic1D.copy(data);
-    } else {
-      throw new UnsupportedError('Type not supported!');
-    }
-
+    Dynamic1DView d = new Dynamic1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
     return new DynamicSeriesView._build(madeLabels, d, name);
   }
+
+  factory DynamicSeriesView.constant(dynamic data,
+          {name, Iterable<LT> labels, int length}) =>
+      new DynamicSeriesView(
+          new ConstantIterable<dynamic>(data, length ?? labels.length),
+          name: name,
+          labels: labels);
 
   factory DynamicSeriesView.fromMap(Map<LT, dynamic> map, {dynamic name}) {
     final labels = new List<LT>(map.length);
@@ -45,7 +44,7 @@ class DynamicSeriesView<LT> extends Object
     return new DynamicSeriesView._(labels, data, name, mapper);
   }
 
-  factory DynamicSeriesView.copy(SeriesView<LT, bool> series) =>
+  factory DynamicSeriesView.copy(SeriesView<LT, dynamic> series) =>
       new DynamicSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 
