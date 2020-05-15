@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 void main() {
   group('StringSeriesView', () {
     test('default', () {
-      final s = new StringSeriesView<String>(['ett', 'två', 'tre'],
+      final s = StringSeriesView<String>(['ett', 'två', 'tre'],
           labels: ['one', 'two', 'three']);
       expect(s.labels, ['one', 'two', 'three']);
       expect(s.data, ['ett', 'två', 'tre']);
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('map', () {
-      final s = new StringSeriesView<String>.fromMap({
+      final s = StringSeriesView<String>.fromMap({
         'one': 'ett',
         'two': 'två',
         'three': 'tre',

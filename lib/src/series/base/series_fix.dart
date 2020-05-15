@@ -15,7 +15,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
   void set(LT label, VT value) => this[label] = value;
 
   void setByPos(int position, VT value) {
-    if (position >= length) throw new RangeError.range(position, 0, length);
+    if (position >= length) throw RangeError.range(position, 0, length);
     _data[position] = value;
   }
 
@@ -39,7 +39,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
         _data[i] = other;
       }
     } else {
-      throw new UnsupportedError('Type not supported!');
+      throw UnsupportedError('Type not supported!');
     }
   }
 

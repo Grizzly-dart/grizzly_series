@@ -1,9 +1,9 @@
 import 'package:grizzly_series/grizzly_series.dart';
 
 void main() {
-  final df = new DataFrame<int>({
-    'num': new IntSeries([1, 2, 3, 4, 5]),
-    'other': new IntSeries([2, 1, 3, 5, 4]),
+  final df = DataFrame<int>({
+    'num': IntSeries([1, 2, 3, 4, 5]),
+    'other': IntSeries([2, 1, 3, 5, 4]),
   });
 
   print(df['num'].asInt.stats.describe());

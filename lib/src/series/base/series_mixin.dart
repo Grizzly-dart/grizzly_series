@@ -20,8 +20,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   void set(LT label, VT value) => this[label] = value;
 
   void append(LT label, VT value) {
-    if (_mapper.containsKey(label))
-      throw new Exception('Label already exists!');
+    if (_mapper.containsKey(label)) throw Exception('Label already exists!');
 
     _labels.add(label);
     _data.add(value);
@@ -29,7 +28,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   void insert(int pos, LT label, VT value) {
-    if (pos > length) throw new RangeError.range(pos, 0, length);
+    if (pos > length) throw RangeError.range(pos, 0, length);
     if (containsLabel(label)) drop(label);
 
     _updatePosOnInsert(pos);
@@ -54,7 +53,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
   /// Remove element at position [pos]
   void remove(int pos) {
-    if (pos >= length) throw new RangeError.range(pos, 0, length);
+    if (pos >= length) throw RangeError.range(pos, 0, length);
 
     final LT label = _labels[pos];
     _mapper.remove(label);
@@ -69,10 +68,10 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       return;
     }
 
-    final positionSet = new Set<int>.from(positions).toList();
+    final positionSet = Set<int>.from(positions).toList();
     positionSet.sort((int a, int b) => b.compareTo(a));
     if (positionSet.first >= length)
-      throw new RangeError.range(positionSet.first, 0, length);
+      throw RangeError.range(positionSet.first, 0, length);
 
     for (int pos in positionSet) {
       final LT label = _labels[pos];
@@ -134,7 +133,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
         _data[i] = other.elementAt(i);
       }
     } else {
-      throw new UnsupportedError('Type not supported!');
+      throw UnsupportedError('Type not supported!');
     }
   }
 
@@ -150,9 +149,9 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   void sortByValue({bool descending: false}) {
-    final items = new List<Pair<LT, VT>>(length);
+    final items = List<Pair<LT, VT>>(length);
     for (int i = 0; i < length; i++) {
-      items[i] = new Pair<LT, VT>(labels.elementAt(i), data[i]);
+      items[i] = Pair<LT, VT>(labels.elementAt(i), data[i]);
     }
 
     if (!descending) {
@@ -177,9 +176,9 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       labelsSorted = labelsSorted.reversed.toList();
     }
 
-    final labs = new List<LT>(length);
+    final labs = List<LT>(length);
     final d = makeValueArraySized(length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int c = 0; c < length; c++) {
       LT lab = labelsSorted[c];
@@ -209,7 +208,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
       keepWhen(mask);
       return;
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   void keepOnly(Labeled<LT> mask) {
@@ -225,12 +224,12 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   void keepLabels(Iterable<LT> mask) {
-      if (length != mask.length)
-        throw lengthMismatch(
-            expected: length, found: mask.length, subject: 'mask');
+    if (length != mask.length)
+      throw lengthMismatch(
+          expected: length, found: mask.length, subject: 'mask');
 
-      keepOnly(new BoolSeriesView.constant(true, labels: mask));
-      return;
+    keepOnly(BoolSeriesView.constant(true, labels: mask));
+    return;
   }
 
   void keepIf(BoolSeriesViewBase<LT> mask) {

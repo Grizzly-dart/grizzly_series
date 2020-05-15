@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 void main() {
   group('StringSeries', () {
     test('default', () {
-      final s = new StringSeries<String>(['ett', 'två', 'tre'],
+      final s = StringSeries<String>(['ett', 'två', 'tre'],
           labels: ['one', 'two', 'three']);
       expect(s.labels, ['one', 'two', 'three']);
       expect(s.toList(), ['ett', 'två', 'tre']);
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('fromMap', () {
-      final s = new StringSeries<String>.fromMap({
+      final s = StringSeries<String>.fromMap({
         'one': 'ett',
         'two': 'två',
         'three': 'tre',
@@ -55,7 +55,7 @@ void main() {
     });
 
     test('ops', () {
-      final s = new StringSeries<String>.fromMap({
+      final s = StringSeries<String>.fromMap({
         'one': 'ett',
         'two': 'två',
         'three': 'tre',
@@ -75,8 +75,7 @@ void main() {
       s.append('fifteen', 'femton');
       expect(s.labels, ['one', 'two', 'three', 'five', 'ten', 'fifteen']);
       expect(s.toList(), ['ett', 'två', 'tre', 'fem', 'tie', 'femton']);
-      expect(
-          () => s.append('ten', 'tie'), throwsA(isA<Exception>()));
+      expect(() => s.append('ten', 'tie'), throwsA(isA<Exception>()));
       s.remove(4);
       expect(s.labels, ['one', 'two', 'three', 'five', 'fifteen']);
       expect(s.toList(), ['ett', 'två', 'tre', 'fem', 'femton']);
@@ -98,7 +97,7 @@ void main() {
       s.apply((s) => s.substring(0, s.length - 1));
       expect(s.labels, ['five', 'ten']);
       expect(s.toList(), ['fem', 'tie']);
-      s.assign(new StringSeriesView.fromMap(
+      s.assign(StringSeriesView.fromMap(
           {'one': 'ett', 'two': 'två', 'three': 'tre'}));
       expect(s.labels, ['five', 'ten', 'one', 'two', 'three']);
       expect(s.toList(), ['fem', 'tie', 'ett', 'två', 'tre']);

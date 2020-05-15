@@ -7,9 +7,9 @@ void main() {
     setUp(() {});
 
     test('series.base', () {
-      final df = new DataFrame({
-        'one': new IntSeries<int>([1, 2, 3, 4]),
-        'two': new IntSeries<int>([10, 20, 30, 40])
+      final df = DataFrame({
+        'one': IntSeries<int>([1, 2, 3, 4]),
+        'two': IntSeries<int>([10, 20, 30, 40])
       });
 
       expect(df.labels, [0, 1, 2, 3]);
@@ -21,11 +21,10 @@ void main() {
     });
 
     test('series.string', () {
-      final df = new DataFrame({
-        'one': new IntSeries<int>([1, 2, 3, 4]),
-        'two': new IntSeries<int>([10, 20, 30, 40]),
-        'alphabets':
-            new StringSeries<int>(['A', 'B', 'C', 'D'], name: 'alphabets')
+      final df = DataFrame({
+        'one': IntSeries<int>([1, 2, 3, 4]),
+        'two': IntSeries<int>([10, 20, 30, 40]),
+        'alphabets': StringSeries<int>(['A', 'B', 'C', 'D'], name: 'alphabets')
       });
 
       expect(df.labels, [0, 1, 2, 3]);
@@ -38,9 +37,9 @@ void main() {
     });
 
     test('series.withSeriesAndList', () {
-      final df = new DataFrame({
-        'one': new IntSeries<int>([1, 2, 3, 4]),
-        'two': new IntSeries<int>([10, 20, 30, 40]),
+      final df = DataFrame({
+        'one': IntSeries<int>([1, 2, 3, 4]),
+        'two': IntSeries<int>([10, 20, 30, 40]),
         'three': <int>[1000, 2000, 3000, 4000],
         'four': <String>['AA', 'BB', 'CC', 'DD']
       });
@@ -55,9 +54,10 @@ void main() {
     });
 
     test('empty', () {
-      final df = new DataFrame<String>({});
-      df['x'] = new DoubleSeries<String>(new List.generate(1000, (i) => log(i)),
-          labels: new List.generate(1000, (i) => i.toString()));
+      final df = DataFrame<String>({});
+      expect(df.numRows, 0);
+
+      df.ensureLabel(List.generate(1000, (i) => i.toString()));
       expect(df.numRows, 1000);
     });
   });

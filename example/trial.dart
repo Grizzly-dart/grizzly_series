@@ -4,8 +4,8 @@
 import 'package:grizzly_series/grizzly_series.dart';
 
 main() {
-  final df = new DataFrame<int>({
-    'num': new IntSeries([1, 2, 3, 4, 5]),
+  final df = DataFrame<int>({
+    'num': IntSeries([1, 2, 3, 4, 5]),
   });
   print(df);
   print(df['num']);

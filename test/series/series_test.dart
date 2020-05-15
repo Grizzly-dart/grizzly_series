@@ -9,7 +9,7 @@ void main() {
     setUp(() {});
 
     test('Subscript operator', () {
-      final series = new IntSeries<int>([1, 2, 3, 4]);
+      final series = IntSeries<int>([1, 2, 3, 4]);
       expect(series[0], 1);
       expect(series[1], 2);
       expect(series[2], 3);
@@ -17,12 +17,12 @@ void main() {
     });
 
     test('duplicate exception', () {
-      expect(() => new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]),
+      expect(() => IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]),
           throwsA(isA<Exception>()));
     });
 
     test('Subscript operator with String index', () {
-      final series = new IntSeries<String>([1, 2, 3, 4],
+      final series = IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'two', 'three', 'four']);
       expect(series['one'], 1);
       expect(series['two'], 2);
@@ -31,7 +31,7 @@ void main() {
     });
 
     test('Pos', () {
-      final series = new IntSeries<int>([1, 2, 3, 4]);
+      final series = IntSeries<int>([1, 2, 3, 4]);
       expect(series.getByPos(0), 1);
       expect(series.getByPos(1), 2);
       expect(series.getByPos(2), 3);
@@ -39,18 +39,16 @@ void main() {
     });
 
     test('add other missing', () {
-      final series1 =
-          new IntSeries<int>([1, 2, 3, 4, 5], labels: [1, 2, 3, 4, 5]);
-      final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
+      final series1 = IntSeries<int>([1, 2, 3, 4, 5], labels: [1, 2, 3, 4, 5]);
+      final series2 = IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
       final res = series1 + series2;
       expect(res.labels, [1, 2, 3, 4, 5]);
-      expect(res.toList(), [11, 22, 33, 4, 5]);
+      expect(res.toList(), [11, 22, 33, null, null]);
     });
 
     test('add self missing', () {
-      final series1 = new IntSeries<int>([1, 2, 3], labels: [1, 2, 3]);
-      final series2 =
-          new IntSeries<int>([10, 20, 30, 40], labels: [1, 2, 3, 4]);
+      final series1 = IntSeries<int>([1, 2, 3], labels: [1, 2, 3]);
+      final series2 = IntSeries<int>([10, 20, 30, 40], labels: [1, 2, 3, 4]);
       final res = series1 + series2;
       expect(res.labels, [1, 2, 3]);
       expect(res.toList(), [11, 22, 33]);

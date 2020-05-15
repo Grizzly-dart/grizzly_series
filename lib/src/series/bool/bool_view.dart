@@ -17,22 +17,22 @@ class BoolSeriesView<LT> extends Object
       : _mapper = labelsToMapper(labels);
 
   factory BoolSeriesView(Iterable<bool> data, {name, Iterable<LT> labels}) {
-    Bool1DView d = new Bool1DView(data);
+    Bool1DView d = Bool1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new BoolSeriesView._build(madeLabels, d, name);
+    return BoolSeriesView._build(madeLabels, d, name);
   }
 
   factory BoolSeriesView.constant(bool data,
           {name, Iterable<LT> labels, int length}) =>
-      new BoolSeriesView(
+      BoolSeriesView(
           ranger.ConstantIterable<bool>(data, length ?? labels.length),
           name: name,
           labels: labels);
 
   factory BoolSeriesView.fromMap(Map<LT, bool> map, {dynamic name}) {
-    final labels = new List<LT>(map.length);
-    final data = new Bool1D.sized(map.length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final labels = List<LT>(map.length);
+    final data = Bool1D.sized(map.length);
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int i = 0; i < map.length; i++) {
       LT label = map.keys.elementAt(i);
@@ -40,12 +40,11 @@ class BoolSeriesView<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new BoolSeriesView._(labels, data, name, mapper);
+    return BoolSeriesView._(labels, data, name, mapper);
   }
 
   factory BoolSeriesView.copy(SeriesView<LT, bool> series) =>
-      new BoolSeriesView<LT>(series.data,
-          name: series.name, labels: series.labels);
+      BoolSeriesView<LT>(series.data, name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;
 
@@ -54,21 +53,21 @@ class BoolSeriesView<LT> extends Object
 }
 
 abstract class BoolSeriesViewMixin<LT> implements SeriesView<LT, bool> {
-  BoolSeries<LT> toSeries() => new BoolSeries(data, name: name, labels: labels);
+  BoolSeries<LT> toSeries() => BoolSeries(data, name: name, labels: labels);
 
   BoolSeriesView<IIT> makeView<IIT>(Iterable<bool> data,
           {dynamic name, Iterable<IIT> labels}) =>
-      new BoolSeriesView(data, name: name, labels: labels);
+      BoolSeriesView(data, name: name, labels: labels);
 
   BoolSeries<IIT> make<IIT>(Iterable<bool> data,
           {dynamic name, Iterable<IIT> labels}) =>
-      new BoolSeries<IIT>(data, name: name, labels: labels);
+      BoolSeries<IIT>(data, name: name, labels: labels);
 
   @override
-  Bool1D makeValueArraySized(int size) => new Bool1D.sized(size);
+  Bool1D makeValueArraySized(int size) => Bool1D.sized(size);
 
   @override
-  Bool1D makeValueArray(Iterable<bool> data) => new Bool1D(data);
+  Bool1D makeValueArray(Iterable<bool> data) => Bool1D(data);
 
   @override
   int compareValue(bool a, bool b) => a == b ? 0 : a ? 1 : -1;

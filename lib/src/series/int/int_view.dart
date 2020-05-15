@@ -17,28 +17,27 @@ class IntSeriesView<LT> extends Object
       : _mapper = labelsToMapper(labels);
 
   factory IntSeriesView(Iterable<int> data, {name, Iterable<LT> labels}) {
-    Int1D d = new Int1D(data);
+    Int1D d = Int1D(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new IntSeriesView._build(madeLabels, d, name);
+    return IntSeriesView._build(madeLabels, d, name);
   }
 
-  factory IntSeriesView.fromNums(Iterable<num> data, {name, Iterable<LT> labels}) {
-    Int1D d = new Int1D.fromNums(data);
+  factory IntSeriesView.fromNums(Iterable<num> data,
+      {name, Iterable<LT> labels}) {
+    Int1D d = Int1D.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new IntSeriesView._build(madeLabels, d, name);
+    return IntSeriesView._build(madeLabels, d, name);
   }
 
   factory IntSeriesView.constant(int data,
           {name, Iterable<LT> labels, int length}) =>
-      new IntSeriesView(
-          ranger.ConstantIterable<int>(data, length ?? labels.length),
-          name: name,
-          labels: labels);
+      IntSeriesView(ranger.ConstantIterable<int>(data, length ?? labels.length),
+          name: name, labels: labels);
 
   factory IntSeriesView.fromMap(Map<LT, int> map, {dynamic name}) {
-    final labels = new List<LT>(map.length);
-    final data = new Int1D.sized(map.length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final labels = List<LT>(map.length);
+    final data = Int1D.sized(map.length);
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int i = 0; i < map.length; i++) {
       LT label = map.keys.elementAt(i);
@@ -46,12 +45,11 @@ class IntSeriesView<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new IntSeriesView._(labels, data, name, mapper);
+    return IntSeriesView._(labels, data, name, mapper);
   }
 
   factory IntSeriesView.copy(SeriesView<LT, int> series) =>
-      new IntSeriesView<LT>(series.data,
-          name: series.name, labels: series.labels);
+      IntSeriesView<LT>(series.data, name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();
 

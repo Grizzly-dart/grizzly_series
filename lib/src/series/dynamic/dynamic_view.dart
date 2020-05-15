@@ -18,22 +18,22 @@ class DynamicSeriesView<LT> extends Object
 
   factory DynamicSeriesView(Iterable<dynamic> data,
       {name, Iterable<LT> labels}) {
-    Dynamic1DView d = new Dynamic1DView(data);
+    Dynamic1DView d = Dynamic1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new DynamicSeriesView._build(madeLabels, d, name);
+    return DynamicSeriesView._build(madeLabels, d, name);
   }
 
   factory DynamicSeriesView.constant(dynamic data,
           {name, Iterable<LT> labels, int length}) =>
-      new DynamicSeriesView(
+      DynamicSeriesView(
           ranger.ConstantIterable<dynamic>(data, length ?? labels.length),
           name: name,
           labels: labels);
 
   factory DynamicSeriesView.fromMap(Map<LT, dynamic> map, {dynamic name}) {
-    final labels = new List<LT>(map.length);
-    final data = new Dynamic1D.sized(map.length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final labels = List<LT>(map.length);
+    final data = Dynamic1D.sized(map.length);
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int i = 0; i < map.length; i++) {
       LT label = map.keys.elementAt(i);
@@ -41,11 +41,11 @@ class DynamicSeriesView<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new DynamicSeriesView._(labels, data, name, mapper);
+    return DynamicSeriesView._(labels, data, name, mapper);
   }
 
   factory DynamicSeriesView.copy(SeriesView<LT, dynamic> series) =>
-      new DynamicSeriesView<LT>(series.data,
+      DynamicSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name.toString();

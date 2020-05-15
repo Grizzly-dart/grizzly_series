@@ -43,42 +43,38 @@ Series<LT, VT> series<LT, VT>(
     {name,
     Iterable<LT> labels}) {
   if (data is Iterable<int>) {
-    return new IntSeries<LT>(data, name: name, labels: labels)
-        as Series<LT, VT>;
+    return IntSeries<LT>(data, name: name, labels: labels) as Series<LT, VT>;
   } else if (data is Iterable<double>) {
-    return new DoubleSeries<LT>(data, name: name, labels: labels)
-        as Series<LT, VT>;
+    return DoubleSeries<LT>(data, name: name, labels: labels) as Series<LT, VT>;
   } else if (data is Iterable<String>) {
-    return new StringSeries<LT>(data, name: name, labels: labels)
-        as Series<LT, VT>;
+    return StringSeries<LT>(data, name: name, labels: labels) as Series<LT, VT>;
   } else if (data is Iterable<bool>) {
-    return new BoolSeries<LT>(data, name: name, labels: labels)
-        as Series<LT, VT>;
+    return BoolSeries<LT>(data, name: name, labels: labels) as Series<LT, VT>;
   } else if (data is Map<dynamic, int>) {
-    return new IntSeries<LT>.fromMap(data, name: name, labels: labels)
+    return IntSeries<LT>.fromMap(data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is Map<dynamic, double>) {
-    return new DoubleSeries<LT>.fromMap(data, name: name, labels: labels)
+    return DoubleSeries<LT>.fromMap(data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is Map<dynamic, String>) {
-    return new StringSeries<LT>.fromMap(data, name: name, labels: labels)
+    return StringSeries<LT>.fromMap(data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is Map<dynamic, bool>) {
-    return new BoolSeries<LT>.fromMap(data, name: name, labels: labels)
+    return BoolSeries<LT>.fromMap(data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is SeriesView<dynamic, int>) {
-    return new IntSeries<LT>(data.data, name: name, labels: labels)
+    return IntSeries<LT>(data.data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is SeriesView<dynamic, double>) {
-    return new DoubleSeries<LT>(data.data, name: name, labels: labels)
+    return DoubleSeries<LT>(data.data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is SeriesView<dynamic, String>) {
-    return new StringSeries<LT>(data.data, name: name, labels: labels)
+    return StringSeries<LT>(data.data, name: name, labels: labels)
         as Series<LT, VT>;
   } else if (data is SeriesView<dynamic, bool>) {
-    return new BoolSeries<LT>(data.data, name: name, labels: labels)
+    return BoolSeries<LT>(data.data, name: name, labels: labels)
         as Series<LT, VT>;
   }
   // TODO dynamic
-  throw new UnimplementedError();
+  throw UnimplementedError();
 }

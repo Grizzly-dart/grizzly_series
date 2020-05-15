@@ -18,12 +18,12 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   VT get(LT label) => this[label];
 
   VT getByPos(int position) {
-    if (position >= length) throw new RangeError.range(position, 0, length);
+    if (position >= length) throw RangeError.range(position, 0, length);
     return data[position];
   }
 
   LT labelAt(int position) {
-    if (position >= length) throw new RangeError.range(position, 0, length);
+    if (position >= length) throw RangeError.range(position, 0, length);
     return labels.elementAt(position);
   }
 
@@ -33,7 +33,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   Pair<LT, VT> pairByLabel(LT label) => pair<LT, VT>(label, this[label]);
 
   Pair<LT, VT> pairByPos(int position) {
-    if (position >= length) throw new RangeError.range(position, 0, length);
+    if (position >= length) throw RangeError.range(position, 0, length);
     return pair<LT, VT>(labels.elementAt(position), data[position]);
   }
 
@@ -45,19 +45,19 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       end = length - 1;
     else {
       if (end > length - 1) {
-        throw new ArgumentError.value(end, 'end', 'Out of range');
+        throw ArgumentError.value(end, 'end', 'Out of range');
       }
     }
 
     if (start > length - 1) {
-      throw new ArgumentError.value(start, 'start', 'Out of range');
+      throw ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return ranger.between(start, end).map(pairByPos);
+    return ranger.range(start, end).map(pairByPos);
   }
 
   Series<int, VT> mode() {
-    final LinkedHashMap<VT, int> map = new LinkedHashMap<VT, int>();
+    final LinkedHashMap<VT, int> map = LinkedHashMap<VT, int>();
     int max = 0;
 
     for (VT v in data) {
@@ -75,13 +75,11 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       ret.add(k);
     }
 
-    return make<int>(ret,
-        labels: new List<int>.generate(ret.length, (int i) => i));
+    return make<int>(ret, labels: List<int>.generate(ret.length, (int i) => i));
   }
 
   StringSeries<LT> toStringSeries() {
-    return new StringSeries<LT>(data.toStringArray(),
-        name: name, labels: labels);
+    return StringSeries<LT>(data.toStringArray(), name: name, labels: labels);
   }
 
   @override
@@ -90,7 +88,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       bool descending: false,
       bool dropNull: false,
       dynamic name}) {
-    final groups = new Map<VT, int>();
+    final groups = Map<VT, int>();
 
     for (int i = 0; i < length; i++) {
       final VT v = data[i];
@@ -101,7 +99,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     // Drop null
     if (dropNull) groups.remove(null);
 
-    final ret = new IntSeries<VT>.fromMap(groups, name: name ?? this.name);
+    final ret = IntSeries<VT>.fromMap(groups, name: name ?? this.name);
 
     // Sort
     if (sortByValue) {
@@ -114,7 +112,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   }
 
   DataFrame<LT> toDataFrame({String column}) {
-    return new DataFrame<LT>({column ?? name: data}, labels: labels);
+    return DataFrame<LT>({column ?? name: data}, labels: labels);
   }
 
   bool labelsMatch(final /* Labeled<LT> | Iterable<LT> */ labels) {
@@ -123,7 +121,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     } else if (labels is Iterable<LT>) {
       return _iterEquality.equals(this.labels, labels);
     }
-    throw new UnsupportedError('Type not supported!');
+    throw UnsupportedError('Type not supported!');
   }
 
   String toString() {
@@ -138,120 +136,120 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   BoolSeriesBase<LT> eq(
       /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data.eq(other), name: name, labels: labels);
+      return BoolSeries<LT>(data.eq(other), name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = data[i] == other[label];
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data.eq(other), name: name, labels: labels);
+      return BoolSeries<LT>(data.eq(other), name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   @override
   BoolSeriesBase<LT> ne(
       /* E | IterView<E> | NumericSeriesView<E> | Numeric1DView<E> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data.ne(other), name: name, labels: labels);
+      return BoolSeries<LT>(data.ne(other), name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = data[i] != other[label];
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data.ne(other), name: name, labels: labels);
+      return BoolSeries<LT>(data.ne(other), name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator >=(
       /* VT | Iterable<VT> | SeriesView<VT> | ArrayView<VT> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+      return BoolSeries<LT>(data >= other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = compareValue(data[i], other[label]) >= 0;
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data >= other, name: name, labels: labels);
+      return BoolSeries<LT>(data >= other, name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator >(
       /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+      return BoolSeries<LT>(data > other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = compareValue(data[i], other[label]) > 0;
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data > other, name: name, labels: labels);
+      return BoolSeries<LT>(data > other, name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator <(
       /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+      return BoolSeries<LT>(data < other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = compareValue(data[i], other[label]) < 0;
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data < other, name: name, labels: labels);
+      return BoolSeries<LT>(data < other, name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   BoolSeriesBase<LT> operator <=(
       /* E | Iterable<E> | SeriesView<E> | ArrayView<E> */ other) {
     if (other is VT) {
-      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+      return BoolSeries<LT>(data <= other, name: name, labels: labels);
     } else if (other is SeriesView<LT, VT>) {
-      final list = new List<bool>()..length = length;
+      final list = List<bool>()..length = length;
       for (int i = 0; i < length; i++) {
         LT label = labelAt(i);
         if (other.containsLabel(label)) {
           list[i] = compareValue(data[i], other[label]) <= 0;
         }
       }
-      return new BoolSeries<LT>(list, name: name, labels: labels);
+      return BoolSeries<LT>(list, name: name, labels: labels);
     } else if (other is Iterable<VT>) {
-      return new BoolSeries<LT>(data <= other, name: name, labels: labels);
+      return BoolSeries<LT>(data <= other, name: name, labels: labels);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   BoolSeries<LT> boolean(SeriesCond<LT, VT> cond) {
-    final ret = new BoolSeries<LT>([]);
+    final ret = BoolSeries<LT>([]);
     for (LT lab in labels) {
       ret[lab] = cond(lab, this);
     }
@@ -259,7 +257,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   }
 
   Iterable<LT> labelsWhere(SeriesCond<LT, VT> cond) {
-    final ret = new List<LT>();
+    final ret = List<LT>();
     for (LT lab in labels) {
       if (cond(lab, this)) ret.add(lab);
     }
@@ -276,7 +274,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     } else if (mask is SeriesCond<LT, VT>) {
       return selectWhen(mask);
     }
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   Series<LT, VT> selectOnly(Labeled<LT> mask) {
@@ -296,7 +294,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       throw lengthMismatch(
           expected: length, found: mask.length, subject: 'mask');
 
-    return selectOnly(new BoolSeriesView.constant(true, labels: mask));
+    return selectOnly(BoolSeriesView.constant(true, labels: mask));
   }
 
   Series<LT, VT> selectIf(BoolSeriesViewBase<LT> mask) {

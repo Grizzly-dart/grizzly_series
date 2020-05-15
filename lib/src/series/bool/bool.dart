@@ -20,19 +20,18 @@ class BoolSeries<LT> extends Object
   BoolSeries._build(this._labels, this._data, this._name)
       : _mapper = labelsToMapper(_labels);
 
-  factory BoolSeries(Iterable<bool> data,
-      {dynamic name, Iterable<LT> labels}) {
-    Bool1D d = new Bool1D(data);
+  factory BoolSeries(Iterable<bool> data, {dynamic name, Iterable<LT> labels}) {
+    Bool1D d = Bool1D(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new BoolSeries._build(madeLabels, d, name);
+    return BoolSeries._build(madeLabels, d, name);
   }
 
   factory BoolSeries.fromMap(Map<LT, bool> map,
       {dynamic name, Iterable<LT> labels}) {
     // TODO take labels into account
-    final labels = new List<LT>()..length = map.length;
-    final data = new Bool1D.sized(map.length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final labels = List<LT>()..length = map.length;
+    final data = Bool1D.sized(map.length);
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int i = 0; i < map.length; i++) {
       LT label = map.keys.elementAt(i);
@@ -40,12 +39,12 @@ class BoolSeries<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new BoolSeries._(labels, data, name, mapper);
+    return BoolSeries._(labels, data, name, mapper);
   }
 
   factory BoolSeries.copy(SeriesView<LT, bool> series,
           {name, Iterable<LT> labels}) =>
-      new BoolSeries<LT>(series.data, name: series.name, labels: series.labels);
+      BoolSeries<LT>(series.data, name: series.name, labels: series.labels);
 
   Iterable<LT> get labels => _labels;
 
@@ -54,12 +53,12 @@ class BoolSeries<LT> extends Object
   BoolSeriesView<LT> _view;
 
   BoolSeriesView<LT> get view =>
-      _view ??= new BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);
+      _view ??= BoolSeriesView<LT>._(_labels, _data, () => name, _mapper);
 
   BoolSeriesFix<LT> _fixed;
 
   BoolSeriesFix<LT> get fixed =>
-      _fixed ??= new BoolSeriesFix<LT>._(_labels, _data, () => name, _mapper);
+      _fixed ??= BoolSeriesFix<LT>._(_labels, _data, () => name, _mapper);
 
   String get name => _name is Function ? _name() : _name.toString();
 

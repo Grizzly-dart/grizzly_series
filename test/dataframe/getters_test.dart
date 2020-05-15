@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('DataFrame.Getters', () {
-    final df = new DataFrame<String>({
+    final df = DataFrame<String>({
       'age': [20, 22, 35],
       'house': ['Stark', 'Targaryan', 'Lannister']
     }, labels: [
@@ -52,14 +52,14 @@ void main() {
 
     /* TODO
     test('Subscript operator multiple', () {
-      final series = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
+      final series = IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
       expect(series[1], 1);
       expect(series[2], 2);
       expect(series[3], 4);
     });
 
     test('Subscript operator with String index', () {
-      final series = new IntSeries<String>([1, 2, 3, 4],
+      final series = IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'two', 'three', 'four']);
       expect(series['one'], 1);
       expect(series['two'], 2);
@@ -68,7 +68,7 @@ void main() {
     });
 
     test('Subscript operator multiple with String index', () {
-      final series = new IntSeries<String>([1, 2, 3, 4],
+      final series = IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'two', 'two', 'three']);
       expect(series['one'], 1);
       expect(series['two'], 2);
@@ -76,25 +76,25 @@ void main() {
     });
 
     test('add', () {
-      final series1 = new IntSeries<int>([1, 2, 3, 4]);
-      final series2 = new IntSeries<int>([1, 2, 3, 4]);
+      final series1 = IntSeries<int>([1, 2, 3, 4]);
+      final series2 = IntSeries<int>([1, 2, 3, 4]);
       final res = series1.add(series2);
       expect(res.labels, [0, 1, 2, 3]);
       expect(res.data, [2, 4, 6, 8]);
     });
 
     test('add dup1', () {
-      final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
-      final series2 = new IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
+      final series1 = IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
+      final series2 = IntSeries<int>([10, 20, 30], labels: [1, 2, 3]);
       final res = series1.add(series2);
       expect(res.labels, [1, 2, 2, 3]);
       expect(res.data, [11, 22, 23, 34]);
     });
 
     test('add dup2', () {
-      final series1 = new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
+      final series1 = IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]);
       final series2 =
-          new IntSeries<int>([10, 20, 30, 40], labels: [1, 2, 2, 3]);
+          IntSeries<int>([10, 20, 30, 40], labels: [1, 2, 2, 3]);
       final res = series1.add(series2);
       expect(res.labels, [1, 2, 2, 3]);
       expect(res.data, [11, 22, 33, 44]);

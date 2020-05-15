@@ -6,7 +6,7 @@ void main() {
     setUp(() {});
 
     test('drop.inplace', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4],
+      final s1 = IntSeries<String>([1, 2, 3, 4],
           labels: ['zero', 'one', 'two', 'three']);
 
       s1.drop('two');
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('dropMany', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4],
+      final s1 = IntSeries<String>([1, 2, 3, 4],
           labels: ['zero', 'one', 'two', 'three']);
 
       s1.dropMany(['zero', 'one']);
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('remove', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4],
+      final s1 = IntSeries<String>([1, 2, 3, 4],
           labels: ['zero', 'one', 'two', 'three']);
 
       s1.remove(2);
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('removeMany', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4],
+      final s1 = IntSeries<String>([1, 2, 3, 4],
           labels: ['zero', 'one', 'two', 'three']);
 
       s1.removeMany([0, 1]);

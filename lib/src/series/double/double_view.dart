@@ -17,28 +17,29 @@ class DoubleSeriesView<LT> extends Object
       : _mapper = labelsToMapper(labels);
 
   factory DoubleSeriesView(Iterable<double> data, {name, Iterable<LT> labels}) {
-    Double1DView d = new Double1DView(data);
+    Double1DView d = Double1DView(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new DoubleSeriesView._build(madeLabels, d, name);
+    return DoubleSeriesView._build(madeLabels, d, name);
   }
 
-  factory DoubleSeriesView.fromNums(Iterable<num> data, {name, Iterable<LT> labels}) {
-    Double1DView d = new Double1DView.fromNums(data);
+  factory DoubleSeriesView.fromNums(Iterable<num> data,
+      {name, Iterable<LT> labels}) {
+    Double1DView d = Double1DView.fromNums(data);
     final List<LT> madeLabels = makeLabels<LT>(d.length, labels);
-    return new DoubleSeriesView._build(madeLabels, d, name);
+    return DoubleSeriesView._build(madeLabels, d, name);
   }
 
   factory DoubleSeriesView.constant(double data,
           {name, Iterable<LT> labels, int length}) =>
-      new DoubleSeriesView(
+      DoubleSeriesView(
           ranger.ConstantIterable<double>(data, length ?? labels.length),
           name: name,
           labels: labels);
 
   factory DoubleSeriesView.fromMap(Map<LT, double> map, {dynamic name}) {
-    final labels = new List<LT>(map.length);
-    final data = new Double1D.sized(map.length);
-    final mapper = new SplayTreeMap<LT, int>();
+    final labels = List<LT>(map.length);
+    final data = Double1D.sized(map.length);
+    final mapper = SplayTreeMap<LT, int>();
 
     for (int i = 0; i < map.length; i++) {
       LT label = map.keys.elementAt(i);
@@ -46,11 +47,11 @@ class DoubleSeriesView<LT> extends Object
       data[i] = map[label];
       mapper[label] = i;
     }
-    return new DoubleSeriesView._(labels, data, name, mapper);
+    return DoubleSeriesView._(labels, data, name, mapper);
   }
 
   factory DoubleSeriesView.copy(SeriesView<LT, double> series) =>
-      new DoubleSeriesView<LT>(series.data,
+      DoubleSeriesView<LT>(series.data,
           name: series.name, labels: series.labels);
 
   String get name => _name is Function ? _name() : _name;

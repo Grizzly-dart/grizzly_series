@@ -9,8 +9,8 @@ void main() {
     setUp(() {});
 
     test('add', () {
-      final s1 = new IntSeries<int>([1, 2, 3, 4]);
-      final s2 = new IntSeries<int>([1, 2, 3, 4]);
+      final s1 = IntSeries<int>([1, 2, 3, 4]);
+      final s2 = IntSeries<int>([1, 2, 3, 4]);
 
       final IntSeries<int> s3 = s1 + s2;
 
@@ -19,9 +19,9 @@ void main() {
     });
 
     test('add.StrIndex', () {
-      final s1 = new IntSeries<String>([1, 2, 3, 4],
+      final s1 = IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'two', 'three', 'four']);
-      final s2 = new IntSeries<String>([1, 2, 3, 4],
+      final s2 = IntSeries<String>([1, 2, 3, 4],
           labels: ['one', 'three', 'four', 'two']);
 
       final IntSeries<String> s3 = s1 + s2;
@@ -33,8 +33,8 @@ void main() {
     });
 
     test('gt', () {
-      final s1 = new IntSeries<int>([1, 2, 3, 4, 5]);
-      final s2 = new IntSeries<int>([5, 4, 3, 2, 1]);
+      final s1 = IntSeries<int>([1, 2, 3, 4, 5]);
+      final s2 = IntSeries<int>([5, 4, 3, 2, 1]);
 
       final BoolSeries<int> s3 = s1 > s2;
 
@@ -49,8 +49,8 @@ void main() {
     });
 
     test('lt', () {
-      final s1 = new IntSeries<int>([1, 2, 3, 4, 5]);
-      final s2 = new IntSeries<int>([5, 4, 3, 2, 1]);
+      final s1 = IntSeries<int>([1, 2, 3, 4, 5]);
+      final s2 = IntSeries<int>([5, 4, 3, 2, 1]);
 
       final BoolSeries<int> s3 = s1 < s2;
 

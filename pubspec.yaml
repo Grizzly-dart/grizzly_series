@@ -9,14 +9,13 @@ environment:
 
 dependencies:
   grizzly_array:
-    path: ../grizzly_array
-  #grizzly_primitives: ^0.4.2
+  grizzly_primitives: ^0.4.2
   text_table: ^2.6.0
 
 dev_dependencies:
   test: ^1.14.3
 
-dev_dependency_overrides:
+dependency_overrides:
   grizzly_primitives:
     path: ../grizzly_primitives
   grizzly_array:
