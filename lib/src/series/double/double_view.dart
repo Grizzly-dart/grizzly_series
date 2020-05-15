@@ -31,7 +31,7 @@ class DoubleSeriesView<LT> extends Object
   factory DoubleSeriesView.constant(double data,
           {name, Iterable<LT> labels, int length}) =>
       new DoubleSeriesView(
-          new ConstantIterable<double>(data, length ?? labels.length),
+          ranger.ConstantIterable<double>(data, length ?? labels.length),
           name: name,
           labels: labels);
 

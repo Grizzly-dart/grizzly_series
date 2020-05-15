@@ -18,9 +18,9 @@ void main() {
       expect(s['one'], 'ett');
       expect(s['two'], 'två');
       expect(s['three'], 'tre');
-      expect(() => s['four'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s['four'], throwsA(isA<LabelNotFound>()));
       expect(s.get('one'), 'ett');
-      expect(() => s.get('four'), throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s.get('four'), throwsA(isA<LabelNotFound>()));
       expect(s.getByPos(1), 'två');
       expect(s.labelAt(1), 'two');
       expect(s.posOf('two'), 1);
@@ -43,9 +43,9 @@ void main() {
       expect(s['one'], 'ett');
       expect(s['two'], 'två');
       expect(s['three'], 'tre');
-      expect(() => s['four'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s['four'], throwsA(isA<LabelNotFound>()));
       expect(s.get('one'), 'ett');
-      expect(() => s.get('four'), throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s.get('four'), throwsA(isA<LabelNotFound>()));
       expect(s.getByPos(1), 'två');
       expect(s.labelAt(1), 'two');
       expect(s.posOf('two'), 1);

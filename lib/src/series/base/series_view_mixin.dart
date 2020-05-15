@@ -38,7 +38,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   }
 
   Iterable<Pair<LT, VT>> get enumerate =>
-      Ranger.indices(length - 1).map(pairByPos);
+      ranger.indices(length - 1).map(pairByPos);
 
   Iterable<Pair<LT, VT>> enumerateSliced(int start, [int end]) {
     if (end == null)
@@ -53,7 +53,7 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return Ranger.between(start, end).map(pairByPos);
+    return ranger.between(start, end).map(pairByPos);
   }
 
   Series<int, VT> mode() {

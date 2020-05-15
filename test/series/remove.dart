@@ -13,7 +13,7 @@ void main() {
 
       expect(s1['zero'], 1);
       expect(s1['one'], 2);
-      expect(() => s1['two'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s1['two'], throwsA(isA<LabelNotFound>()));
       expect(s1['three'], 4);
     });
 
@@ -23,8 +23,8 @@ void main() {
 
       s1.dropMany(['zero', 'one']);
 
-      expect(() => s1['zero'], throwsA(new isInstanceOf<LabelNotFound>()));
-      expect(() => s1['one'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s1['zero'], throwsA(isA<LabelNotFound>()));
+      expect(() => s1['one'], throwsA(isA<LabelNotFound>()));
       expect(s1['two'], 3);
       expect(s1['three'], 4);
     });
@@ -37,7 +37,7 @@ void main() {
 
       expect(s1['zero'], 1);
       expect(s1['one'], 2);
-      expect(() => s1['two'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s1['two'], throwsA(isA<LabelNotFound>()));
       expect(s1['three'], 4);
     });
 
@@ -47,8 +47,8 @@ void main() {
 
       s1.removeMany([0, 1]);
 
-      expect(() => s1['zero'], throwsA(new isInstanceOf<LabelNotFound>()));
-      expect(() => s1['one'], throwsA(new isInstanceOf<LabelNotFound>()));
+      expect(() => s1['zero'], throwsA(isA<LabelNotFound>()));
+      expect(() => s1['one'], throwsA(isA<LabelNotFound>()));
       expect(s1['two'], 3);
       expect(s1['three'], 4);
     });

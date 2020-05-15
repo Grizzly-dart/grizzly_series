@@ -5,6 +5,7 @@ import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:collection/collection.dart';
 import 'package:grizzly_array/grizzly_array.dart';
+import 'package:grizzly_range/grizzly_range.dart' as ranger;
 
 import 'package:text_table/text_table.dart';
 

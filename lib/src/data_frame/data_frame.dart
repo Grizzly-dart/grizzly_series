@@ -6,6 +6,7 @@ import 'package:grizzly_array/grizzly_array.dart';
 import 'package:grizzly_primitives/grizzly_primitives.dart';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:grizzly_series/src/utils/utils.dart';
+import 'package:grizzly_range/grizzly_range.dart' as ranger;
 import 'package:collection/collection.dart';
 
 import 'package:text_table/text_table.dart';
@@ -426,7 +427,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       pair<LT, DynamicSeriesViewBase<String>>(label, getByLabel(label));
 
   Iterable<Pair<LT, DynamicSeriesViewBase<String>>> get enumerate =>
-      Ranger.indices(numRows).map(pairByPos);
+      ranger.indices(numRows).map(pairByPos);
 
   Iterable<Pair<LT, DynamicSeriesViewBase<String>>> enumerateSliced(int start,
       [int end]) {
@@ -442,7 +443,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
       throw new ArgumentError.value(start, 'start', 'Out of range');
     }
 
-    return Ranger.between(start, end).map(pairByPos);
+    return ranger.between(start, end).map(pairByPos);
   }
 
   String toString() {

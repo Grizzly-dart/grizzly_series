@@ -18,7 +18,7 @@ void main() {
 
     test('duplicate exception', () {
       expect(() => new IntSeries<int>([1, 2, 3, 4], labels: [1, 2, 2, 3]),
-          throwsA(new isInstanceOf<Exception>()));
+          throwsA(isA<Exception>()));
     });
 
     test('Subscript operator with String index', () {

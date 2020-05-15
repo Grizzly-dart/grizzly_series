@@ -26,7 +26,7 @@ class DynamicSeriesView<LT> extends Object
   factory DynamicSeriesView.constant(dynamic data,
           {name, Iterable<LT> labels, int length}) =>
       new DynamicSeriesView(
-          new ConstantIterable<dynamic>(data, length ?? labels.length),
+          ranger.ConstantIterable<dynamic>(data, length ?? labels.length),
           name: name,
           labels: labels);
 

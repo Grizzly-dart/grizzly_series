@@ -25,7 +25,7 @@ class StringSeriesView<LT> extends Object
   factory StringSeriesView.constant(String data,
           {name, Iterable<LT> labels, int length}) =>
       new StringSeriesView(
-          new ConstantIterable<String>(data, length ?? labels.length),
+          ranger.ConstantIterable<String>(data, length ?? labels.length),
           name: name,
           labels: labels);
 

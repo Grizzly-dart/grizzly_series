@@ -25,7 +25,7 @@ class BoolSeriesView<LT> extends Object
   factory BoolSeriesView.constant(bool data,
           {name, Iterable<LT> labels, int length}) =>
       new BoolSeriesView(
-          new ConstantIterable<bool>(data, length ?? labels.length),
+          ranger.ConstantIterable<bool>(data, length ?? labels.length),
           name: name,
           labels: labels);
 
