@@ -15,6 +15,16 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
     return data[_mapper[label]];
   }
 
+  void ensureLabels(/* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled) labels = labels.labels;
+
+    for (final label in labels) {
+      if (containsLabel(label)) continue;
+
+      throw Exception('Cannot add new label to series view');
+    }
+  }
+
   VT get(LT label) => this[label];
 
   VT getByPos(int position) {
@@ -30,17 +40,18 @@ abstract class SeriesViewMixin<LT, VT> implements SeriesView<LT, VT> {
   @override
   int posOf(LT label) => _mapper[label];
 
-  Pair<LT, VT> pairByLabel(LT label) => pair<LT, VT>(label, this[label]);
+  MapEntry<LT, VT> pairByLabel(LT label) =>
+      MapEntry<LT, VT>(label, this[label]);
 
-  Pair<LT, VT> pairByPos(int position) {
+  MapEntry<LT, VT> pairByPos(int position) {
     if (position >= length) throw RangeError.range(position, 0, length);
-    return pair<LT, VT>(labels.elementAt(position), data[position]);
+    return MapEntry<LT, VT>(labels.elementAt(position), data[position]);
   }
 
-  Iterable<Pair<LT, VT>> get enumerate =>
+  Iterable<MapEntry<LT, VT>> get enumerate =>
       ranger.indices(length - 1).map(pairByPos);
 
-  Iterable<Pair<LT, VT>> enumerateSliced(int start, [int end]) {
+  Iterable<MapEntry<LT, VT>> enumerateSliced(int start, [int end]) {
     if (end == null)
       end = length - 1;
     else {

@@ -12,6 +12,16 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
     _data[_mapper[label]] = value;
   }
 
+  void ensureLabels(/* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled) labels = labels.labels;
+
+    for (final label in labels) {
+      if (containsLabel(label)) continue;
+
+      throw Exception('Cannot add new label to Fixed series');
+    }
+  }
+
   void set(LT label, VT value) => this[label] = value;
 
   void setByPos(int position, VT value) {

@@ -51,9 +51,12 @@ class DataFrame<LT> implements DataFrameBase<LT> {
   @override
   bool containsLabel(LT label) => _mapper.containsKey(label);
 
-  void ensureLabel(Iterable<LT> labels) {
-    for(final label in labels) {
-      if(containsLabel(label)) continue;
+  @override
+  void ensureLabels(/* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled) labels = labels.labels;
+
+    for (final label in labels) {
+      if (containsLabel(label)) continue;
 
       append(label, List.generate(numCols, (index) => null));
     }
@@ -227,7 +230,7 @@ class DataFrame<LT> implements DataFrameBase<LT> {
           _data.add(DynamicSeries<LT>([value[colname]],
               name: colname, labels: <LT>[label]));
         }
-      } else if(value is Iterable) {
+      } else if (value is Iterable) {
         // Do nothing
       } else {
         throw UnsupportedError('Type not supported!');
@@ -432,19 +435,20 @@ class DataFrame<LT> implements DataFrameBase<LT> {
 
   bool containsColumn(String column) => _columns.contains(column);
 
-  Pair<LT, DynamicSeriesFixBase<String>> pairByPos(int position) {
+  MapEntry<LT, DynamicSeriesFixBase<String>> pairByPos(int position) {
     if (position >= numRows) throw RangeError.range(position, 0, numRows);
-    return pair<LT, DynamicSeriesFixBase<String>>(
+    return MapEntry<LT, DynamicSeriesFixBase<String>>(
         _labels[position], getByPos(position));
   }
 
-  Pair<LT, DynamicSeriesViewBase<String>> pairByLabel(LT label) =>
-      pair<LT, DynamicSeriesViewBase<String>>(label, getByLabel(label));
+  MapEntry<LT, DynamicSeriesViewBase<String>> pairByLabel(LT label) =>
+      MapEntry<LT, DynamicSeriesViewBase<String>>(label, getByLabel(label));
 
-  Iterable<Pair<LT, DynamicSeriesViewBase<String>>> get enumerate =>
+  Iterable<MapEntry<LT, DynamicSeriesViewBase<String>>> get enumerate =>
       ranger.indices(numRows).map(pairByPos);
 
-  Iterable<Pair<LT, DynamicSeriesViewBase<String>>> enumerateSliced(int start,
+  Iterable<MapEntry<LT, DynamicSeriesViewBase<String>>> enumerateSliced(
+      int start,
       [int end]) {
     if (end == null)
       end = numRows - 1;

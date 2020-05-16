@@ -7,6 +7,16 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
 
   SplayTreeMap<LT, int> get _mapper;
 
+  void ensureLabels(/* Labeled<LT> | Iterable<LT> */ labels) {
+    if (labels is Labeled) labels = labels.labels;
+
+    for (final label in labels) {
+      if (containsLabel(label)) continue;
+
+      append(label, null);
+    }
+  }
+
   operator []=(LT label, VT value) {
     if (!_mapper.containsKey(label)) {
       _labels.add(label);
@@ -149,21 +159,21 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
   }
 
   void sortByValue({bool descending: false}) {
-    final items = List<Pair<LT, VT>>(length);
+    final items = List<MapEntry<LT, VT>>(length);
     for (int i = 0; i < length; i++) {
-      items[i] = Pair<LT, VT>(labels.elementAt(i), data[i]);
+      items[i] = MapEntry<LT, VT>(labels.elementAt(i), data[i]);
     }
 
     if (!descending) {
-      items.sort(
-          (Pair<LT, VT> a, Pair<LT, VT> b) => compareValue(a.value, b.value));
+      items.sort((MapEntry<LT, VT> a, MapEntry<LT, VT> b) =>
+          compareValue(a.value, b.value));
     } else {
-      items.sort(
-          (Pair<LT, VT> a, Pair<LT, VT> b) => compareValue(b.value, a.value));
+      items.sort((MapEntry<LT, VT> a, MapEntry<LT, VT> b) =>
+          compareValue(b.value, a.value));
     }
 
     for (int i = 0; i < items.length; i++) {
-      Pair<LT, VT> item = items[i];
+      MapEntry<LT, VT> item = items[i];
       _labels[i] = item.key;
       _data[i] = item.value;
       _mapper[item.key] = i;

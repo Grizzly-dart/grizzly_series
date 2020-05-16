@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:grizzly_series/grizzly_series.dart';
 import 'package:test/test.dart';
 
@@ -57,7 +56,7 @@ void main() {
       final df = DataFrame<String>({});
       expect(df.numRows, 0);
 
-      df.ensureLabel(List.generate(1000, (i) => i.toString()));
+      df.ensureLabels(List.generate(1000, (i) => i.toString()));
       expect(df.numRows, 1000);
     });
   });
