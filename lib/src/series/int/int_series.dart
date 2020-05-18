@@ -6,7 +6,7 @@ class IntSeries<LT> extends Object
         SeriesFixMixin<LT, int>,
         SeriesMixin<LT, int>,
         IntSeriesFixMixin<LT>
-    implements IntSeriesFix<LT>, NumericSeries<LT, int> {
+    implements IntNumericSeries<LT>, IntSeriesFix<LT>, NumericSeries<LT, int> {
   final List<LT> _labels;
 
   final Int1D _data;
@@ -108,20 +108,20 @@ class IntSeries<LT> extends Object
 
   double get std => data.std;
 
-  NumericSeries<LT, double> get log =>
+  DoubleNumericSeries<LT> get log =>
       DoubleSeries(data.log, name: name, labels: labels);
 
-  NumericSeries<LT, double> get log10 =>
+  DoubleNumericSeries<LT> get log10 =>
       DoubleSeries(data.log10, name: name, labels: labels);
 
-  NumericSeries<LT, double> logN(num n) =>
+  DoubleNumericSeries<LT> logN(num n) =>
       DoubleSeries(data.logN(n), name: name, labels: labels);
 
-  NumericSeries<LT, double> get exp =>
+  DoubleNumericSeries<LT> get exp =>
       DoubleSeries(data.exp, name: name, labels: labels);
 
-  NumericSeries<LT, double> get abs =>
-      DoubleSeries.fromNums(data.abs(), name: name, labels: labels);
+  IntNumericSeries<LT> get abs =>
+      IntSeries<LT>.fromNums(data.abs(), name: name, labels: labels);
 
   DoubleSeries<LT> toDouble() =>
       DoubleSeries<LT>(data.toDouble(), name: name, labels: labels.toList());

@@ -199,7 +199,7 @@ abstract class SeriesMixin<LT, VT> implements Series<LT, VT> {
     }
 
     _labels.replaceRange(0, _labels.length, labs);
-    _data.assign = d;
+    _data.setAll = d;
     _mapper.clear();
     _mapper.addAll(mapper);
   }

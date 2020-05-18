@@ -1,15 +1,11 @@
 part of grizzly.series;
 
 abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
-  List<LT> get _labels;
-
-  ArrayFix<VT> get _data;
-
   SplayTreeMap<LT, int> get _mapper;
 
   operator []=(LT label, VT value) {
     if (!_mapper.containsKey(label)) throw labelNotFound(label);
-    _data[_mapper[label]] = value;
+    data[_mapper[label]] = value;
   }
 
   void ensureLabels(/* Labeled<LT> | Iterable<LT> */ labels) {
@@ -26,7 +22,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
 
   void setByPos(int position, VT value) {
     if (position >= length) throw RangeError.range(position, 0, length);
-    _data[position] = value;
+    data[position] = value;
   }
 
   void assign(/* Series<LT, VT> | Iterable<VT> */ other) {
@@ -34,7 +30,7 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
       for (LT label in other.labels) {
         if (containsLabel(label)) {
           final int sourcePos = _mapper[label];
-          _data[sourcePos] = other[label];
+          data[sourcePos] = other[label];
         }
       }
     } else if (other is Iterable<VT>) {
@@ -42,11 +38,11 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
         throw lengthMismatch(
             expected: length, found: other.length, subject: 'other');
       for (int i = 0; i < length; i++) {
-        _data[i] = other.elementAt(i);
+        data[i] = other.elementAt(i);
       }
     } else if (other is VT) {
       for (int i = 0; i < length; i++) {
-        _data[i] = other;
+        data[i] = other;
       }
     } else {
       throw UnsupportedError('Type not supported!');
@@ -57,14 +53,15 @@ abstract class SeriesFixMixin<LT, VT> implements SeriesFix<LT, VT> {
     for (LT label in other.keys) {
       if (containsLabel(label)) {
         final int sourcePos = _mapper[label];
-        _data[sourcePos] = other[label];
+        data[sourcePos] = other[label];
       }
     }
   }
 
-  void apply(VT func(VT value)) {
+  void apply(VT func(VT value), {bool ignoreNull = true}) {
     for (int i = 0; i < length; i++) {
-      _data[i] = func(_data[i]);
+      if (data[i] == null) continue;
+      data[i] = func(data[i]);
     }
   }
 

@@ -34,20 +34,20 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
 
   double get std => data.std;
 
-  NumericSeries<LT, double> get log =>
+  DoubleNumericSeries<LT> get log =>
       DoubleSeries(data.log, name: name, labels: labels);
 
-  NumericSeries<LT, double> get log10 =>
+  DoubleNumericSeries<LT> get log10 =>
       DoubleSeries(data.log10, name: name, labels: labels);
 
-  NumericSeries<LT, double> logN(num n) =>
+  DoubleNumericSeries<LT> logN(num n) =>
       DoubleSeries(data.logN(n), name: name, labels: labels);
 
-  NumericSeries<LT, double> get exp =>
+  DoubleNumericSeries<LT> get exp =>
       DoubleSeries(data.exp, name: name, labels: labels);
 
-  NumericSeries<LT, double> get abs =>
-      DoubleSeries.fromNums(data.abs(), name: name, labels: labels);
+  IntNumericSeries<LT> get abs =>
+      IntSeries<LT>.fromNums(data.abs(), name: name, labels: labels);
 
   DoubleSeries<LT> toDouble() =>
       DoubleSeries<LT>(data.toDouble(), name: name, labels: labels.toList());
@@ -236,5 +236,10 @@ abstract class IntSeriesViewMixin<LT> implements NumericSeriesView<LT, int> {
       return BoolSeries<LT>(data < other, name: name, labels: labels);
     }
     throw UnimplementedError();
+  }
+
+  DoubleSeries<LT> normalized() {
+    int s = sum;
+    return DoubleSeries<LT>(this.data.map((e) => e/s), labels: labels);
   }
 }

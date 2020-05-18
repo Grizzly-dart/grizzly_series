@@ -1,7 +1,6 @@
 part of grizzly.series;
 
-abstract class DoubleSeriesFixMixin<LT>
-    implements NumericSeriesFix<LT, double> {
+abstract class DoubleSeriesFixMixin<LT> implements DoubleNumericSeriesFix<LT> {
   @override
   void addition(
       /* E | NumericSeriesView<E> | Iterable<E> */ other) {
@@ -86,6 +85,37 @@ abstract class DoubleSeriesFixMixin<LT>
   void truncDiv(
           /* E | IterView<E> | NumericSeriesView<E> | Iterable<E> */ other) =>
       divide(other);
+
+  DoubleSeries<LT> normalized() {
+    double s = sum;
+    return DoubleSeries<LT>(this.data.map((e) => e / s), labels: labels);
+  }
+
+  void absSelf() {
+    apply((value) => value.abs());
+  }
+
+  void normalizeSelf() {
+    double s = sum;
+    apply((value) => value / s);
+  }
+
+  void logSelf() {
+    apply((value) => math.log(value));
+  }
+
+  void log10Self() {
+    apply((value) => math.log(value) / math.ln10);
+  }
+
+  void logNSelf(num n) {
+    final logOfN = math.log(n);
+    apply((value) => math.log(value) / logOfN);
+  }
+
+  void expSelf() {
+    apply((value) => math.exp(value));
+  }
 }
 
 class DoubleSeriesFix<LT> extends Object
@@ -93,7 +123,10 @@ class DoubleSeriesFix<LT> extends Object
         SeriesViewMixin<LT, double>,
         SeriesFixMixin<LT, double>,
         DoubleSeriesFixMixin<LT>
-    implements DoubleSeriesView<LT>, NumericSeriesFix<LT, double> {
+    implements
+        DoubleNumericSeriesFix<LT>,
+        DoubleSeriesView<LT>,
+        NumericSeriesFix<LT, double> {
   final List<LT> _labels;
 
   final Double1DFix _data;
@@ -195,19 +228,19 @@ class DoubleSeriesFix<LT> extends Object
 
   double get std => data.std;
 
-  NumericSeries<LT, double> get log =>
+  DoubleNumericSeries<LT> get log =>
       DoubleSeries(data.log, name: name, labels: labels);
 
-  NumericSeries<LT, double> get log10 =>
+  DoubleNumericSeries<LT> get log10 =>
       DoubleSeries(data.log10, name: name, labels: labels);
 
-  NumericSeries<LT, double> logN(num n) =>
+  DoubleNumericSeries<LT> logN(num n) =>
       DoubleSeries(data.logN(n), name: name, labels: labels);
 
-  NumericSeries<LT, double> get exp =>
+  DoubleNumericSeries<LT> get exp =>
       DoubleSeries(data.exp, name: name, labels: labels);
 
-  NumericSeries<LT, double> get abs =>
+  DoubleNumericSeries<LT> get abs =>
       DoubleSeries(data.abs(), name: name, labels: labels);
 
   DoubleSeries<LT> toDouble() =>

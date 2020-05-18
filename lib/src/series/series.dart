@@ -1,5 +1,6 @@
 library grizzly.series;
 
+import 'dart:math' as math;
 import 'dart:collection';
 import 'package:grizzly_series/src/utils/utils.dart';
 import 'package:grizzly_series/grizzly_series.dart';
